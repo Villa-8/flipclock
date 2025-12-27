@@ -1,0 +1,34 @@
+name: Deploy FlipClock and Fast Index
+on:
+  push:
+    branches: ["main"] # Or your master branch
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.' # If your index.html is in the main folder
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      # PROFESSIONAL STEP: Force Google to see the update
+      - name: Fast Index Ping
+        run: |
+          curl "https://www.google.com/ping?sitemap=https://villa-8.github.io/flipclock/sitemap.xml"
