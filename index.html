@@ -227,11 +227,17 @@
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/flipclock/sw.js')
-                    .then(reg => console.log('Service Worker Registered'))
-                    .catch(err => console.log('Registration Failed', err));
+                navigator.serviceWorker.register('/flipclock/sw.js', { scope: '/flipclock/' })
+                .then(reg => {
+                    console.log('Service Worker registered! Scope:', reg.scope);
+                })
+                .catch(err => {
+                    console.error('Service Worker registration failed:', err);
+                });
             });
         }
     </script>
+</body>
+</html>
 </body>
             </html>
