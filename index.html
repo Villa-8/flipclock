@@ -223,14 +223,14 @@
         function playMusic(s) { const a = document.getElementById('v8-audio'); if(!s){a.pause(); return;} a.src=s; a.play(); }
         function copyLink() { navigator.clipboard.writeText(window.location.href); alert("Link Copied!"); }
     </script>
-    <script>
-  if ('serviceWorker' in navigator) {
+     <script>
+         if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('/flipclock/sw.js')
         .then(reg => console.log('Service Worker Registered'))
         .catch(err => console.log('Registration Failed', err));
-    });
-  }
-</script>
+        });
+        }
+     </script>
 </body>
             </html>
