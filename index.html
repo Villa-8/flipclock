@@ -225,17 +225,28 @@
         
     </script>
     <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/flipclock/sw.js', { scope: '/flipclock/' })
-                .then(reg => {
-                    console.log('Service Worker registered! Scope:', reg.scope);
-                })
-                .catch(err => {
-                    console.error('Service Worker registration failed:', err);
-                });
-            });
-        }
+let v8Prompt;
+window.addEventListener('beforeinstallprompt',(e)=>{
+e.preventDefault();
+v8Prompt=e;
+});
+document.addEventListener('click',(e)=>{
+const btn=e.target.closest('#btn-install');
+if(!btn)return;
+if(v8Prompt){
+v8Prompt.prompt();
+v8Prompt=null;
+}else if(/iPad|iPhone|iPod/.test(navigator.userAgent)){
+alert("To Install: Tap 'Share' then 'Add to Home Screen'");
+}
+});
+if('serviceWorker' in navigator){
+window.addEventListener('load',()=>{
+navigator.serviceWorker.register('/flipclock/sw.js',{scope:'/flipclock/'})
+.then(reg=>console.log('PWA Ready:',reg.scope))
+.catch(err=>console.log('PWA Error:',err));
+});
+}
     </script>
 </body>
 </html>
