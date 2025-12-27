@@ -225,40 +225,19 @@
         
     </script>
     <script>
-  // Prevents layout shifting and irritating popups
-  let v8Prompt;
-
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    v8Prompt = e;
-  });
-
-  // Universal click handler - won't conflict with your clock code
-  document.addEventListener('click', (e) => {
-    const el = e.target.closest('#btn-install');
-    if (!el) return;
-
-    const isApple = /iPad|iPhone|iPod/.test(navigator.userAgent);
-
-    if (v8Prompt) {
-      v8Prompt.prompt();
-      v8Prompt = null;
-    } else if (isApple) {
-      alert("iOS Install: Tap 'Share' then 'Add to Home Screen'");
-    } else {
-      console.log("PWA already active or managed by browser bar.");
-    }
-  });
-
-  // Safe Service Worker Registration
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/flipclock/sw.js', { scope: '/flipclock/' })
-        .catch(err => console.warn('SW Error:', err));
-    });
-  }
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/flipclock/sw.js', { scope: '/flipclock/' })
+                .then(reg => {
+                    console.log('Service Worker registered! Scope:', reg.scope);
+                })
+                .catch(err => {
+                    console.error('Service Worker registration failed:', err);
+                });
+            });
+        }
     </script>
 </body>
 </html>
 </body>
-            </html>
+</html>
