@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us | Villa 8 Collective</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;400;800&family=Syncopate:wght@700&family=Cinzel:wght@800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --accent: #6366f1;
+            --bg: #020205;
+            --glass: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.08);
+        }
+
+        /* Basic Setup */
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+        body { 
+            background: var(--bg); 
+            color: #fff; 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            overflow-x: hidden;
+            line-height: 1.4;
+        }
+
+        /* Navigation */
+        .nav-fixed {
+            position: fixed; top: 0; left: 0; width: 100%; padding: 40px;
+            display: flex; justify-content: space-between; align-items: center; z-index: 100;
+        }
+        .back-btn { 
+            color: #fff; text-decoration: none; font-size: 10px; font-family: 'Syncopate'; 
+            letter-spacing: 3px; border: 1px solid rgba(255,255,255,0.2); padding: 10px 20px;
+            border-radius: 50px; transition: 0.3s;
+        }
+        .back-btn:hover { background: #fff; color: #000; }
+
+        /* Hero Section */
+        .hero {
+            height: 80vh; display: flex; flex-direction: column; justify-content: center;
+            padding: 0 10%; position: relative;
+        }
+        .hero-sub { font-family: 'Syncopate'; font-size: 12px; color: var(--accent); letter-spacing: 10px; margin-bottom: 20px; }
+        .hero-title { font-size: clamp(3rem, 12vw, 9rem); font-weight: 800; line-height: 0.9; letter-spacing: -5px; }
+
+        /* --- Huge Aim Section (3 Paragraphs) --- */
+        .aim-section { padding: 100px 10%; background: #000; border-top: 1px solid #111; }
+        .aim-label { font-family: 'Syncopate'; font-size: 10px; color: var(--accent); letter-spacing: 5px; margin-bottom: 50px; display: block; }
+        
+        .aim-container { display: flex; flex-direction: column; gap: 100px; }
+        .aim-para { font-size: clamp(1.5rem, 3vw, 2.8rem); font-weight: 200; line-height: 1.2; color: #fff; }
+        .aim-para span { color: var(--accent); font-weight: 800; }
+        .para-2 { opacity: 0.6; border-left: 3px solid var(--accent); padding-left: 40px; }
+        .para-3 { opacity: 0.3; }
+
+        /* Team Grid */
+        .section-label { padding: 120px 10% 40px; font-family: 'Syncopate'; font-size: 10px; opacity: 0.3; letter-spacing: 5px; }
+        .team-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            gap: 1px; background: var(--border);
+            border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+        }
+        .member-card { 
+            background: var(--bg); padding: 80px 40px; 
+            transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .member-card:hover { background: #080810; }
+        .member-card:hover h3 { color: var(--accent); transform: translateY(-5px); }
+        .member-card span { font-family: 'Syncopate'; font-size: 10px; opacity: 0.4; display: block; margin-bottom: 15px; }
+        .member-card h3 { font-size: 40px; font-weight: 800; letter-spacing: -2px; transition: 0.4s; }
+
+        /* Cinematic Lyric Theater */
+        .lyrics-section {
+            padding: 150px 10%; background: #050508;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start;
+        }
+        .sticky-meta h2 { font-size: 60px; font-weight: 800; line-height: 1; margin-bottom: 20px; }
+        
+        .lyrics-window { height: 500px; overflow-y: scroll; padding-right: 40px; scroll-behavior: smooth; }
+        .lyrics-window::-webkit-scrollbar { width: 0; }
+        
+        .lyric-line { 
+            font-size: 32px; font-weight: 800; margin-bottom: 40px; opacity: 0.05; 
+            transition: 0.6s; filter: blur(10px); transform: translateX(-30px);
+        }
+        .lyric-line.active { 
+            opacity: 1; filter: blur(0); transform: translateX(0); color: var(--accent); 
+        }
+
+        /* Footer */
+        .conclude { padding: 150px 10%; text-align: center; border-top: 1px solid #111; }
+        .conclude h2 { font-family: 'Cinzel'; font-size: 40px; color: var(--accent); }
+        .v8-tag { font-family: 'Syncopate'; font-size: 10px; opacity: 0.2; letter-spacing: 10px; margin-top: 20px; }
+
+        /* Fixed Audio Bar */
+        .audio-capsule {
+            position: fixed; bottom: 40px; right: 40px; background: rgba(10,10,15,0.8);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            padding: 20px 30px; border-radius: 100px;
+            border: 1px solid var(--border); display: flex; align-items: center; gap: 20px;
+            z-index: 1000; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+        .audio-capsule span { font-family: 'Syncopate'; font-size: 9px; letter-spacing: 2px; opacity: 0.6; }
+        audio { height: 30px; filter: invert(1); opacity: 0.5; }
+
+        @media (max-width: 900px) {
+            .lyrics-section { grid-template-columns: 1fr; }
+            .hero-title { font-size: 60px; }
+            .aim-para { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="nav-fixed">
+        <a href="index.html" class="back-btn">RETURN TO CLOCK</a>
+        <div style="font-family:'Syncopate'; font-size: 10px; opacity: 0.4;">VILLA 8 // 2025</div>
+    </nav>
+
+    <section class="hero">
+        <span class="hero-sub">THE COLLECTIVE</span>
+        <h1 class="hero-title">VILLA 8<br>TEAM.</h1>
+    </section>
+
+    <section class="aim-section">
+        <span class="aim-label">01 // MISSION STATEMENT</span>
+        <div class="aim-container">
+            <p class="aim-para para-1">
+                Our primary objective at <span>Villa 8</span> is to redefine the intersection of high-fidelity digital art and functional utility, creating a "Zen-state" environment for the modern student. We believe that time management should not be a chore, but rather an <span>immersive experience</span> that complements the user’s aesthetic.
+            </p>
+            <p class="aim-para para-2">
+                We recognize that the environment is just as important as the effort; therefore, our mission is to provide a platform where users can customize their digital workspace through our <span>Advanced Theme Engine</span>. We aren't just building a clock; we are building a sanctuary for focus, where design fosters deep flow.
+            </p>
+            <p class="aim-para para-3">
+                The Villa 8 Team is committed to the <span>V8 Protocol</span>, a standard of speed and cross-platform accessibility that ensures our tools are always fast and responsive. We aim to cultivate a community of high-performers who value the <span>beauty of simplicity</span> and the power of a focused atmosphere.
+            </p>
+        </div>
+    </section>
+
+    <div class="section-label">02 // THE TEAM</div>
+    <section class="team-grid">
+        <div class="member-card"><span>01 / CORE</span><h3>IBRAHIM</h3></div>
+        <div class="member-card"><span>02 / UI/UX</span><h3>ROSHAN</h3></div>
+        <div class="member-card"><span>03 / LOGIC</span><h3>ANEEN</h3></div>
+        <div class="member-card"><span>04 / STYLE</span><h3>NIDHAL</h3></div>
+        <div class="member-card"><span>05 / DEV</span><h3>HARI</h3></div>
+        <div class="member-card"><span>06 / AUDIO</span><h3>SCION</h3></div>
+        <div class="member-card"><span>07 / QA</span><h3>AKASH</h3></div>
+    </section>
+
+    <section class="lyrics-section">
+        <div class="sticky-meta">
+            <span class="hero-sub">V8 ANTHEM</span>
+            <h2>VILLA 8<br>VIBE.</h2>
+            <p style="opacity:0.4; margin-top: 30px; font-weight: 200;">Perfectly synchronized with the official collective track. Experience the rhythm of Villa 8.</p>
+        </div>
+
+        <div class="lyrics-window" id="lyrics-wrap">
+            <div class="lyric-line" data-time="0">Villa eight gang da, repeaters life da</div>
+            <div class="lyric-line" data-time="4">Study onnum illa, still full vibe da</div>
+            <div class="lyric-line" data-time="8">Laugh all day, no break da</div>
+            <div class="lyric-line" data-time="12">Malappuram blood, pure strike da</div>
+            <div class="lyric-line" data-time="16">Akash sigma look try cheyyum</div>
+            <div class="lyric-line" data-time="20">Mirror nokki pose, bunny face varum</div>
+            <div class="lyric-line" data-time="24">Anneen parayunna ellam full waste</div>
+            <div class="lyric-line" data-time="28">“Bro I know everything,” heavy taste</div>
+            <div class="lyric-line" data-time="32">Hari soft heart, peace mode aa</div>
+            <div class="lyric-line" data-time="36">Roshan bro, aunty lover fame</div>
+            <div class="lyric-line" data-time="40">Nidhal dark mind, space il thaan</div>
+            <div class="lyric-line" data-time="44">Ibrahim cry mood, snack gone bro</div>
+            <div class="lyric-line" data-time="48">Scion talk mix, half English half air</div>
+            <div class="lyric-line" data-time="52">Villa eight, repeaters great</div>
+            <div class="lyric-line" data-time="56">No study, still top rate</div>
+            <div class="lyric-line" data-time="60">Villa 8 forever — straight!</div>
+        </div>
+    </section>
+
+    <section class="conclude">
+        <h2>STAY FOCUSED.</h2>
+        <div class="v8-tag">VILLA 8 COLLECTIVE</div>
+    </section>
+
+    <div class="audio-capsule">
+        <span>PLAY ANTHEM</span>
+        <audio id="v8-player" controls src="Villa 8.mp3"></audio>
+    </div>
+
+    <script>
+        const audio = document.getElementById('v8-player');
+        const lines = document.querySelectorAll('.lyric-line');
+        const windowBox = document.getElementById('lyrics-wrap');
+
+        audio.addEventListener('timeupdate', () => {
+            let now = audio.currentTime;
+            lines.forEach(line => {
+                let timestamp = parseFloat(line.getAttribute('data-time'));
+                if (now >= timestamp) {
+                    // Reset all
+                    lines.forEach(l => l.classList.remove('active'));
+                    // Set active
+                    line.classList.add('active');
+                    
+                    // Perfect scroll sync
+                    windowBox.scrollTo({
+                        top: line.offsetTop - windowBox.offsetTop - 180,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+    </html>
