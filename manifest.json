@@ -2,6 +2,7 @@
   "name": "Flipclock",
   "short_name": "Clock",
   "description": "Villa 8 Clock - Professional Flip Clock with modern features and study themes.",
+  "id": "/flipclock/",
   "start_url": "/flipclock/index.html",
   "scope": "/flipclock/",
   "display": "standalone",
@@ -9,16 +10,44 @@
   "theme_color": "#ffffff",
   "dir": "ltr",
   "orientation": "any",
+  "categories": [
+    "utilities",
+    "productivity"
+  ],
   "icons": [
     {
-      "src": "https://villa-8.github.io/flipclock/icon-192.png",
+      "src": "icon-192.png",
       "type": "image/png",
-      "sizes": "192x192"
+      "sizes": "192x192",
+      "purpose": "any"
     },
     {
-      "src": "https://villa-8.github.io/flipclock/icon-512.png",
+      "src": "icon-512.png",
       "type": "image/png",
-      "sizes": "512x512"
+      "sizes": "512x512",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshot-mobile.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Mobile View of Flipclock"
+    },
+    {
+      "src": "screenshot-desktop.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Desktop View of Flipclock"
     }
   ]
 }
