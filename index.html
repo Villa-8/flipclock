@@ -225,28 +225,38 @@
         
     </script>
     <script>
-let v8Prompt;
-window.addEventListener('beforeinstallprompt',(e)=>{
-e.preventDefault();
-v8Prompt=e;
-});
-document.addEventListener('click',(e)=>{
-const btn=e.target.closest('#btn-install');
-if(!btn)return;
-if(v8Prompt){
-v8Prompt.prompt();
-v8Prompt=null;
-}else if(/iPad|iPhone|iPod/.test(navigator.userAgent)){
-alert("To Install: Tap 'Share' then 'Add to Home Screen'");
-}
-});
-if('serviceWorker' in navigator){
-window.addEventListener('load',()=>{
-navigator.serviceWorker.register('/flipclock/sw.js',{scope:'/flipclock/'})
-.then(reg=>console.log('PWA Ready:',reg.scope))
-.catch(err=>console.log('PWA Error:',err));
-});
-}
+  // Prevents layout shifting and irritating popups
+  let v8Prompt;
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    v8Prompt = e;
+  });
+
+  // Universal click handler - won't conflict with your clock code
+  document.addEventListener('click', (e) => {
+    const el = e.target.closest('#btn-install');
+    if (!el) return;
+
+    const isApple = /iPad|iPhone|iPod/.test(navigator.userAgent);
+
+    if (v8Prompt) {
+      v8Prompt.prompt();
+      v8Prompt = null;
+    } else if (isApple) {
+      alert("iOS Install: Tap 'Share' then 'Add to Home Screen'");
+    } else {
+      console.log("PWA already active or managed by browser bar.");
+    }
+  });
+
+  // Safe Service Worker Registration
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/flipclock/sw.js', { scope: '/flipclock/' })
+        .catch(err => console.warn('SW Error:', err));
+    });
+  }
     </script>
 </body>
 </html>
