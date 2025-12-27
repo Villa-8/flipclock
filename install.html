@@ -3,122 +3,165 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Install Flipclock - Villa 8</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>Reviews - Flipclock Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary: #ffffff;
-            --bg: #0f172a;
-            --card-bg: rgba(255, 255, 255, 0.05);
+            --bg: #050505;
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
             --accent: #38bdf8;
+            --text-sec: #a1a1aa;
         }
 
         body {
             margin: 0;
-            font-family: 'Inter', system-ui, sans-serif;
+            font-family: 'Inter', sans-serif;
             background-color: var(--bg);
-            color: var(--primary);
+            color: white;
             display: flex;
             justify-content: center;
-            align-items: center;
             min-height: 100vh;
-            background: radial-gradient(circle at top right, #1e293b, #0f172a);
+            background: radial-gradient(circle at 50% -20%, #1e293b, #050505);
+            padding: 20px;
         }
 
         .container {
-            text-align: center;
-            padding: 2rem;
-            max-width: 500px;
-            width: 90%;
+            max-width: 600px;
+            width: 100%;
+            margin-top: 50px;
         }
 
-        .logo-container {
+        .header { text-align: center; margin-bottom: 3rem; }
+        h1 { font-weight: 800; font-size: 2.5rem; margin: 0; letter-spacing: -1px; }
+        .rating-summary { color: #fbbf24; font-size: 1.2rem; margin-top: 10px; }
+
+        /* Review Form */
+        .review-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            padding: 2rem;
+            border-radius: 24px;
             margin-bottom: 2rem;
         }
 
-        .logo {
-            width: 120px;
-            height: 120px;
-            border-radius: 24px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
-            border: 2px solid var(--card-bg);
-        }
-
-        h1 { font-size: 2.5rem; margin-bottom: 0.5rem; letter-spacing: -1px; }
-        p { color: #94a3b8; margin-bottom: 2.5rem; }
-
-        .install-options {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            padding: 16px;
-            border-radius: 12px;
-            text-decoration: none;
-            color: white;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            background: var(--card-bg);
-            border: 1px solid rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
-        }
-
-        .btn:hover {
-            transform: translateY(-3px);
-            background: rgba(255,255,255,0.1);
-            border-color: var(--accent);
-        }
-
-        .android { border-left: 4px solid #3DDC84; }
-        .ios { border-left: 4px solid #A2AAAD; }
-        .windows { border-left: 4px solid #0078D4; }
-
-        .btn i { font-size: 1.5rem; }
+        .form-group { margin-bottom: 1.5rem; text-align: left; }
+        label { display: block; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--text-sec); }
         
-        .footer-link {
-            margin-top: 2rem;
-            display: block;
-            color: var(--accent);
-            text-decoration: none;
-            font-size: 0.9rem;
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            color: white;
+            font-family: inherit;
+            box-sizing: border-box;
         }
+
+        .star-rating {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .star-rating input { display: none; }
+        .star-rating label { font-size: 1.5rem; color: #333; cursor: pointer; transition: 0.2s; }
+        .star-rating input:checked ~ label { color: #fbbf24; }
+        .star-rating label:hover, .star-rating label:hover ~ label { color: #fbbf24; }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: white;
+            color: black;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .submit-btn:hover { background: var(--accent); color: white; transform: translateY(-2px); }
+
+        /* Review List (Static Examples) */
+        .review-item {
+            border-bottom: 1px solid var(--glass-border);
+            padding: 1.5rem 0;
+        }
+        .user-info { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .avatar { width: 35px; height: 35px; background: #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; }
+        .username { font-weight: 600; font-size: 0.95rem; }
+        .stars { color: #fbbf24; font-size: 0.8rem; }
+        .comment { color: var(--text-sec); font-size: 0.9rem; line-height: 1.5; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="logo-container">
-        <img src="icon-512.png" alt="Flipclock Logo" class="logo">
+    <div class="header">
+        <h1>User Reviews</h1>
+        <div class="rating-summary">
+            <i class="fas fa-star"></i> 4.9 <span style="color: var(--text-sec); font-size: 0.9rem;">(128 reviews)</span>
+        </div>
     </div>
 
-    <h1>Get Flipclock</h1>
-    <p>Choose your platform to install the official app.</p>
-
-    <div class="install-options">
-        <a href="https://villa-8.github.io/flipclock/index.html" class="btn android">
-            <i class="fab fa-android"></i>
-            <span>Install on Android</span>
-        </a>
-
-        <a href="https://villa-8.github.io/flipclock/index.html" class="btn ios">
-            <i class="fab fa-apple"></i>
-            <span>Install on iOS / iPhone</span>
-        </a>
-
-        <a href="https://villa-8.github.io/flipclock/index.html" class="btn windows">
-            <i class="fab fa-windows"></i>
-            <span>Install on Windows PC</span>
-        </a>
+    <div class="review-card">
+        <h3 style="margin-top:0">Write a Review</h3>
+        <form action="https://formspree.io/f/your-id" method="POST">
+            <div class="form-group">
+                <label>Rating</label>
+                <div class="star-rating">
+                    <input type="radio" id="5" name="rating" value="5"><label for="5">★</label>
+                    <input type="radio" id="4" name="rating" value="4"><label for="4">★</label>
+                    <input type="radio" id="3" name="rating" value="3"><label for="3">★</label>
+                    <input type="radio" id="2" name="rating" value="2"><label for="2">★</label>
+                    <input type="radio" id="1" name="rating" value="1"><label for="1">★</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Display Name</label>
+                <input type="text" name="name" placeholder="John Doe" required>
+            </div>
+            <div class="form-group">
+                <label>Your Feedback</label>
+                <textarea name="message" rows="4" placeholder="What do you think of the Flipclock?" required></textarea>
+            </div>
+            <button type="submit" class="submit-btn">Post Review</button>
+        </form>
     </div>
 
-    <a href="index.html" class="footer-link">Open Web Version →</a>
+    <div class="review-list">
+        <div class="review-item">
+            <div class="user-info">
+                <div class="avatar">JD</div>
+                <div>
+                    <div class="username">Alex Rivera</div>
+                    <div class="stars">★★★★★</div>
+                </div>
+            </div>
+            <p class="comment">The cleanest flip clock I've ever used. Looks amazing on my second monitor while I'm coding!</p>
+        </div>
+        
+        <div class="review-item">
+            <div class="user-info">
+                <div class="avatar">SM</div>
+                <div>
+                    <div class="username">Sarah Miller</div>
+                    <div class="stars">★★★★★</div>
+                </div>
+            </div>
+            <p class="comment">Love the aesthetic themes. It really helps me stay focused during study sessions.</p>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 30px;">
+        <a href="index.html" style="color: var(--text-sec); text-decoration: none; font-size: 0.9rem;">← Back to Clock</a>
+    </div>
 </div>
 
 </body>
-</html>
+                        </html>
