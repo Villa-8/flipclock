@@ -1,0 +1,27 @@
+{
+  "background_color": "#ffffff",
+  "description": "Villa 8 Clock - Professional Flip Clock with modern features and study themes.",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "Flipclock",
+  "orientation": "any",
+  "scope": "/",
+  "short_name": "Clock",
+  "start_url": "/",
+  "theme_color": "#ffffff",
+  "icons": [
+    {
+      "src": "https://villa-8.github.io/flipclock/favicon.ico",
+      "type": "image/x-icon",
+      "sizes": "2560x2560",
+      "isSquare": true,
+      "isPng": false,
+      "isWebp": false,
+      "isJpg": false,
+      "width": 2560,
+      "is512x512": false,
+      "is256x256": false,
+      "is192x192": false
+    }
+  ]
+}
