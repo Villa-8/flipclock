@@ -221,8 +221,12 @@
     </script>
     <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js');
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/flipclock/sw.js')
+        .then(reg => console.log('Service Worker Registered'))
+        .catch(err => console.log('Registration Failed', err));
+    });
   }
-    </script>
+</script>
 </body>
             </html>
