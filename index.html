@@ -32,11 +32,17 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
-        body { 
+        
+        /* Ensure the clock is the primary first view and fills the screen */
+        html, body { 
+            height: 100%;
+            width: 100%;
+            overflow-x: hidden;
             background: #000 var(--bg-url) no-repeat center center fixed; 
-            background-size: cover; color: #fff; font-family: 'Plus Jakarta Sans', sans-serif;
-            transition: 0.5s ease; overflow-x: hidden;
-            min-height: 100vh;
+            background-size: cover; 
+            color: #fff; 
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            transition: 0.5s ease;
         }
 
         /* --- Header --- */
@@ -86,7 +92,16 @@
         .timer-btn { background: var(--accent); font-weight: bold; cursor: pointer; border: none; margin-bottom: 5px; }
 
         /* --- Clock Canvas --- */
-        #clock-canvas { height: 100vh; display: flex; align-items: center; justify-content: center; touch-action: none; }
+        #clock-canvas { 
+            height: 100vh; 
+            width: 100vw;
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            touch-action: none; 
+            position: relative;
+            z-index: 1;
+        }
         .clock-scaler { transform: scale(var(--zoom)); transition: transform 0.1s linear; }
 
         .flip-clock-wrapper ul { width: 60px !important; height: 90px !important; margin: 3px !important; }
@@ -97,11 +112,10 @@
         }
         .flip-clock-dot { background: var(--accent) !important; box-shadow: 0 0 10px var(--accent); }
 
-        /* --- Fullscreen Behavior: Only Header & Sections Hide --- */
+        /* --- Fullscreen Behavior --- */
         :fullscreen header, :fullscreen section, :fullscreen footer, :fullscreen #install-banner { display: none !important; }
-        /* Toolbox stays accessible in Fullscreen via Swipe/Keyboard */
 
-        /* --- Q&A (Optimized Size) --- */
+        /* --- Q&A (Content below the fold) --- */
         section { padding: 100px 10%; background: #000; position: relative; z-index: 5; }
         .qa-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
         .qa-item { background: #070707; padding: 40px; border-radius: 15px; border: 1px solid #151515; }
@@ -114,7 +128,7 @@
 <body onclick="hideInstallBanner()">
 
     <div id="install-banner" onclick="event.stopPropagation();">
-        <span style="font-size: 11px; font-weight: 800; letter-spacing: 1px;">VILLA 8 APP</span>
+        <span style="font-size: 11px; font-weight: 800; letter-spacing: 1px;">VILLA 8 CLOCK APP</span>
         <button class="timer-btn" style="margin:0; width:auto; padding: 5px 15px;" onclick="installPWA()">INSTALL</button>
     </div>
 
@@ -175,7 +189,7 @@
             <div class="qa-item"><h3>03. Mobile Swipe</h3><p>Swipe left from the right edge to open tools. Swipe right to close them or the sidebar.</p></div>
             <div class="qa-item"><h3>04. Pinch Gesture</h3><p>Use two fingers to pinch-to-zoom. Compatible with iOS 14+ and all modern Android touch devices.</p></div>
             <div class="qa-item"><h3>05. Custom Timer</h3><p>Set specific study intervals in the toolbox. The clock will flip to a countdown mode automatically.</p></div>
-            <div class="qa-item"><h3>06. iOS 14 Integration</h3><p>Optimized for Apple's standalone web-app mode. 'Add to Home Screen' for a notch-friendly immersive experience.</p></div>
+            <div class="qa-item"><h3>06. iOS App Mode</h3><p>Tap the "Share" button in Safari and select "Add to Home Screen" to use the clock as a full-screen, notch-friendly app.</p></div>
             <div class="qa-item"><h3>07. Background Engine</h3><p>Paste any high-resolution image link to personalize your workspace background instantly.</p></div>
             <div class="qa-item"><h3>08. Ambient Audio</h3><p>Built-in focus tracks help mask distractions. Select your preferred wave frequency in the toolbox.</p></div>
             <div class="qa-item"><h3>09. Installation Prompt</h3><p>The install notification appears after 3 visits to ensure only regular users are prompted.</p></div>
@@ -190,6 +204,7 @@
         let clock, zoom = 1.2, pDist = 0, deferredPrompt;
 
         $(document).ready(function() {
+            // Start directly on the clock view
             clock = $('#v8-flip').FlipClock({ clockFace: 'TwentyFourHourClock' });
             
             let count = localStorage.getItem('v8_re') || 0;
@@ -197,6 +212,7 @@
             localStorage.setItem('v8_re', count);
             if(count >= 3) { setTimeout(() => $('#install-banner').addClass('show'), 3000); }
 
+            // Keyboard PC Controls
             window.addEventListener('keydown', e => {
                 if(e.key === '+' || e.key === '=') updateZoom(0.1);
                 if(e.key === '-' || e.key === '_') updateZoom(-0.1);
@@ -204,6 +220,7 @@
                 if(e.key === 'ArrowRight') { $('#toolbox').removeClass('open'); $('#sidebar').removeClass('active'); }
             });
 
+            // Touch Swiping & Pinch (iOS compatible)
             let sX = 0;
             window.addEventListener('touchstart', e => { 
                 sX = e.touches[0].clientX; 
@@ -265,14 +282,17 @@
         function playMusic(s) { const a = document.getElementById('v8-audio'); if(!s){a.pause(); return;} a.src=s; a.play(); }
         function hideInstallBanner() { $('#install-banner').removeClass('show'); }
 
+        // PWA Installation
         window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; });
         async function installPWA() {
             if (deferredPrompt) {
                 deferredPrompt.prompt();
                 const { outcome } = await deferredPrompt.userChoice;
                 if (outcome === 'accepted') deferredPrompt = null;
+            } else {
+                alert("To install on iOS: Tap 'Share' in Safari and select 'Add to Home Screen'.");
             }
         }
     </script>
 </body>
-            </html>
+    </html>
