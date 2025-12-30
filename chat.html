@@ -3,153 +3,156 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>VILLA-8 Chat</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>VILLA-8 Global Hub</title>
     <style>
         :root {
-            --bg-deep: #0e1621; /* Telegram Dark Mode Blue */
-            --bg-soft: #17212b;
-            --accent: #5288c1;
-            --sent-bubble: #2b5278;
-            --recv-bubble: #182533;
-            --text-main: #f5f5f5;
-            --text-dim: #708499;
+            --bg: #0f172a;        /* Deep Space Blue */
+            --sidebar: #1e293b;   /* Slate Blue */
+            --accent: #38bdf8;    /* Bright Sky Blue */
+            --sent: #0ea5e9;      /* Telegram Blue */
+            --recv: #334155;      /* Dark Slate */
+            --glass: rgba(15, 23, 42, 0.8);
         }
 
-        body {
-            margin: 0; background: var(--bg-deep); color: var(--text-main);
-            font-family: 'Inter', sans-serif; display: flex; overflow: hidden; height: 100vh;
+        * { box-sizing: border-box; }
+        body, html { 
+            margin: 0; padding: 0; height: 100%; width: 100%; 
+            background: var(--bg); color: #f8fafc; font-family: 'Segoe UI', Roboto, sans-serif;
+            overflow: hidden; /* Prevents whole page from bouncing on mobile */
         }
 
-        /* --- Sidebar --- */
-        #side-panel {
-            width: 300px; background: var(--bg-soft); border-right: 1px solid #101921;
-            display: flex; flex-direction: column; transition: 0.3s;
+        /* Main Layout */
+        .app-container { display: flex; height: 100vh; width: 100vw; }
+
+        /* Sidebar - Hidden on mobile by default */
+        #sidebar {
+            width: 280px; background: var(--sidebar); border-right: 1px solid #334155;
+            display: flex; flex-direction: column; transition: 0.3s; z-index: 1000;
         }
 
-        @media (max-width: 768px) { #side-panel { position: fixed; left: -300px; z-index: 100; height: 100%; } #side-panel.open { left: 0; } }
+        @media (max-width: 768px) {
+            #sidebar { position: fixed; left: -280px; height: 100%; }
+            #sidebar.open { left: 0; }
+        }
 
-        /* --- Main Chat Area --- */
-        #main-chat { flex: 1; display: flex; flex-direction: column; position: relative; }
+        /* Chat Viewport */
+        #chat-main { flex: 1; display: flex; flex-direction: column; position: relative; }
 
         header {
-            padding: 12px 20px; background: var(--bg-soft); display: flex; 
-            align-items: center; gap: 15px; border-bottom: 1px solid #101921;
+            height: 60px; background: var(--glass); backdrop-filter: blur(10px);
+            display: flex; align-items: center; padding: 0 20px; gap: 15px;
+            border-bottom: 1px solid #334155;
         }
 
+        /* Message Area - Independent Scrolling */
         #chat-scroll {
-            flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px;
-            background: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
+            flex: 1; overflow-y: auto; padding: 20px; display: flex; 
+            flex-direction: column; gap: 12px; scroll-behavior: smooth;
         }
 
-        /* --- Professional Telegram Bubbles --- */
-        .msg {
-            max-width: 70%; padding: 8px 12px; border-radius: 12px; font-size: 0.95rem;
-            position: relative; animation: slideUp 0.2s ease-out;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        /* Professional Telegram Bubbles */
+        .bubble {
+            max-width: 75%; padding: 10px 14px; border-radius: 18px; font-size: 0.95rem;
+            line-height: 1.5; position: relative; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
-        .sent { align-self: flex-end; background: var(--sent-bubble); border-bottom-right-radius: 4px; }
-        .received { align-self: flex-start; background: var(--recv-bubble); border-bottom-left-radius: 4px; }
+        .sent { align-self: flex-end; background: var(--sent); border-bottom-right-radius: 4px; }
+        .received { align-self: flex-start; background: var(--recv); border-bottom-left-radius: 4px; }
         
-        .user-label { color: var(--accent); font-weight: 600; font-size: 0.8rem; margin-bottom: 2px; display: block; }
-        .time { font-size: 0.7rem; color: var(--text-dim); margin-top: 4px; text-align: right; }
+        .sender { font-size: 0.75rem; font-weight: bold; color: var(--accent); display: block; margin-bottom: 3px; }
+        .time { font-size: 0.65rem; opacity: 0.6; float: right; margin-top: 5px; margin-left: 10px; }
 
-        /* --- Modern Input Bar --- */
-        .input-wrapper {
-            padding: 15px 20px; background: var(--bg-soft); display: flex; align-items: center; gap: 12px;
+        /* Reply Style (Visual indicator for specific replies) */
+        .reply-box { 
+            border-left: 3px solid var(--accent); background: rgba(255,255,255,0.05);
+            padding: 5px 10px; margin-bottom: 8px; border-radius: 4px; font-size: 0.85rem;
         }
 
-        .action-btn { background: none; border: none; font-size: 1.4rem; cursor: pointer; color: var(--text-dim); transition: 0.2s; }
-        .action-btn:hover { color: var(--accent); }
-
-        #msg-input {
-            flex: 1; background: var(--bg-deep); border: none; color: white;
-            padding: 12px 18px; border-radius: 20px; outline: none; font-size: 1rem;
+        /* FIX: BOTTOM INPUT BAR */
+        .input-area {
+            background: var(--sidebar); padding: 12px 20px; display: flex;
+            align-items: center; gap: 12px; border-top: 1px solid #334155;
         }
 
-        /* --- Admin UI --- */
-        .admin-box { background: #311b1b; padding: 10px; border-radius: 8px; margin: 10px; border: 1px solid #632a2a; }
+        .input-field {
+            flex: 1; background: #0f172a; border: 1px solid #475569; color: white;
+            padding: 12px 20px; border-radius: 25px; outline: none; transition: 0.2s;
+        }
+        .input-field:focus { border-color: var(--accent); }
 
-        /* --- Attachment Previews --- */
-        .media-box img, .media-box video { max-width: 100%; border-radius: 8px; margin-top: 8px; }
-        .file-link { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; display: block; text-decoration: none; color: var(--accent); margin-top: 5px; }
+        .icon-btn { background: none; border: none; font-size: 1.4rem; color: #94a3b8; cursor: pointer; }
+        .send-btn { color: var(--accent); font-weight: bold; }
 
-        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* Auth Gate */
+        #auth-screen {
+            position: fixed; inset: 0; background: var(--bg); z-index: 2000;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .login-card { background: var(--sidebar); padding: 40px; border-radius: 24px; width: 90%; max-width: 350px; text-align: center; border: 1px solid #334155; }
     </style>
 </head>
 <body>
 
-<div id="side-panel">
-    <div style="padding: 20px;">
-        <h2 style="color: var(--accent);">VILLA-8 HUB</h2>
-        <div id="user-info"></div>
-        <hr style="border: 0.5px solid #232e3b;">
-        <div class="sidebar-item" onclick="logout()" style="cursor:pointer; color: #e53935;">Logout</div>
-        
-        <div class="admin-box">
-            <p style="font-size: 0.8rem; margin: 0 0 5px;">Admin Controls</p>
-            <button onclick="adminClear()" style="width:100%; background:#e53935; border:none; color:white; padding:5px; border-radius:4px; cursor:pointer;">Clear History</button>
-        </div>
+<div id="auth-screen">
+    <div class="login-card">
+        <h1 style="color:var(--accent); letter-spacing: 2px;">VILLA-8</h1>
+        <input type="text" id="reg-name" placeholder="Username" class="input-field" style="width:100%; margin-bottom:15px;">
+        <input type="text" id="reg-id" placeholder="Email / Mobile" class="input-field" style="width:100%; margin-bottom:20px;">
+        <button onclick="login()" style="width:100%; background:var(--accent); border:none; padding:14px; border-radius:25px; color:black; font-weight:bold; cursor:pointer;">Start Chatting</button>
     </div>
 </div>
 
-<div id="main-chat">
-    <header>
-        <button class="action-btn" onclick="toggleMenu()">☰</button>
-        <div>
-            <div style="font-weight: 600;">Global Group</div>
-            <div style="font-size: 0.75rem; color: var(--accent);">Online</div>
+<div class="app-container">
+    <aside id="sidebar">
+        <div style="padding: 25px;">
+            <h2 style="color:var(--accent)">Settings</h2>
+            <div style="margin-top:20px; cursor:pointer;" onclick="adminClear()">🗑 Clear Chat (Admin)</div>
+            <div style="margin-top:20px; cursor:pointer; color:#f43f5e;" onclick="logout()">🚪 Logout</div>
         </div>
-    </header>
+    </aside>
 
-    <div id="chat-scroll"></div>
+    <main id="chat-main">
+        <header>
+            <button class="icon-btn" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+            <div style="font-weight:600;">VILLA-8 Global Group</div>
+        </header>
 
-    <div class="input-wrapper">
-        <button class="action-btn" title="Emoji" onclick="addEmoji('😊')">😊</button>
-        <input type="text" id="msg-input" placeholder="Message..." onkeypress="if(event.key==='Enter') send()">
-        <button class="action-btn" title="Attach Link" onclick="promptLink()">📎</button>
-        <button class="action-btn" style="color: var(--accent);" onclick="send()">➤</button>
-    </div>
-</div>
+        <div id="chat-scroll">
+            </div>
 
-<div id="auth-gate" style="position:fixed; inset:0; background:var(--bg-deep); z-index:1000; display:flex; justify-content:center; align-items:center;">
-    <div style="background:var(--bg-soft); padding:40px; border-radius:20px; text-align:center; width:300px;">
-        <h1 style="color:var(--accent)">Join Chat</h1>
-        <input type="text" id="reg-name" placeholder="Name" style="width:100%; padding:12px; margin:10px 0; background:var(--bg-deep); border:none; color:white; border-radius:8px;">
-        <input type="text" id="reg-id" placeholder="Email/Mobile" style="width:100%; padding:12px; margin:10px 0; background:var(--bg-deep); border:none; color:white; border-radius:8px;">
-        <button onclick="login()" style="width:100%; padding:12px; background:var(--accent); border:none; color:white; border-radius:8px; font-weight:bold; cursor:pointer;">Enter</button>
-    </div>
+        <div class="input-area">
+            <button class="icon-btn">📎</button>
+            <input type="text" id="msg-input" placeholder="Write a message..." class="input-field" onkeypress="if(event.key==='Enter') send()">
+            <button class="icon-btn">😊</button>
+            <button class="icon-btn send-btn" onclick="send()">➤</button>
+        </div>
+    </main>
 </div>
 
 <script>
     const API = 'https://script.google.com/macros/s/AKfycbwNePV6LXtQEWKP8fYHaPocTI1zp2aq2IhmSFjB28htuerelQB46vi3aHPaVznIs5o2/exec';
-    let user = JSON.parse(localStorage.getItem('v8_telegram_user'));
+    let user = JSON.parse(localStorage.getItem('v8_user'));
 
-    if(user) document.getElementById('auth-gate').style.display = 'none';
-
-    function toggleMenu() { document.getElementById('side-panel').classList.toggle('open'); }
-    function addEmoji(e) { document.getElementById('msg-input').value += e; }
-    function promptLink() { const url = prompt("Paste Image/Video/PDF Link:"); if(url) document.getElementById('msg-input').value += url; }
+    if(user) document.getElementById('auth-screen').style.display = 'none';
 
     function login() {
         const n = document.getElementById('reg-name').value;
         const i = document.getElementById('reg-id').value;
         if(n && i) {
             user = { name: n, id: i };
-            localStorage.setItem('v8_telegram_user', JSON.stringify(user));
-            document.getElementById('auth-gate').style.display = 'none';
+            localStorage.setItem('v8_user', JSON.stringify(user));
+            document.getElementById('auth-screen').style.display = 'none';
             init();
         }
     }
 
-    function logout() { localStorage.removeItem('v8_telegram_user'); location.reload(); }
+    function logout() { localStorage.removeItem('v8_user'); location.reload(); }
 
     async function send() {
-        const input = document.getElementById('msg-input');
-        const text = input.value.trim();
+        const el = document.getElementById('msg-input');
+        const text = el.value.trim();
         if(!text) return;
-        input.value = '';
-
+        el.value = '';
+        
         await fetch(API, {
             method: 'POST',
             body: JSON.stringify({ name: user.name, email: user.id, message: text })
@@ -157,39 +160,41 @@
         sync();
     }
 
-    function renderMedia(text) {
-        const urlRegex = /(https?:\/\/[^\s]+)/g;
-        return text.replace(urlRegex, (url) => {
-            if (url.match(/\.(jpeg|jpg|gif|png|webp)$/)) return `<div class="media-box"><img src="${url}" loading="lazy"></div>`;
-            if (url.match(/\.(mp4|webm)$/)) return `<div class="media-box"><video src="${url}" controls></video></div>`;
-            if (url.match(/\.(pdf)$/)) return `<a href="${url}" target="_blank" class="file-link">📄 View PDF Document</a>`;
-            return `<a href="${url}" target="_blank" style="color:var(--accent)">${url}</a>`;
-        });
-    }
-
     async function sync() {
         try {
             const res = await fetch(API);
             const data = await res.json();
-            const scroll = document.getElementById('chat-scroll');
-            scroll.innerHTML = data.map(m => `
-                <div class="msg ${m.email === user.id ? 'sent' : 'received'}">
-                    <span class="user-label">${m.name}</span>
-                    ${renderMedia(m.msg)}
-                    <div class="time">${new Date(m.time).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</div>
+            const win = document.getElementById('chat-scroll');
+            win.innerHTML = data.map(m => `
+                <div class="bubble ${m.email === user.id ? 'sent' : 'received'}">
+                    <span class="sender">${m.name}</span>
+                    ${parseMedia(m.msg)}
+                    <span class="time">${new Date(m.time).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
                 </div>
             `).join('');
-            scroll.scrollTop = scroll.scrollHeight;
+            win.scrollTop = win.scrollHeight;
         } catch(e) {}
     }
 
-    async function adminClear() {
-        const pass = prompt("Admin Password:");
-        await fetch(API, { method: 'POST', body: JSON.stringify({ command: "CLEAR_ALL", password: pass }) });
-        sync();
+    function parseMedia(text) {
+        const urlRegex = /(https?:\/\/[^\s]+)/g;
+        return text.replace(urlRegex, (url) => {
+            if (url.match(/\.(jpeg|jpg|gif|png|webp)$/)) return `<img src="${url}" style="width:100%; border-radius:10px; margin-top:5px;">`;
+            if (url.match(/\.(mp4|webm)$/)) return `<video src="${url}" controls style="width:100%; border-radius:10px;"></video>`;
+            if (url.match(/\.(pdf)$/)) return `<div style="background:#1e293b; padding:10px; border-radius:8px; margin-top:5px;"><a href="${url}" target="_blank" style="color:var(--accent); text-decoration:none;">📄 View PDF Document</a></div>`;
+            return `<a href="${url}" target="_blank" style="color:var(--accent)">${url}</a>`;
+        });
     }
 
-    function init() { sync(); setInterval(sync, 4000); }
+    async function adminClear() {
+        const p = prompt("Admin Password:");
+        if(p) {
+            await fetch(API, { method: 'POST', body: JSON.stringify({ command: "CLEAR_ALL", password: p }) });
+            sync();
+        }
+    }
+
+    function init() { sync(); setInterval(sync, 5000); }
     if(user) init();
 </script>
 </body>
