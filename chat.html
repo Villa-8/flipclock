@@ -2,109 +2,87 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>VILLA-8 Professional Hub</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
+    <title>VILLA-8 Global Hub</title>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
-            --ios-blur: rgba(255, 255, 255, 0.08);
             --ios-accent: #007AFF;
-            --bg-dark: #000000;
-            --card-bg: rgba(28, 28, 30, 0.7);
-            --sent-bubble: #007AFF;
-            --recv-bubble: #262629;
+            --glass-bg: rgba(28, 28, 30, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --sent: #007AFF;
+            --recv: #262629;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        /* FIX: Using 100dvh (Dynamic Viewport Height) to account for mobile bars */
         body, html { 
-            margin: 0; padding: 0; height: 100%; width: 100%; 
-            background: var(--bg-dark); color: #ffffff; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Helvetica, sans-serif;
-            overflow: hidden;
+            margin: 0; padding: 0; height: 100dvh; width: 100%; 
+            background: #000; color: #fff; font-family: -apple-system, sans-serif;
+            overflow: hidden; display: flex;
         }
 
-        /* Background Mesh Gradient */
         .mesh-bg {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(at 0% 0%, #1e293b 0px, transparent 50%),
-                        radial-gradient(at 100% 100%, #0c4a6e 0px, transparent 50%);
-            z-index: -1;
+            position: fixed; inset: 0; z-index: -1;
+            background: radial-gradient(at 0% 0%, #1e293b 0%, transparent 50%),
+                        radial-gradient(at 100% 100%, #0c4a6e 0%, transparent 50%);
         }
 
-        .app-shell { display: flex; height: 100vh; width: 100vw; position: relative; }
-
-        /* --- iOS Side Panel --- */
+        /* --- Sidebar & Swipe Logic --- */
         #sidebar {
-            width: 300px; background: var(--card-bg); backdrop-filter: blur(30px);
-            border-right: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column;
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1001;
+            width: 280px; background: var(--glass-bg); backdrop-filter: blur(30px);
+            border-right: 1px solid var(--glass-border); position: fixed;
+            left: -280px; height: 100%; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1000;
         }
+        #sidebar.open { left: 0; box-shadow: 20px 0 50px rgba(0,0,0,0.5); }
 
-        @media (max-width: 768px) {
-            #sidebar { position: fixed; left: 0; transform: translateX(-100%); height: 100%; }
-            #sidebar.open { transform: translateX(0); box-shadow: 20px 0 50px rgba(0,0,0,0.5); }
-        }
-
-        /* --- Chat Section --- */
-        #chat-main { flex: 1; display: flex; flex-direction: column; position: relative; background: transparent; }
+        /* --- Chat Main --- */
+        #chat-main { flex: 1; display: flex; flex-direction: column; position: relative; height: 100%; }
 
         header {
-            height: 70px; background: var(--ios-blur); backdrop-filter: blur(20px);
-            display: flex; align-items: center; justify-content: space-between; padding: 0 20px;
-            border-bottom: 1px solid rgba(255,255,255,0.1); z-index: 100;
+            height: 60px; background: rgba(0,0,0,0.5); backdrop-filter: blur(20px);
+            display: flex; align-items: center; justify-content: space-between; padding: 0 15px;
+            border-bottom: 1px solid var(--glass-border);
         }
 
         #chat-scroll {
-            flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 14px;
-            scroll-behavior: smooth; padding-bottom: 100px;
+            flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 12px;
+            scroll-behavior: smooth;
         }
 
-        /* --- Message Bubbles --- */
-        .msg-wrapper { display: flex; flex-direction: column; max-width: 80%; }
+        /* --- iOS Bubbles --- */
+        .msg-box { display: flex; flex-direction: column; max-width: 80%; margin-bottom: 4px; }
         .sent { align-self: flex-end; }
         .received { align-self: flex-start; }
-
+        
         .bubble {
-            padding: 12px 16px; border-radius: 20px; font-size: 16px; line-height: 1.4;
-            position: relative; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            padding: 10px 14px; border-radius: 18px; font-size: 15px; line-height: 1.4;
+            position: relative; word-wrap: break-word;
         }
-        .sent .bubble { background: var(--sent-bubble); border-bottom-right-radius: 4px; color: white; }
-        .received .bubble { background: var(--recv-bubble); border-bottom-left-radius: 4px; color: #efeff4; }
+        .sent .bubble { background: var(--sent); border-bottom-right-radius: 4px; }
+        .received .bubble { background: var(--recv); border-bottom-left-radius: 4px; }
 
-        .meta { font-size: 11px; opacity: 0.5; margin-top: 4px; display: flex; gap: 8px; }
-        .sender-name { color: var(--ios-accent); font-weight: 600; font-size: 12px; margin-bottom: 2px; }
-
-        /* --- Glass Input Bar --- */
-        .glass-input-container {
-            position: absolute; bottom: 20px; left: 20px; right: 20px;
-            background: rgba(44, 44, 46, 0.8); backdrop-filter: blur(20px);
-            padding: 10px 15px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.1);
-            display: flex; align-items: center; gap: 12px;
+        /* --- Professional Input Area --- */
+        .input-wrapper {
+            padding: 10px 15px; background: rgba(0,0,0,0.6); backdrop-filter: blur(25px);
+            border-top: 1px solid var(--glass-border); display: flex; align-items: center; gap: 10px;
         }
 
-        #msg-input {
-            flex: 1; background: transparent; border: none; color: white;
-            font-size: 16px; outline: none; padding: 5px 0;
+        .input-glass {
+            flex: 1; background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border);
+            border-radius: 20px; padding: 8px 15px; color: #fff; font-size: 16px; outline: none;
         }
 
-        .icon-btn { 
-            background: none; border: none; color: var(--ios-accent); 
-            cursor: pointer; display: flex; align-items: center; transition: 0.2s;
-        }
-        .icon-btn:active { transform: scale(0.9); opacity: 0.7; }
+        .icon-btn { background: none; border: none; color: var(--ios-accent); cursor: pointer; padding: 5px; }
 
-        /* --- Auth View --- */
-        #auth-gate {
-            position: fixed; inset: 0; background: #000; z-index: 2000;
-            display: flex; justify-content: center; align-items: center;
-        }
-        .ios-card {
-            background: #1c1c1e; width: 320px; padding: 30px; border-radius: 24px;
-            text-align: center; border: 1px solid #38383a;
-        }
+        /* --- Media Styles --- */
+        .media-link { color: #58a6ff; text-decoration: none; display: block; margin-top: 5px; font-size: 13px; }
+        .media-preview img { width: 100%; border-radius: 10px; margin-top: 8px; }
 
-        /* --- Media Content --- */
-        .media-content { margin-top: 8px; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); }
-        .pdf-box { background: rgba(255,255,255,0.1); padding: 12px; display: flex; align-items: center; gap: 10px; color: white; text-decoration: none; }
+        /* --- Auth Screen --- */
+        #auth-gate { position: fixed; inset: 0; background: #000; z-index: 2000; display: flex; justify-content: center; align-items: center; }
+        .ios-login { background: #1c1c1e; padding: 30px; border-radius: 24px; width: 90%; max-width: 340px; text-align: center; }
     </style>
 </head>
 <body>
@@ -112,91 +90,75 @@
 <div class="mesh-bg"></div>
 
 <div id="auth-gate">
-    <div class="ios-card">
-        <h2 style="margin-top:0">VILLA-8</h2>
-        <p style="opacity:0.6; font-size:14px">Enter your details to join</p>
-        <input type="text" id="reg-name" placeholder="Display Name" style="width:100%; padding:14px; background:#2c2c2e; border:none; color:white; border-radius:12px; margin-bottom:12px;">
-        <input type="text" id="reg-id" placeholder="Mobile / Email" style="width:100%; padding:14px; background:#2c2c2e; border:none; color:white; border-radius:12px; margin-bottom:20px;">
-        <button onclick="login()" style="width:100%; background:var(--ios-accent); color:white; border:none; padding:14px; border-radius:12px; font-weight:bold; cursor:pointer;">Continue</button>
+    <div class="ios-login">
+        <h2 style="margin-bottom: 25px;">VILLA-8</h2>
+        <input type="text" id="reg-name" placeholder="Name" class="input-glass" style="width:100%; margin-bottom:12px;">
+        <input type="text" id="reg-id" placeholder="Mobile / Email" class="input-glass" style="width:100%; margin-bottom:20px;">
+        <button onclick="login()" style="width:100%; background:var(--ios-accent); color:white; border:none; padding:12px; border-radius:15px; font-weight:bold;">Sign In</button>
     </div>
 </div>
 
-<div class="app-shell">
-    <aside id="sidebar">
-        <div style="padding: 30px 20px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:40px;">
-                <h2 style="margin:0">Settings</h2>
-                <button class="icon-btn" onclick="toggleMenu()" style="color:white"><i data-lucide="x"></i></button>
-            </div>
-            
-            <div style="display:flex; flex-direction:column; gap:25px;">
-                <div onclick="adminClear()" style="display:flex; align-items:center; gap:15px; cursor:pointer;">
-                    <i data-lucide="shield-alert" style="color:#ff3b30"></i> Admin: Clear All
-                </div>
-                <div onclick="logout()" style="display:flex; align-items:center; gap:15px; cursor:pointer; color:#ff3b30">
-                    <i data-lucide="log-out"></i> Logout Account
-                </div>
-            </div>
-        </div>
-    </aside>
+<div id="sidebar">
+    <div style="padding: 20px;">
+        <h3>Options</h3>
+        <hr style="border:0; border-top:1px solid var(--glass-border); margin:20px 0;">
+        <div onclick="adminClear()" style="padding:15px 0; color:#ff453a; cursor:pointer;"><i data-lucide="trash-2"></i> Clear History</div>
+        <div onclick="logout()" style="padding:15px 0; color:#ff453a; cursor:pointer;"><i data-lucide="log-out"></i> Log Out</div>
+        <div onclick="toggleMenu()" style="padding:15px 0; opacity:0.6; cursor:pointer;"><i data-lucide="chevron-left"></i> Close Panel</div>
+    </div>
+</div>
 
-    <main id="chat-main">
-        <header>
-            <div style="display:flex; align-items:center; gap:15px;">
-                <button class="icon-btn" onclick="toggleMenu()" style="color:white"><i data-lucide="menu"></i></button>
-                <div style="font-weight:bold; font-size:18px;">VILLA-8 Global</div>
-            </div>
-            <button class="icon-btn" onclick="toggleMenu()"><i data-lucide="more-horizontal"></i></button>
-        </header>
+<div id="chat-main" onclick="if(event.target.id==='chat-main') closeMenu()">
+    <header>
+        <button class="icon-btn" onclick="toggleMenu()"><i data-lucide="menu"></i></button>
+        <div style="font-weight:600;">VILLA-8 Global Hub</div>
+        <button class="icon-btn" onclick="toggleMenu()"><i data-lucide="more-vertical"></i></button>
+    </header>
 
-        <div id="chat-scroll"></div>
+    <div id="chat-scroll"></div>
 
-        <div class="glass-input-container">
-            <button class="icon-btn" onclick="attachFile()"><i data-lucide="paperclip"></i></button>
-            <input type="text" id="msg-input" placeholder="Type a message..." onkeypress="if(event.key==='Enter') send()">
-            <button class="icon-btn" onclick="send()" style="padding-left:10px;"><i data-lucide="send-horizontal"></i></button>
-        </div>
-    </main>
+    <div class="input-wrapper">
+        <button class="icon-btn" onclick="attachFile()"><i data-lucide="plus"></i></button>
+        <input type="text" id="msg-input" placeholder="iMessage" class="input-glass" onkeypress="if(event.key==='Enter') send()">
+        <button class="icon-btn" onclick="send()"><i data-lucide="arrow-up-circle" style="width:30px; height:30px;"></i></button>
+    </div>
 </div>
 
 <script>
-    // INITIALIZE ICONS
     lucide.createIcons();
-
     const API = 'https://script.google.com/macros/s/AKfycbwNePV6LXtQEWKP8fYHaPocTI1zp2aq2IhmSFjB28htuerelQB46vi3aHPaVznIs5o2/exec';
-    let user = JSON.parse(localStorage.getItem('v8_auth'));
+    let user = JSON.parse(localStorage.getItem('v8_user'));
 
     if(user) document.getElementById('auth-gate').style.display = 'none';
 
     function toggleMenu() { document.getElementById('sidebar').classList.toggle('open'); }
+    function closeMenu() { document.getElementById('sidebar').classList.remove('open'); }
+
     function login() {
         const n = document.getElementById('reg-name').value;
         const i = document.getElementById('reg-id').value;
         if(n && i) {
             user = { name: n, id: i };
-            localStorage.setItem('v8_auth', JSON.stringify(user));
+            localStorage.setItem('v8_user', JSON.stringify(user));
             document.getElementById('auth-gate').style.display = 'none';
             init();
         }
     }
 
-    function logout() { localStorage.removeItem('v8_auth'); location.reload(); }
+    function logout() { localStorage.removeItem('v8_user'); location.reload(); }
 
     async function send() {
-        const input = document.getElementById('msg-input');
-        const text = input.value.trim();
+        const el = document.getElementById('msg-input');
+        const text = el.value.trim();
         if(!text) return;
-        input.value = '';
-
-        await fetch(API, {
-            method: 'POST',
-            body: JSON.stringify({ name: user.name, email: user.id, message: text })
-        });
+        el.value = '';
+        
+        await fetch(API, { method: 'POST', body: JSON.stringify({ name: user.name, email: user.id, message: text }) });
         sync();
     }
 
     function attachFile() {
-        const url = prompt("Paste link to Image, Video, or PDF:");
+        const url = prompt("Paste Image/PDF URL:");
         if(url) document.getElementById('msg-input').value += url;
     }
 
@@ -204,46 +166,37 @@
         try {
             const res = await fetch(API);
             const data = await res.json();
-            const container = document.getElementById('chat-scroll');
-            
-            container.innerHTML = data.map(m => `
-                <div class="msg-wrapper ${m.email === user.id ? 'sent' : 'received'}">
-                    <span class="sender-name">${m.name}</span>
-                    <div class="bubble">
-                        ${renderContent(m.msg)}
-                        <div class="meta">
-                            <span>${new Date(m.time).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
-                        </div>
-                    </div>
+            const win = document.getElementById('chat-scroll');
+            win.innerHTML = data.map(m => `
+                <div class="msg-box ${m.email === user.id ? 'sent' : 'received'}">
+                    <span style="font-size:11px; opacity:0.6; margin-bottom:2px; margin-left:5px;">${m.name}</span>
+                    <div class="bubble">${parseMedia(m.msg)}</div>
+                    <span style="font-size:10px; opacity:0.4; margin-top:3px; text-align:right;">${new Date(m.time).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
                 </div>
             `).join('');
-            container.scrollTop = container.scrollHeight;
+            win.scrollTop = win.scrollHeight;
         } catch(e) {}
     }
 
-    function renderContent(text) {
+    function parseMedia(text) {
         const urlRegex = /(https?:\/\/[^\s]+)/g;
         return text.replace(urlRegex, (url) => {
-            if (url.match(/\.(jpeg|jpg|gif|png|webp)$/i)) 
-                return `<div class="media-content"><img src="${url}" style="width:100%; display:block;"></div>`;
-            if (url.match(/\.(mp4|webm)$/i)) 
-                return `<div class="media-content"><video src="${url}" controls style="width:100%; display:block;"></video></div>`;
-            if (url.match(/\.(pdf)$/i)) 
-                return `<a href="${url}" target="_blank" class="pdf-box"><i data-lucide="file-text"></i> Open PDF Document</a>`;
-            return `<a href="${url}" target="_blank" style="color:white; text-decoration:underline;">${url}</a>`;
+            if (url.match(/\.(jpeg|jpg|gif|png|webp)$/i)) return `<div class="media-preview"><img src="${url}"></div>`;
+            if (url.match(/\.(pdf)$/i)) return `<a href="${url}" target="_blank" class="media-link">📄 Open PDF Document</a>`;
+            return `<a href="${url}" target="_blank" class="media-link">${url}</a>`;
         });
     }
 
     async function adminClear() {
-        const p = prompt("Enter Admin Password to Wipe Chat:");
+        const p = prompt("Admin Pass:");
         if(p) {
             await fetch(API, { method: 'POST', body: JSON.stringify({ command: "CLEAR_ALL", password: p }) });
             sync();
         }
     }
 
-    function init() { sync(); setInterval(sync, 4000); }
+    function init() { sync(); setInterval(sync, 5000); }
     if(user) init();
 </script>
 </body>
-    </html>
+</html>
