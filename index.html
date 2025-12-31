@@ -92,27 +92,22 @@
             justify-content: center; touch-action: none; position: relative; z-index: 10;
         }
         .clock-scaler { transform: scale(var(--zoom)); transition: transform 0.1s linear; }
-
-        /* Decrease the thickness of the horizontal divider line */
-.flip-clock-wrapper ul li a div.down .shadow {
-    border-top: 1px solid rgba(0,0,0,0.1) !important; /* Thinner top shadow */
-}
-
-.flip-clock-wrapper ul li a div div.inn {
-    /* This creates the visual 'gap' between top and bottom */
-    text-shadow: 0 1px 2px #000 !important; 
-}
-
-/* Reduces the actual physical gap between the two halves */
-.flip-clock-wrapper ul li {
-    margin: 0 1px !important; 
-}
-
-/* The horizontal line itself is often controlled by a border on the top/bottom halves */
+        /* This makes the horizontal line very faint and thin */
 .flip-clock-wrapper ul li a div.up:after {
-    height: 1px !important; /* Force the divider to 1px thickness */
-    background-color: rgba(0,0,0,0.15) !important; /* Make the line lighter/fainter */
+    top: 50% !important;
+    height: 1px !important;
+    background-color: rgba(0,0,0,0.1) !important; /* Extremely faint line */
+    z-index: 5;
 }
+
+/* This ensures the background of the cards stays solid */
+.flip-clock-wrapper ul li a div div.inn {
+    background-color: var(--card-bg) !important;
+    color: var(--accent) !important;
+    border-radius: var(--radius) !important;
+    font-family: var(--clock-font) !important;
+}
+
         .flip-clock-dot { background: var(--accent) !important; box-shadow: 0 0 10px var(--accent); }
 
         /* Fullscreen Rules: Keeps toolbox accessible */
@@ -324,13 +319,15 @@
         $('#timer-settings').hide();
         $('#v8-flip').empty();
         
-        // Use the logic that handles both 12H and 24H selection
+        // Check if user selected 12H or 24H
         let face = (val === 'TwelveHourClock') ? 'TwelveHourClock' : 'TwentyFourHourClock';
+        
+        // Rebuild the clock with the selected face
         clock = $('#v8-flip').FlipClock({ 
             clockFace: face 
         });
     }
-        }
+}
         function startTimer() {
             let mins = $('#timer-min').val() * 60;
             $('#v8-flip').empty();
