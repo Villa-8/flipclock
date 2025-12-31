@@ -33,6 +33,7 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
         
+        /* Forces Initial View to Clock */
         html, body { 
             height: 100%;
             overflow-x: hidden;
@@ -41,6 +42,7 @@
             transition: 0.5s ease;
         }
 
+        /* --- Header --- */
         header {
             position: fixed; top: 0; right: 0; padding: 40px;
             display: flex; align-items: center; gap: 30px; z-index: 1000;
@@ -52,6 +54,7 @@
         .menu-trigger { cursor: pointer; display: flex; flex-direction: column; gap: 6px; }
         .menu-trigger div { width: 25px; height: 2px; background: #fff; transition: 0.3s; }
 
+        /* --- Cross-Platform Install Banner --- */
         #install-banner {
             position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
             background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(20px);
@@ -63,11 +66,13 @@
         }
         #install-banner.show { top: env(safe-area-inset-top, 20px); }
 
+        /* --- iOS Specific Sidebar Info --- */
         .ios-hint { 
             display: none; background: #111; padding: 15px; border-radius: 10px; 
             font-size: 12px; margin-top: 20px; border: 1px dashed var(--accent);
         }
 
+        /* --- Toolbox (Compact & Swipeable) --- */
         .toolbox {
             position: fixed; right: -280px; top: 50%; transform: translateY(-50%); width: 260px;
             background: rgba(0,0,0,0.95); padding: 30px; border-radius: 20px 0 0 20px;
@@ -81,28 +86,24 @@
         }
         .timer-btn { background: var(--accent); font-weight: bold; cursor: pointer; border: none; }
 
+        /* --- Clock Canvas (Main View) --- */
         #clock-canvas { 
             height: 100vh; width: 100vw; display: flex; align-items: center; 
             justify-content: center; touch-action: none; position: relative; z-index: 10;
         }
         .clock-scaler { transform: scale(var(--zoom)); transition: transform 0.1s linear; }
 
-        /* PROFESSIONAL FIX FOR CARD SPACING */
         .flip-clock-wrapper ul { width: 60px !important; height: 90px !important; margin: 3px !important; }
         .flip-clock-wrapper ul li { line-height: 90px !important; }
-        .flip-clock-wrapper ul li a div.up:after { top: 44px !important; height: 1px !important; background-color: rgba(0,0,0,0.2) !important; }
         .flip-clock-wrapper ul li a div div.inn { 
             background-color: var(--card-bg) !important; color: var(--accent) !important; 
-            border-radius: var(--radius) !important; font-family: var(--clock-font) !important; 
-            font-size: 55px !important;
-            height: 100% !important;
-            backface-visibility: hidden !important;
+            border-radius: var(--radius) !important; font-family: var(--clock-font) !important; font-size: 55px !important;
         }
-        /* End of fix */
-
         .flip-clock-dot { background: var(--accent) !important; box-shadow: 0 0 10px var(--accent); }
 
+        /* Fullscreen Rules: Keeps toolbox accessible */
         :fullscreen header, :fullscreen section, :fullscreen footer, :fullscreen #install-banner { display: none !important; }
+         /* --- Sidebar: Swipe to Close --- */
         .sidebar {
             position: fixed; top: 0; right: -300px; width: 300px; height: 100vh;
             background: rgba(10, 10, 15, 0.85); backdrop-filter: blur(20px);
@@ -114,6 +115,7 @@
         .sidebar a:hover { color: var(--accent); opacity: 1; }
         .sidebar-hint { font-size: 9px; opacity: 0.3; text-transform: uppercase; margin-top: 50px; }
 
+        /* Q&A (Optimized Readability) */
         section { padding: 100px 10%; background: #000; position: relative; z-index: 5; }
         .qa-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
         .qa-item { background: #070707; padding: 40px; border-radius: 15px; border: 1px solid #151515; }
@@ -194,49 +196,58 @@
 
     <section id="qa">
         <div class="qa-grid">
-            <div class="qa-item">
-                <h3>01. Focus-First Interface</h3>
-                <p>The app opens directly to the Flip Clock for immediate productivity.</p>
-            </div>
-            <div class="qa-item">
-                <h3>02. Immersive Fullscreen</h3>
-                <p>Double-click the clock face on any browser to activate distraction-free display.</p>
-            </div>
-            <div class="qa-item">
-                <h3>03. Native iOS Experience</h3>
-                <p>Optimized for iOS, interface accounts for the notch and screen curves.</p>
-            </div>
-            <div class="qa-item">
-                <h3>04. Universal Gestures</h3>
-                <p>Swipe left from the right edge to reveal your toolkit.</p>
-            </div>
-            <div class="qa-item">
-                <h3>05. Keyboard Shortcuts</h3>
-                <p>On desktop, use '+' and '-' to scale the clock size.</p>
-            </div>
-            <div class="qa-item">
-                <h3>06. Pomodoro Mode</h3>
-                <p>Switch between a standard clock and a customizable study timer.</p>
-            </div>
-            <div class="qa-item">
-                <h3>07. One-Tap Installation</h3>
-                <p>Frequent users will see an installation prompt.</p>
-            </div>
-            <div class="qa-item">
-                <h3>08. Curated Themes</h3>
-                <p>Choose from five professional color palettes.</p>
-            </div>
-            <div class="qa-item">
-                <h3>09. Deep Work Audio</h3>
-                <p>Activate high-quality ambient soundscapes directly from the panel.</p>
-            </div>
-            <div class="qa-item">
-                <h3>Modern Flipclock</h3>
-                <p>Built with lightweight Modern Use flipclock from a dedicated villa 8 team</p>
-            </div>
+    <div class="qa-item">
+        <h3>01. Focus-First Interface</h3>
+        <p>The app opens directly to the Flip Clock for immediate productivity. Settings and documentation are easily accessible by scrolling down.</p>
+    </div>
+
+    <div class="qa-item">
+        <h3>02. Immersive Fullscreen</h3>
+        <p>Double-click the clock face on any browser (iOS, Android, or PC) to activate a distraction-free, edge-to-edge display.</p>
+    </div>
+
+    <div class="qa-item">
+        <h3>03. Native iOS Experience</h3>
+        <p>Optimized for iOS , the interface accounts for the notch and screen curves to provide a seamless, app-like feel.</p>
+    </div>
+
+    <div class="qa-item">
+        <h3>04. Universal Gestures</h3>
+        <p>Swipe left from the right edge to reveal your toolkit. This intuitive gesture is standardized across all mobile platforms.</p>
+    </div>
+
+    <div class="qa-item">
+        <h3>05. Keyboard Shortcuts</h3>
+        <p>On desktop, use '+' and '-' to scale the clock size. Use the arrow keys to toggle tools and menus instantly.</p>
+    </div>
+
+    <div class="qa-item">
+        <h3>06. Pomodoro Mode</h3>
+        <p>Switch between a standard clock and a customizable study timer to help manage your deep work sessions.</p>
+    </div>
+
+    <div class="qa-item">
+        <h3>07. One-Tap Installation</h3>
+        <p>Frequent users will see an installation prompt. Android and PC users can install directly, while iOS users get a simple setup guide.</p>
+    </div>
+
+    <div class="qa-item">
+        <h3>08. Curated Themes</h3>
+        <p>Choose from five professional color palettes designed to match your office lighting and reduce eye strain.</p>
+    </div>
+
+    <div class="qa-item">
+        <h3>09. Deep Work Audio</h3>
+        <p>Activate high-quality ambient soundscapes and wave frequencies directly from the swipe panel to improve concentration.</p>
+    </div>
+
+    <div class="qa-item">
+        <h3>Modern Flipclock</h3>
+        <p>Built with lightweight Modern Use flipclock from a dedicated villa 8 team</p>
         </div>
     </section>
 
+    
     <footer>
         © COPYRIGHT <a href="about.html">VILLA8 TEAM</a>
     </footer>
@@ -245,11 +256,13 @@
 
     <script>
         let clock, zoom = 1.2, pDist = 0, deferredPrompt;
-        let clockFormat = 'TwentyFourHourClock';
+        let clockFormat = 'TwentyFourHourClock'; // Default
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
         $(document).ready(function() {
+            // Force scroll to top (Clock view) on load
             window.scrollTo(0, 0);
+            
             clock = $('#v8-flip').FlipClock({ clockFace: clockFormat });
             
             let count = localStorage.getItem('v8_re') || 0;
@@ -260,6 +273,7 @@
                 setTimeout(() => $('#install-banner').addClass('show'), 3000); 
             }
 
+            // iOS 14+ Fullscreen Gesture and Keyboard Unification
             window.addEventListener('keydown', e => {
                 if(e.key === '+' || e.key === '=') updateZoom(0.1);
                 if(e.key === '-' || e.key === '_') updateZoom(-0.1);
@@ -267,6 +281,7 @@
                 if(e.key === 'ArrowRight') { $('#toolbox').removeClass('open'); $('#sidebar').removeClass('active'); }
             });
 
+            // Unified Mobile Gestures (Android style on iOS)
             let sX = 0;
             window.addEventListener('touchstart', e => { 
                 sX = e.touches[0].clientX; 
@@ -359,6 +374,7 @@
         function playMusic(s) { const a = document.getElementById('v8-audio'); if(!s){a.pause(); return;} a.src=s; a.play(); }
         function hideInstallBanner() { $('#install-banner').removeClass('show'); }
 
+        // Multi-Platform Installation Logic
         window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; });
         
         async function handleInstallClick(e) {
