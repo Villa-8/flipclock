@@ -381,7 +381,7 @@
                 alert("Please use 'Add to Home Screen' in your browser menu to install.");
             }
         }
-  if ('serviceWorker' in navigator) {
+        if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('./sw.js')
         .then((registration) => {
@@ -392,6 +392,7 @@
         });
     });
         }
+      
     </script>
 </body>
     </html>
