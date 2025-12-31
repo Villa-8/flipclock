@@ -93,12 +93,26 @@
         }
         .clock-scaler { transform: scale(var(--zoom)); transition: transform 0.1s linear; }
 
-        .flip-clock-wrapper ul { width: 60px !important; height: 90px !important; margin: 3px !important; }
-        .flip-clock-wrapper ul li { line-height: 30px !important; }
-        .flip-clock-wrapper ul li a div div.inn { 
-            background-color: var(--card-bg) !important; color: var(--accent) !important; 
-            border-radius: var(--radius) !important; font-family: var(--clock-font) !important; font-size: 55px !important;
-        }
+        /* Decrease the thickness of the horizontal divider line */
+.flip-clock-wrapper ul li a div.down .shadow {
+    border-top: 1px solid rgba(0,0,0,0.1) !important; /* Thinner top shadow */
+}
+
+.flip-clock-wrapper ul li a div div.inn {
+    /* This creates the visual 'gap' between top and bottom */
+    text-shadow: 0 1px 2px #000 !important; 
+}
+
+/* Reduces the actual physical gap between the two halves */
+.flip-clock-wrapper ul li {
+    margin: 0 1px !important; 
+}
+
+/* The horizontal line itself is often controlled by a border on the top/bottom halves */
+.flip-clock-wrapper ul li a div.up:after {
+    height: 1px !important; /* Force the divider to 1px thickness */
+    background-color: rgba(0,0,0,0.15) !important; /* Make the line lighter/fainter */
+}
         .flip-clock-dot { background: var(--accent) !important; box-shadow: 0 0 10px var(--accent); }
 
         /* Fullscreen Rules: Keeps toolbox accessible */
