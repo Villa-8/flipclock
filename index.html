@@ -94,7 +94,7 @@
         .clock-scaler { transform: scale(var(--zoom)); transition: transform 0.1s linear; }
 
         .flip-clock-wrapper ul { width: 60px !important; height: 90px !important; margin: 3px !important; }
-        .flip-clock-wrapper ul li { line-height: 90px !important; }
+        .flip-clock-wrapper ul li { line-height: 30px !important; }
         .flip-clock-wrapper ul li a div div.inn { 
             background-color: var(--card-bg) !important; color: var(--accent) !important; 
             border-radius: var(--radius) !important; font-family: var(--clock-font) !important; font-size: 55px !important;
@@ -157,7 +157,8 @@
     <aside class="toolbox" id="toolbox">
         <span class="tool-label">MODE</span>
         <select id="mode-selector" onchange="toggleModeControls(this.value)">
-            <option value="clock">Live Clock (24H)</option>
+            <option value="clock">24-Hour</option>
+            <option value="TwelveHourClock">12-Hour</option>
             <option value="timer">Study Timer</option>
         </select>
 
@@ -303,9 +304,23 @@
         }
 
         function toggleModeControls(val) {
-            if(val === 'timer') $('#timer-settings').fadeIn();
-            else { $('#timer-settings').hide(); $('#v8-flip').empty(); clock = $('#v8-flip').FlipClock({ clockFace: 'TwentyFourHourClock' }); }
-        }
+    if(val === 'timer') {
+        // Show timer settings and hide the main clock
+        $('#timer-settings').fadeIn();
+    } else {
+        // Hide timer settings if switching back to a clock
+        $('#timer-settings').hide();
+        $('#v8-flip').empty();
+
+        // Determine which clock face to use
+        // If 'clock' is selected, use 24H. If 'TwelveHourClock' is selected, use 12H.
+        let face = (val === 'TwelveHourClock') ? 'TwelveHourClock' : 'TwentyFourHourClock';
+        
+        clock = $('#v8-flip').FlipClock({ 
+            clockFace: face 
+        });
+    }
+}
 
         function startTimer() {
             let mins = $('#timer-min').val() * 60;
