@@ -93,12 +93,28 @@
         }
         .clock-scaler { transform: scale(var(--zoom)); transition: transform 0.1s linear; }
 
+        /* Unified Sizing and Gap Fix */
         .flip-clock-wrapper ul { width: 60px !important; height: 90px !important; margin: 3px !important; }
         .flip-clock-wrapper ul li { line-height: 90px !important; }
-        .flip-clock-wrapper ul li a div div.inn { 
-            background-color: var(--card-bg) !important; color: var(--accent) !important; 
-            border-radius: var(--radius) !important; font-family: var(--clock-font) !important; font-size: 55px !important;
+        
+        .flip-clock-wrapper ul li a div.inn { 
+            background-color: var(--card-bg) !important; 
+            color: var(--accent) !important; 
+            border-radius: var(--radius) !important; 
+            font-family: var(--clock-font) !important; 
+            font-size: 55px !important;
+            height: 200% !important; /* Fixes background gap */
         }
+
+        /* Tightens the horizontal fold line */
+        .flip-clock-wrapper ul li a div.up:after {
+            top: 44px !important; 
+            height: 1px !important; 
+            opacity: 0.5; /* Makes the center line subtle */
+        }
+
+        .flip-clock-wrapper ul li a div.up { height: 50% !important; }
+        .flip-clock-wrapper ul li a div.down { height: 50% !important; top: 50% !important; }
         .flip-clock-dot { background: var(--accent) !important; box-shadow: 0 0 10px var(--accent); }
 
         /* Fullscreen Rules: Keeps toolbox accessible */
