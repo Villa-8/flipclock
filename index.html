@@ -319,23 +319,18 @@
 
         function toggleModeControls(val) {
     if(val === 'timer') {
-        // Show timer settings and hide the main clock
         $('#timer-settings').fadeIn();
     } else {
-        // Hide timer settings if switching back to a clock
         $('#timer-settings').hide();
         $('#v8-flip').empty();
-
-        // Determine which clock face to use
-        // If 'clock' is selected, use 24H. If 'TwelveHourClock' is selected, use 12H.
-        let face = (val === 'TwelveHourClock') ? 'TwelveHourClock' : 'TwentyFourHourClock';
         
+        // Use the logic that handles both 12H and 24H selection
+        let face = (val === 'TwelveHourClock') ? 'TwelveHourClock' : 'TwentyFourHourClock';
         clock = $('#v8-flip').FlipClock({ 
             clockFace: face 
         });
     }
-}
-
+        }
         function startTimer() {
             let mins = $('#timer-min').val() * 60;
             $('#v8-flip').empty();
