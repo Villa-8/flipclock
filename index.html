@@ -100,7 +100,7 @@
             border-radius: var(--radius) !important; font-family: var(--clock-font) !important; font-size: 55px !important;
         }
         .flip-clock-wrapper ul li a div.up:after { 
-            top: 50% !important; height: 1px !important; background-color: rgba(0,0,0,0.1) !important; z-index: 5; 
+            top: 50% !important; height: 2px !important; background-color: rgba(0,0,0,0.1) !important; z-index: 5; 
             }
         .flip-clock-dot { background: var(--accent) !important; box-shadow: 0 0 10px var(--accent); }
 
@@ -160,7 +160,8 @@
     <aside class="toolbox" id="toolbox">
         <span class="tool-label">MODE</span>
         <select id="mode-selector" onchange="toggleModeControls(this.value)">
-            <option value="clock">Live Clock (24H)</option>
+            <option value="clock">24-Hour Clock</option>
+            <option value="TwelveHourClock">12-Hour Clock</option>
             <option value="timer">Study Timer</option>
         </select>
 
@@ -306,8 +307,31 @@
         }
 
         function toggleModeControls(val) {
-            if(val === 'timer') $('#timer-settings').fadeIn();
-            else { $('#timer-settings').hide(); $('#v8-flip').empty(); clock = $('#v8-flip').FlipClock({ clockFace: 'TwentyFourHourClock' }); }
+    if(val === 'timer') {
+        // Show timer settings and hide the main clock
+        $('#timer-settings').fadeIn();
+    } else {
+        // Hide timer settings if switching back to a clock
+        $('#timer-settings').hide();
+        
+        // Clear the old clock
+        $('#v8-flip').empty();
+
+        // Determine which clock face to use
+        let face = (val === 'TwelveHourClock') ? 'TwelveHourClock' : 'TwentyFourHourClock';
+        
+        // Initialize the new clock
+        clock = $('#v8-flip').FlipClock({ 
+            clockFace: face 
+        });
+
+        // IMPORTANT: Re-apply the current theme so colors don't reset
+        // This ensures the new clock cards match your selected template
+        const currentTheme = $('#theme-selector').val();
+        if(currentTheme) {
+            applyTheme(currentTheme);
+        }
+    }
         }
 
         function startTimer() {
