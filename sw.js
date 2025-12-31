@@ -1,20 +1,13 @@
-const CACHE_NAME = 'v8-clock-v1';
+const CACHE_NAME = 'villa8-clock-v1';
 const urlsToCache = [
-  '/flipclock/',
-  '/flipclock/index.html',
-  '/flipclock/manifest.json',
-  '/flipclock/icon-192.png',
-  '/flipclock/icon-512.png'
+  './',
+  './index.html',
+  './manifest.json',
+  './favicon.ico',
+  './icon-512.png',
+  'https://code.jquery.com/jquery-3.4.1.min.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/flipclock/0.7.7/flipclock.min.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/flipclock/0.7.7/flipclock.css'
 ];
 
-self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))
-  );
-});
-
-self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request).then(response => response || fetch(event.request))
-  );
-});
+// ... rest of your service worker code ...
