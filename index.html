@@ -93,38 +93,17 @@
         }
         .clock-scaler { transform: scale(var(--zoom)); transition: transform 0.1s linear; }
 
-        /* Unified Sizing and Gap Fix */
-        /* Ultra-Tight Flip Card Fix */
         .flip-clock-wrapper ul { width: 60px !important; height: 90px !important; margin: 3px !important; }
         .flip-clock-wrapper ul li { line-height: 90px !important; }
-        
         .flip-clock-wrapper ul li a div div.inn { 
-            background-color: var(--card-bg) !important; 
-            color: var(--accent) !important; 
-            border-radius: var(--radius) !important; 
-            font-family: var(--clock-font) !important; 
-            font-size: 55px !important;
-            height: 200% !important; /* Forces background color to span the seam */
+            background-color: var(--card-bg) !important; color: var(--accent) !important; 
+            border-radius: var(--radius) !important; font-family: var(--clock-font) !important; font-size: 55px !important;
         }
+        .flip-clock-dot { background: var(--accent) !important; box-shadow: 0 0 10px var(--accent); }
 
-        /* This removes the horizontal line and shadows entirely */
-        .flip-clock-wrapper ul li a div.up:after { 
-            display: none !important; 
-        }
-
-        .flip-clock-wrapper ul li a div.up .shadow, 
-        .flip-clock-wrapper ul li a div.down .shadow { 
-            display: none !important; 
-        }
-
-        /* Ensures halves are perfectly joined */
-        .flip-clock-wrapper ul li a div.up { height: 50% !important; }
-        .flip-clock-wrapper ul li a div.down { 
-            height: 50% !important; 
-            top: 50% !important; 
-            border-bottom-left-radius: var(--radius);
-            border-bottom-right-radius: var(--radius);
-        }
+        /* Fullscreen Rules: Keeps toolbox accessible */
+        :fullscreen header, :fullscreen section, :fullscreen footer, :fullscreen #install-banner { display: none !important; }
+         /* --- Sidebar: Swipe to Close --- */
         .sidebar {
             position: fixed; top: 0; right: -300px; width: 300px; height: 100vh;
             background: rgba(10, 10, 15, 0.85); backdrop-filter: blur(20px);
@@ -178,17 +157,9 @@
     <aside class="toolbox" id="toolbox">
         <span class="tool-label">MODE</span>
         <select id="mode-selector" onchange="toggleModeControls(this.value)">
-            <option value="clock">Live Clock</option>
+            <option value="clock">Live Clock (24H)</option>
             <option value="timer">Study Timer</option>
         </select>
-
-        <div id="clock-format-settings">
-            <span class="tool-label">FORMAT</span>
-            <select id="format-selector" onchange="changeFormat(this.value)">
-                <option value="TwentyFourHourClock">24 Hour</option>
-                <option value="TwelveHourClock">12 Hour</option>
-            </select>
-        </div>
 
         <div id="timer-settings" style="display: none;">
             <span class="tool-label">MINUTES</span>
@@ -277,14 +248,13 @@
 
     <script>
         let clock, zoom = 1.2, pDist = 0, deferredPrompt;
-        let clockFormat = 'TwentyFourHourClock'; // Default
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
         $(document).ready(function() {
             // Force scroll to top (Clock view) on load
             window.scrollTo(0, 0);
             
-            clock = $('#v8-flip').FlipClock({ clockFace: clockFormat });
+            clock = $('#v8-flip').FlipClock({ clockFace: 'TwentyFourHourClock' });
             
             let count = localStorage.getItem('v8_re') || 0;
             count++;
@@ -333,30 +303,12 @@
         }
 
         function toggleModeControls(val) {
-            if(val === 'timer') {
-                $('#timer-settings').fadeIn();
-                $('#clock-format-settings').hide();
-            } else {
-                $('#timer-settings').hide();
-                $('#clock-format-settings').fadeIn();
-                reinitClock();
-            }
-        }
-
-        function changeFormat(val) {
-            clockFormat = val;
-            reinitClock();
-        }
-
-        function reinitClock() {
-            if(clock) { clock.stop(); }
-            $('#v8-flip').empty();
-            clock = $('#v8-flip').FlipClock({ clockFace: clockFormat });
+            if(val === 'timer') $('#timer-settings').fadeIn();
+            else { $('#timer-settings').hide(); $('#v8-flip').empty(); clock = $('#v8-flip').FlipClock({ clockFace: 'TwentyFourHourClock' }); }
         }
 
         function startTimer() {
             let mins = $('#timer-min').val() * 60;
-            if(clock) { clock.stop(); }
             $('#v8-flip').empty();
             clock = $('#v8-flip').FlipClock(mins, { clockFace: 'MinuteCounter', countdown: true });
             $('#toolbox').removeClass('open');
@@ -414,3 +366,4 @@
     </script>
 </body>
     </html>
+    
