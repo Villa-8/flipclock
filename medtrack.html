@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    :root {
+      --ios-bg: #f2f2f7;
+      --glass: rgba(255, 255, 255, 0.7);
+      --accent: #007aff;
+    }
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica; 
+      background: linear-gradient(135deg, #a2c2e6 0%, #d4e3f7 100%);
+      margin: 0; padding: 20px; color: #1c1c1e;
+    }
+    .glass-card {
+      background: var(--glass);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.3);
+      padding: 20px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    input, button {
+      border-radius: 10px; border: 1px solid #ccc; padding: 12px; margin: 5px 0; width: 100%; box-sizing: border-box;
+    }
+    button { background: var(--accent); color: white; font-weight: 600; border: none; cursor: pointer; transition: 0.3s; }
+    button:active { transform: scale(0.98); }
+    
+    .chapter-row { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,0.05); }
+    .subject-title { font-size: 1.5rem; font-weight: bold; margin-top: 20px; color: var(--accent); }
+    .score-dock { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; text-align: center; font-weight: bold; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+
+  <div id="loginPage" class="glass-card">
+    <h1 style="text-align:center">MedTrack Pro</h1>
+    <input type="text" id="userName" placeholder="Full Name">
+    <input type="number" id="userMobile" placeholder="Mobile Number">
+    <button onclick="login()">Sign In</button>
+  </div>
+
+  <div id="mainPage" class="hidden">
+    <div class="glass-card">
+      <h2 id="welcomeText">Welcome</h2>
+      <button onclick="location.reload()" style="width: auto; padding: 5px 15px; background: #ff3b30;">Sign Out</button>
+    </div>
+
+    <div id="content" class="glass-card">
+      <div class="subject-title">Biology</div>
+      <div class="chapter-row" style="font-weight:bold; font-size: 0.8rem;">
+        <span>Chapter</span><span>Notes</span><span>Prac.</span><span>Qty</span><span>Rev.</span><span>Star</span>
+      </div>
+      <div id="chapterList">
+        <div class="chapter-row" data-sub="Bio" data-chap="Cell Cycle">
+          <span>Cell Cycle</span>
+          <input type="checkbox" class="notes">
+          <input type="checkbox" class="prac">
+          <input type="number" class="qCount" placeholder="0" style="padding:4px">
+          <input type="checkbox" class="rev">
+          <input type="number" class="rating" min="1" max="5" placeholder="5">
+        </div>
+      </div>
+    </div>
+    
+    <button onclick="syncData()">Sync Progress to Cloud</button>
+
+    <div class="glass-card score-dock">
+      Preparation Score: <span id="overallScore">0</span>%
+    </div>
+  </div>
+
+  <script>
+    let currentUser = {};
+
+    function login() {
+      const name = document.getElementById('userName').value;
+      const mobile = document.getElementById('userMobile').value;
+      if(!name || !mobile) return alert("Fill details");
+      
+      google.script.run.withSuccessHandler(user => {
+        currentUser = user;
+        document.getElementById('loginPage').classList.add('hidden');
+        document.getElementById('mainPage').classList.remove('hidden');
+        document.getElementById('welcomeText').innerText = "Dr. " + user.name;
+        calculateScore();
+      }).loginUser(name, mobile);
+    }
+
+    function calculateScore() {
+      const rows = document.querySelectorAll('.chapter-row[data-chap]');
+      let totalPoints = rows.length * 4; // Notes, Prac, Rev, Rating
+      let earned = 0;
+      
+      rows.forEach(row => {
+        if(row.querySelector('.notes').checked) earned++;
+        if(row.querySelector('.prac').checked) earned++;
+        if(row.querySelector('.rev').checked) earned++;
+        if(row.querySelector('.rating').value > 3) earned++;
+      });
+      
+      let score = Math.round((earned / totalPoints) * 100) || 0;
+      document.getElementById('overallScore').innerText = score;
+    }
+
+    function syncData() {
+      const data = [];
+      document.querySelectorAll('.chapter-row[data-chap]').forEach(row => {
+        data.push({
+          mobile: currentUser.mobile,
+          subject: row.dataset.sub,
+          chapter: row.dataset.chap,
+          notes: row.querySelector('.notes').checked,
+          practice: row.querySelector('.prac').checked,
+          qCount: row.querySelector('.qCount').value,
+          revision: row.querySelector('.rev').checked,
+          rating: row.querySelector('.rating').value
+        });
+      });
+      google.script.run.withSuccessHandler(() => {
+        alert("Progress Saved!");
+        calculateScore();
+      }).saveData(data);
+    }
+  </script>
+</body>
+</html>
