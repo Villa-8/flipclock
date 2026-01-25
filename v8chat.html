@@ -6,23 +6,48 @@
     <title>VILLA-8 ULTIMATE</title>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        :root { --ios-blue: #007AFF; --bg: #000; --glass: rgba(255,255,255,0.1); --glass-thick: rgba(28,28,30,0.9); }
+        :root { --ios-blue: #007AFF; --bg: #000; --glass: rgba(255,255,255,0.1); --glass-thick: rgba(28,28,30,0.95); }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { margin: 0; background: var(--bg); color: white; font-family: -apple-system, sans-serif; height: 100dvh; overflow: hidden; }
-        .wallpaper { position: fixed; inset: 0; z-index: -1; background: linear-gradient(135deg, #0f172a, #334155, #000); }
-        .view { display: none; height: 100%; flex-direction: column; backdrop-filter: blur(30px); position: absolute; width: 100%; }
+        
+        /* Glassmorphism Background */
+        .wallpaper { position: fixed; inset: 0; z-index: -1; background: linear-gradient(135deg, #0f172a, #1e1b4b, #000); }
+        
+        .view { display: none; height: 100%; flex-direction: column; backdrop-filter: blur(35px); position: absolute; width: 100%; animation: fadeIn 0.3s ease; }
         .view.active { display: flex; z-index: 10; }
-        header { height: 100px; padding: 50px 20px 10px; display: flex; align-items: center; justify-content: space-between; background: var(--glass); border-bottom: 0.5px solid rgba(255,255,255,0.1); }
-        .row { padding: 15px 20px; display: flex; align-items: center; gap: 15px; border-bottom: 0.5px solid rgba(255,255,255,0.05); cursor: pointer; }
-        .avatar { width: 45px; height: 45px; border-radius: 50%; background: var(--ios-blue); display: flex; align-items: center; justify-content: center; font-weight: bold; }
-        #msg-flow { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 6px; }
-        .bubble { max-width: 75%; padding: 10px 16px; border-radius: 18px; font-size: 16px; }
-        .out { align-self: flex-end; background: var(--ios-blue); }
-        .in { align-self: flex-start; background: rgba(255,255,255,0.15); }
-        .input-bar { padding: 10px 15px 35px; background: var(--glass-thick); display: flex; align-items: center; gap: 10px; }
-        input { flex: 1; background: rgba(255,255,255,0.1); border: none; padding: 12px 18px; border-radius: 25px; color: white; outline: none; font-size: 16px; }
-        .tab-bar { height: 85px; background: var(--glass-thick); border-top: 0.5px solid rgba(255,255,255,0.1); display: flex; justify-content: space-around; align-items: center; padding-bottom: 20px; }
-        .btn-ios { background: var(--ios-blue); color: white; border: none; padding: 12px; border-radius: 12px; font-weight: 600; width: 100%; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(1.05); } to { opacity: 1; transform: scale(1); } }
+
+        header { height: 110px; padding: 60px 20px 10px; display: flex; align-items: center; justify-content: space-between; background: var(--glass); border-bottom: 0.5px solid rgba(255,255,255,0.1); }
+        
+        /* Search Bar & Suggestions */
+        .search-container { padding: 10px 15px; background: var(--glass); position: relative; }
+        .search-input-wrapper { background: rgba(255,255,255,0.1); border-radius: 10px; display: flex; align-items: center; padding: 8px 12px; }
+        .search-input-wrapper input { background: none; border: none; color: white; flex: 1; outline: none; font-size: 16px; margin-left: 8px; }
+        
+        #search-suggestions { 
+            position: absolute; top: 100%; left: 0; right: 0; 
+            background: var(--glass-thick); border-radius: 0 0 15px 15px;
+            max-height: 300px; overflow-y: auto; z-index: 100;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5); display: none;
+        }
+
+        /* List Items */
+        .row { padding: 14px 20px; display: flex; align-items: center; gap: 15px; border-bottom: 0.5px solid rgba(255,255,255,0.05); transition: 0.2s; }
+        .row:active { background: rgba(255,255,255,0.1); }
+        .avatar { width: 48px; height: 48px; border-radius: 50%; background: var(--ios-blue); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; }
+        
+        .add-label { color: var(--ios-blue); font-weight: 600; font-size: 14px; padding: 6px 12px; border: 1px solid var(--ios-blue); border-radius: 15px; }
+
+        /* Chat Logic */
+        #msg-flow { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 8px; }
+        .bubble { max-width: 75%; padding: 10px 16px; border-radius: 20px; font-size: 16px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .out { align-self: flex-end; background: var(--ios-blue); color: white; border-bottom-right-radius: 4px; }
+        .in { align-self: flex-start; background: rgba(255,255,255,0.15); border-bottom-left-radius: 4px; }
+
+        .input-bar { padding: 10px 15px 40px; background: var(--glass-thick); display: flex; align-items: center; gap: 10px; }
+        .msg-input { flex: 1; background: rgba(255,255,255,0.1); border: none; padding: 12px 18px; border-radius: 25px; color: white; outline: none; font-size: 16px; }
+        
+        .tab-bar { height: 85px; background: var(--glass-thick); border-top: 0.5px solid rgba(255,255,255,0.1); display: flex; justify-content: space-around; align-items: center; padding-bottom: 25px; }
     </style>
 </head>
 <body>
@@ -30,9 +55,10 @@
 
     <div id="v-auth" class="view">
         <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px;">
-            <h1 style="margin-bottom: 40px; font-weight: 800;">Villa-8</h1>
-            <input type="text" id="login-user" placeholder="Enter Unique Name" style="width: 100%; margin-bottom: 15px; text-align: center;">
-            <button class="btn-ios" onclick="handleAuth()">Continue</button>
+            <div class="avatar" style="width:80px; height:80px; margin-bottom:20px;">V8</div>
+            <h1 style="font-weight: 800; margin-bottom: 40px;">Villa-8</h1>
+            <input type="text" id="login-user" placeholder="Enter Unique Name" class="msg-input" style="width:100%; text-align:center; margin-bottom:20px;">
+            <button onclick="handleAuth()" style="background:var(--ios-blue); color:white; border:none; width:100%; padding:15px; border-radius:15px; font-weight:600;">Get Started</button>
         </div>
     </div>
 
@@ -40,34 +66,37 @@
         <header>
             <span style="font-size: 34px; font-weight: 800;">Chats</span>
             <div style="display: flex; gap: 20px;">
-                <i data-lucide="plus-circle" onclick="openSearch()"></i>
                 <i data-lucide="users" onclick="handleCreateGroup()"></i>
+                <i data-lucide="log-out" onclick="handleLogout()" color="#FF3B30"></i>
             </div>
         </header>
+        
+        <div class="search-container">
+            <div class="search-input-wrapper">
+                <i data-lucide="search" size="18" color="#888"></i>
+                <input type="text" id="search-q" oninput="liveSearch()" placeholder="Search users to add...">
+            </div>
+            <div id="search-suggestions"></div>
+        </div>
+
         <div id="chat-list" style="flex: 1; overflow-y: auto;"></div>
+        
         <div class="tab-bar">
             <i data-lucide="message-circle" color="var(--ios-blue)"></i>
-            <i data-lucide="log-out" onclick="handleLogout()" color="#FF3B30"></i>
+            <i data-lucide="settings" color="#888"></i>
         </div>
-    </div>
-
-    <div id="v-search" class="view">
-        <header>
-            <i data-lucide="chevron-left" onclick="showView('v-hub')"></i>
-            <input type="text" id="search-q" oninput="doSearch()" placeholder="Search existing users..." style="margin: 0 10px;">
-        </header>
-        <div id="search-results" style="flex: 1; overflow-y: auto;"></div>
     </div>
 
     <div id="v-chat" class="view">
         <header style="height: 80px; padding-top: 30px;">
             <i data-lucide="chevron-left" onclick="closeChat()"></i>
-            <b id="active-chat-name">Chat</b>
-            <i></i>
+            <b id="active-chat-name">Direct Message</b>
+            <i data-lucide="info" color="var(--ios-blue)"></i>
         </header>
         <div id="msg-flow"></div>
         <div class="input-bar">
-            <input type="text" id="m-input" placeholder="iMessage">
+            <i data-lucide="plus" color="var(--ios-blue)"></i>
+            <input type="text" id="m-input" class="msg-input" placeholder="iMessage">
             <i data-lucide="arrow-up-circle" onclick="sendMsg()" style="color: var(--ios-blue); width: 35px; height: 35px;"></i>
         </div>
     </div>
@@ -87,7 +116,7 @@
         async function handleAuth() {
             const u = document.getElementById('login-user').value.trim();
             if(!u) return;
-            // Using POST to register/check
+            // Mode 'no-cors' used for Google Apps Script POST
             await fetch(API, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'SIGN_UP', username: u, id: Date.now() }) });
             localStorage.setItem('v8_user', u);
             me = u;
@@ -99,42 +128,50 @@
             const res = await fetch(`${API}?action=LOAD_CHATS&me=${me}`);
             const data = await res.json();
             const list = document.getElementById('chat-list');
-            list.innerHTML = data.map(item => `
+            list.innerHTML = data.length ? data.map(item => `
                 <div class="row" onclick="openChat('${item[1]}', '${item[3] || item[1]}')">
                     <div class="avatar">${(item[3] || item[1])[0].toUpperCase()}</div>
                     <div style="flex:1"><b>${item[3] || item[1]}</b><br><small style="opacity:0.5">${item[2]}</small></div>
                 </div>
-            `).join('');
+            `).join('') : '<div style="text-align:center; padding:40px; opacity:0.5;">No active chats.<br>Search a name above to start.</div>';
         }
 
-        function openSearch() { showView('v-search'); document.getElementById('search-results').innerHTML = ''; }
-
-        async function doSearch() {
+        // --- LIVE SEARCH LOGIC ---
+        async function liveSearch() {
             const q = document.getElementById('search-q').value;
-            if(q.length < 1) return;
-            // This queries your Users sheet via the App Script SEARCH action
+            const sugBox = document.getElementById('search-suggestions');
+            
+            if(q.length < 1) { sugBox.style.display = 'none'; return; }
+            
             const res = await fetch(`${API}?action=SEARCH_GLOBAL&q=${q}&me=${me}`);
             const users = await res.json();
-            document.getElementById('search-results').innerHTML = users.map(u => `
-                <div class="row" onclick="addFriend('${u}')">
-                    <div class="avatar">${u[0].toUpperCase()}</div>
-                    <div style="flex:1"><b>${u}</b></div>
-                    <i data-lucide="user-plus" color="var(--ios-blue)"></i>
-                </div>
-            `).join('');
-            lucide.createIcons();
+            
+            if(users.length > 0) {
+                sugBox.style.display = 'block';
+                sugBox.innerHTML = users.map(u => `
+                    <div class="row" onclick="addFriend('${u}')">
+                        <div class="avatar" style="width:35px; height:35px; font-size:14px;">${u[0].toUpperCase()}</div>
+                        <div style="flex:1"><b>${u}</b></div>
+                        <div class="add-label">Add Friend</div>
+                    </div>
+                `).join('');
+            } else {
+                sugBox.style.display = 'none';
+            }
         }
 
         async function addFriend(f) {
+            document.getElementById('search-suggestions').style.display = 'none';
+            document.getElementById('search-q').value = '';
             await fetch(API, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'ADD_FRIEND', me: me, friend: f }) });
-            setTimeout(initApp, 500); // Small delay to let Sheet update
+            setTimeout(initApp, 600);
         }
 
         async function handleCreateGroup() {
-            const name = prompt("Group Name:");
+            const name = prompt("Enter Group Name:");
             if(!name) return;
             await fetch(API, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'CREATE_GROUP', name: name, creator: me }) });
-            setTimeout(initApp, 500);
+            setTimeout(initApp, 600);
         }
 
         function openChat(id, name) {
