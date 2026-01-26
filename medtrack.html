@@ -1,192 +1,127 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MedTrack Pro</title>
   <style>
-    :root {
-      --ios-bg: #f2f2f7;
-      --glass: rgba(255, 255, 255, 0.75);
-      --accent: #007aff;
-      --success: #34c759;
-    }
+    :root { --ios-blue: #007aff; --ios-bg: #f2f2f7; }
     body { 
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-      background: linear-gradient(160deg, #a2c2e6 0%, #d4e3f7 100%);
-      margin: 0; padding: 15px; min-height: 100vh; color: #1c1c1e;
+      font-family: -apple-system, sans-serif; background: #a2c2e1; 
+      display: flex; justify-content: center; padding: 20px;
     }
-    .glass-card {
-      background: var(--glass);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,0.4);
-      padding: 20px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-      margin-bottom: 20px;
+    .glass {
+      background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(15px);
+      border-radius: 20px; border: 1px solid rgba(255,255,255,0.3);
+      padding: 25px; width: 100%; max-width: 600px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
     }
-    h1, h2 { text-align: center; letter-spacing: -0.5px; }
-    input[type="text"], input[type="number"] {
-      border-radius: 12px; border: 1px solid rgba(0,0,0,0.1); padding: 12px;
-      margin: 8px 0; width: 100%; box-sizing: border-box; background: white;
+    input, button { 
+      width: 100%; padding: 12px; margin: 8px 0; border-radius: 10px; border: none; font-size: 16px;
     }
-    button { 
-      background: var(--accent); color: white; font-weight: 600; 
-      border: none; border-radius: 12px; padding: 15px; width: 100%; 
-      cursor: pointer; transition: all 0.2s; font-size: 16px;
-    }
-    button:active { transform: scale(0.97); opacity: 0.8; }
-    
-    .subject-section { margin-top: 25px; }
-    .subject-header { 
-      font-size: 20px; font-weight: 700; margin-bottom: 15px; 
-      display: flex; align-items: center; color: #000;
-    }
-    .chapter-row { 
-      display: grid; grid-template-columns: 2.5fr 1fr 1fr 1fr 1fr 1.2fr; 
-      gap: 8px; align-items: center; padding: 12px 0;
-      border-bottom: 1px solid rgba(0,0,0,0.05); font-size: 13px;
-    }
-    .header-row { font-weight: bold; color: #8e8e93; text-transform: uppercase; font-size: 10px; }
-    
-    input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--success); }
-    .q-input { width: 100% !important; padding: 5px !important; margin: 0 !important; text-align: center; }
-    .rating-input { width: 100% !important; padding: 5px !important; margin: 0 !important; color: #ff9500; font-weight: bold; }
-
-    .score-dock {
-      position: sticky; bottom: 15px; background: rgba(0, 122, 255, 0.9);
-      color: white; padding: 15px; border-radius: 15px; text-align: center;
-      backdrop-filter: blur(10px); box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-    }
+    button { background: var(--ios-blue); color: white; font-weight: 600; cursor: pointer; transition: 0.3s; }
+    button:active { transform: scale(0.98); opacity: 0.8; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th { text-align: left; opacity: 0.6; padding-bottom: 10px; }
+    td { padding: 10px 0; border-bottom: 0.5px solid rgba(0,0,0,0.1); }
     .hidden { display: none; }
-    .loader { color: var(--accent); font-weight: bold; text-align: center; display: none; }
+    .progress-container { background: #ddd; height: 8px; border-radius: 4px; margin: 15px 0; }
+    #progressFill { background: #34c759; height: 100%; width: 0%; border-radius: 4px; transition: 1s; }
   </style>
 </head>
 <body>
 
-  <div id="loginPage" class="glass-card">
-    <h1>MedTrack Pro</h1>
-    <p style="text-align:center; color: #666;">NEET Progression Tracker</p>
-    <input type="text" id="userName" placeholder="Your Name">
-    <input type="number" id="userMobile" placeholder="Mobile Number">
-    <button onclick="login()">Enter Dashboard</button>
-    <p id="loginStatus" class="loader">Accessing Cloud...</p>
+  <div id="loginCard" class="glass">
+    <h1 style="text-align:center">MedTrack Pro</h1>
+    <input type="text" id="name" placeholder="Full Name">
+    <input type="tel" id="mobile" placeholder="Mobile Number">
+    <button onclick="handleLogin()">Sign In</button>
   </div>
 
-  <div id="mainPage" class="hidden">
-    <div class="glass-card" style="display:flex; justify-content:space-between; align-items:center;">
-      <div id="welcomeText" style="font-weight:700; font-size:18px;">Welcome</div>
-      <button onclick="location.reload()" style="width:auto; padding:8px 15px; background:#ff3b30; font-size:12px;">Sign Out</button>
-    </div>
-
-    <div class="glass-card">
-      <div class="subject-section">
-        <div class="subject-header">🧬 Biology</div>
-        <div class="chapter-row header-row">
-          <span>Chapter</span><span>Notes</span><span>Prac</span><span>Qty</span><span>Rev</span><span>Star</span>
-        </div>
-        <div id="bioChapters">
-          <div class="chapter-row" data-sub="Biology" data-chap="Cell Biology">
-            <span>Cell Biology</span>
-            <input type="checkbox" class="notes" onchange="calculateScore()">
-            <input type="checkbox" class="prac" onchange="calculateScore()">
-            <input type="number" class="qCount" placeholder="0">
-            <input type="checkbox" class="rev" onchange="calculateScore()">
-            <input type="number" class="rating" min="1" max="5" value="5">
-          </div>
-          <div class="chapter-row" data-sub="Biology" data-chap="Genetics">
-            <span>Genetics</span>
-            <input type="checkbox" class="notes" onchange="calculateScore()">
-            <input type="checkbox" class="prac" onchange="calculateScore()">
-            <input type="number" class="qCount" placeholder="0">
-            <input type="checkbox" class="rev" onchange="calculateScore()">
-            <input type="number" class="rating" min="1" max="5" value="5">
-          </div>
-        </div>
-      </div>
-
-      <div class="subject-section">
-        <div class="subject-header">⚡ Physics</div>
-        <div id="phyChapters">
-          <div class="chapter-row" data-sub="Physics" data-chap="Kinematics">
-            <span>Kinematics</span>
-            <input type="checkbox" class="notes" onchange="calculateScore()">
-            <input type="checkbox" class="prac" onchange="calculateScore()">
-            <input type="number" class="qCount" placeholder="0">
-            <input type="checkbox" class="rev" onchange="calculateScore()">
-            <input type="number" class="rating" min="1" max="5" value="5">
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <button id="syncBtn" onclick="syncData()" style="background: var(--success); margin-bottom: 80px;">Sync to Cloud</button>
-
-    <div class="score-dock">
-      Current NEET Preparation: <span id="overallScore" style="font-size: 22px;">0</span>%
-    </div>
+  <div id="mainUI" class="glass hidden">
+    <h2 id="userGreet">Welcome</h2>
+    <div class="progress-container"><div id="progressFill"></div></div>
+    <p id="stats">Ready to study?</p>
+    
+    <table>
+      <thead><tr><th>Chapter</th><th>Notes</th><th>Qns</th><th>Count</th><th>Rev</th></tr></thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+    <button onclick="saveAll()" id="saveBtn" style="margin-top:20px;">Save to Cloud</button>
   </div>
 
   <script>
-    let currentUser = {};
+    // PASTE YOUR GOOGLE APPS SCRIPT URL HERE
+    const API_URL = "https://script.google.com/macros/s/AKfycbzfsasIqUCmEeIfp1IKkRtJ9plQeB4QMlK3jhf9z9wsiiTE0NZEKuwHKdfZHccrbKZkxQ/exec";
+    
+    let userKey = "";
+    const chapters = [
+      {s: 'Bio', n: 'Living World'}, {s: 'Phy', n: 'Units & Measure'}, {s: 'Che', n: 'Mole Concept'}
+    ];
 
-    function login() {
-      const name = document.getElementById('userName').value;
-      const mobile = document.getElementById('userMobile').value;
-      if(!name || !mobile) return alert("Enter Name & Mobile");
+    async function handleLogin() {
+      const name = document.getElementById('name').value;
+      const mobile = document.getElementById('mobile').value;
+      if(!name || !mobile) return alert("Enter details");
+
+      const res = await fetch(API_URL, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'login', name, mobile })
+      });
+      const data = await res.json();
+      userKey = data.userKey;
       
-      document.getElementById('loginStatus').style.display = 'block';
-
-      // Communicates with AppScript loginUser function
-      google.script.run.withSuccessHandler(response => {
-        currentUser = response;
-        document.getElementById('loginPage').classList.add('hidden');
-        document.getElementById('mainPage').classList.remove('hidden');
-        document.getElementById('welcomeText').innerText = "Dr. " + response.name;
-        calculateScore();
-      }).loginUser(name, mobile);
+      document.getElementById('loginCard').classList.add('hidden');
+      document.getElementById('mainUI').classList.remove('hidden');
+      document.getElementById('userGreet').innerText = "Hi, " + name;
+      renderTable(data.progress);
     }
 
-    function calculateScore() {
-      const rows = document.querySelectorAll('.chapter-row[data-chap]');
-      let totalTasks = rows.length * 3; // Notes, Prac, Rev
-      let completedTasks = 0;
-      
-      rows.forEach(row => {
-        if(row.querySelector('.notes').checked) completedTasks++;
-        if(row.querySelector('.prac').checked) completedTasks++;
-        if(row.querySelector('.rev').checked) completedTasks++;
+    function renderTable(savedData) {
+      const body = document.getElementById('tableBody');
+      body.innerHTML = "";
+      chapters.forEach(ch => {
+        const rowData = savedData.find(r => r[1] === ch.n) || [];
+        body.innerHTML += `
+          <tr>
+            <td><b>${ch.n}</b></td>
+            <td><input type="checkbox" class="c-note" ${rowData[3]?'checked':''}></td>
+            <td><input type="checkbox" class="c-qns" ${rowData[4]?'checked':''}></td>
+            <td><input type="number" class="c-count" value="${rowData[5]||0}" style="width:40px"></td>
+            <td><input type="checkbox" class="c-rev" ${rowData[6]?'checked':''}></td>
+          </tr>`;
       });
-      
-      let percentage = Math.round((completedTasks / totalTasks) * 100) || 0;
-      document.getElementById('overallScore').innerText = percentage;
+      updateScore();
     }
 
-    function syncData() {
-      const syncBtn = document.getElementById('syncBtn');
-      syncBtn.innerText = "Syncing...";
-      syncBtn.disabled = true;
-
-      const data = [];
-      document.querySelectorAll('.chapter-row[data-chap]').forEach(row => {
-        data.push({
-          mobile: currentUser.mobile,
-          subject: row.dataset.sub,
-          chapter: row.dataset.chap,
-          notes: row.querySelector('.notes').checked,
-          practice: row.querySelector('.prac').checked,
-          qCount: row.querySelector('.qCount').value || 0,
-          revision: row.querySelector('.rev').checked,
-          rating: row.querySelector('.rating').value || 5
-        });
+    async function saveAll() {
+      const btn = document.getElementById('saveBtn');
+      btn.innerText = "Saving...";
+      const dataRows = [];
+      document.querySelectorAll('#tableBody tr').forEach(tr => {
+        dataRows.push([
+          userKey, 
+          tr.cells[0].innerText, 
+          "Subject",
+          tr.querySelector('.c-note').checked,
+          tr.querySelector('.c-qns').checked,
+          tr.querySelector('.c-count').value,
+          tr.querySelector('.c-rev').checked,
+          0 // Rating placeholder
+        ]);
       });
 
-      // Communicates with AppScript saveData function
-      google.script.run.withSuccessHandler(res => {
-        alert("Progress Saved Successfully!");
-        syncBtn.innerText = "Sync to Cloud";
-        syncBtn.disabled = false;
-        calculateScore();
-      }).saveData(data);
+      await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'save', userKey, data: dataRows })});
+      btn.innerText = "Saved!";
+      updateScore();
+      setTimeout(() => btn.innerText = "Save to Cloud", 2000);
+    }
+
+    function updateScore() {
+      const total = chapters.length * 3;
+      const done = document.querySelectorAll('input[type="checkbox"]:checked').length;
+      const pc = Math.round((done/total)*100);
+      document.getElementById('progressFill').style.width = pc + "%";
+      document.getElementById('stats').innerText = `Total Readiness: ${pc}%`;
     }
   </script>
 </body>
