@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🔥 COMIC PASSWORD GAME 🗝️ - Huge Logic Puzzle!</title>
+    <title>🔥 COMIC BLUETOOTH ADVENTURE ESCAPE 🗝️ - 10 Levels, 20 Lockers!</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700;900&display=swap');
         * { box-sizing: border-box; }
         body {
             font-family: 'Comic Neue', cursive;
-            background: linear-gradient(45deg, #ff00ff, #00ffff, #ffff00, #ff0000);
-            background-size: 400% 400%;
-            animation: comicBg 10s ease infinite;
+            background: linear-gradient(45deg, #00ffff, #ff00ff, #00ff00, #ff0000, #ffff00);
+            background-size: 600% 600%;
+            animation: comicBg 8s ease infinite;
             color: #000;
             text-align: center;
             margin: 0;
@@ -24,495 +24,475 @@
             100% { background-position: 0% 50%; }
         }
         #game {
-            max-width: 900px;
+            max-width: 1000px;
             margin: auto;
-            background: rgba(255,255,255,0.95);
-            border: 5px solid #000;
-            border-radius: 30px;
-            padding: 30px;
-            box-shadow: 0 0 50px #fff, inset 0 0 50px rgba(0,0,0,0.1);
+            background: rgba(255,255,255,0.97);
+            border: 8px solid #000;
+            border-radius: 40px;
+            padding: 40px;
+            box-shadow: 0 0 100px #fff, inset 0 0 50px rgba(0,0,0,0.1);
         }
         h1 {
-            font-size: 3em;
-            text-shadow: 3px 3px 0 #000;
+            font-size: 3.5em;
+            text-shadow: 5px 5px 0 #000;
             margin: 0 0 20px;
-            animation: bounce 2s infinite;
+            animation: bounce 1.5s infinite;
         }
         @keyframes bounce {
             0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-            40% { transform: translateY(-10px); }
-            60% { transform: translateY(-5px); }
+            40% { transform: translateY(-15px); }
+            60% { transform: translateY(-8px); }
         }
-        .locker { font-size: 5em; animation: glow 1.5s infinite alternate; }
+        .locker { font-size: 6em; animation: glow 2s infinite alternate; margin: 20px 0; }
         @keyframes glow {
-            from { filter: drop-shadow(0 0 10px #ff0); }
-            to { filter: drop-shadow(0 0 30px #f0f); }
+            from { filter: drop-shadow(0 0 20px #00f); }
+            to { filter: drop-shadow(0 0 50px #0ff); }
         }
-        label { display: block; margin: 20px 0; font-size: 1.5em; font-weight: bold; }
+        #levelDisplay { font-size: 2.5em; color: #00f; font-weight: 900; margin: 20px 0; }
+        #idleTimer { font-size: 2em; color: #00ffff; margin: 10px; }
+        label { display: block; margin: 25px 0 10px; font-size: 1.8em; font-weight: bold; }
         textarea {
             font-family: 'Courier New', monospace;
-            font-size: 1.8em;
+            font-size: 2em;
             width: 100%;
-            min-height: 60px;
-            padding: 15px;
-            border: 3px solid #000;
-            border-radius: 15px;
-            background: #000;
-            color: #0f0;
+            min-height: 80px;
+            padding: 20px;
+            border: 5px solid #000;
+            border-radius: 20px;
+            background: #111;
+            color: #00ffff;
             resize: vertical;
             text-align: center;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
         }
-        textarea:focus { border-color: #ff0; box-shadow: 0 0 20px #ff0; outline: none; }
+        textarea:focus { border-color: #00f; box-shadow: 0 0 30px #00f; outline: none; }
         #rules {
             margin-top: 40px;
             text-align: left;
-            max-height: 500px;
+            max-height: 600px;
             overflow-y: auto;
-            background: rgba(0,0,0,0.2);
-            padding: 20px;
-            border-radius: 15px;
+            background: rgba(0,0,0,0.15);
+            padding: 25px;
+            border-radius: 20px;
+            border: 3px dashed #00f;
         }
         #rules ul { list-style: none; padding: 0; }
         .rule {
-            font-size: 1.3em;
-            margin: 15px 0;
-            padding: 10px;
-            border-radius: 10px;
-            transition: all 0.3s;
+            font-size: 1.5em;
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 15px;
+            transition: all 0.4s;
+            cursor: pointer;
         }
-        .rule.ok { background: #4f0; color: #fff; transform: scale(1.02); }
-        .rule.fail { background: #f00; color: #fff; animation: shake 0.5s; }
+        .rule:hover { transform: scale(1.02); }
+        .rule.ok { background: linear-gradient(45deg, #00f, #0ff); color: #fff; }
+        .rule.fail { background: linear-gradient(45deg, #f00, #f80); color: #fff; animation: shake 0.6s; }
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
         }
-        .rule-check { font-size: 2em; margin-right: 10px; }
-        #paulStatus, #fireStatus { font-size: 2em; }
+        .rule-check { font-size: 2.5em; margin-right: 15px; }
+        .rule a { color: #00ffff; font-weight: bold; text-decoration: none; }
+        .rule a:hover { color: #00f; }
+        #hintSection { margin: 20px 0; }
+        #hintBtn, #buyBtn { 
+            background: #00ffff; color: #000; border: none; padding: 15px 35px; 
+            font-size: 1.5em; font-family: inherit; border-radius: 25px; 
+            cursor: pointer; margin: 10px; box-shadow: 4px 4px 0 #000; 
+            transition: all 0.3s; font-weight: bold;
+        }
+        #hintBtn:hover, #buyBtn:hover { transform: translate(4px,4px); box-shadow: 0 0 0 #000; background: #00f; }
+        #hintBtn:disabled { background: #666; cursor: not-allowed; transform: none; }
+        #hintText { 
+            display: none; font-size: 1.6em; color: #00ffff; 
+            background: rgba(0,255,255,0.3); padding: 20px; border-radius: 15px; 
+            margin: 20px; border: 2px solid #00f; font-weight: bold;
+        }
+        #levelStory {
+            display: none; position: fixed; top: 20%; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,255,0.95); color: #fff; padding: 40px; border-radius: 30px;
+            font-size: 2.5em; z-index: 50; box-shadow: 0 0 50px #00f; max-width: 80%;
+            animation: popIn 1s;
+        }
+        @keyframes popIn { from { scale: 0; } to { scale: 1; } }
         #win {
             display: none;
-            font-size: 2.5em;
-            color: #ffd700;
-            text-shadow: 0 0 20px #ff0;
-            animation: celebrate 1s infinite;
+            font-size: 3em;
+            color: #00ffff;
+            text-shadow: 0 0 30px #00f;
+            animation: celebrate 0.8s infinite;
         }
         @keyframes celebrate {
-            0%, 100% { transform: scale(1) rotate(0deg); }
-            50% { transform: scale(1.1) rotate(5deg); }
+            0%, 100% { transform: scale(1) rotate(0); }
+            50% { transform: scale(1.15) rotate(10deg); }
         }
-        button {
-            background: #ff0;
-            color: #000;
-            border: none;
-            padding: 15px 30px;
-            font-size: 1.5em;
-            font-family: inherit;
-            border-radius: 20px;
-            cursor: pointer;
-            margin: 10px;
-            box-shadow: 3px 3px 0 #000;
-            transition: all 0.2s;
-        }
-        button:hover { transform: translate(3px,3px); box-shadow: 0 0 0 #000; }
-        button:active { transform: translate(0,0); }
-        #banModal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8);
-            z-index: 100;
-        }
-        #banModalContent {
-            background: #fff;
-            margin: 20% auto;
-            padding: 30px;
-            border-radius: 20px;
-            max-width: 600px;
-            text-align: center;
-        }
+        #resetBtn { background: #f00 !important; color: #fff !important; }
+        #banModal, #levelStory { backdrop-filter: blur(10px); }
+        #banModalContent { background: #fff; margin: 15% auto; padding: 40px; border-radius: 30px; max-width: 700px; }
         .ban-btn {
-            font-size: 2em;
-            width: 60px;
-            height: 60px;
-            margin: 5px;
-            border-radius: 50%;
+            font-size: 2.2em; width: 70px; height: 70px; margin: 8px;
+            border-radius: 50%; background: #ccc; border: 3px solid #000;
         }
-        .ban-btn.banned { background: #f00; color: #fff; }
-        #resetBtn { background: #f00; color: #fff; }
+        .ban-btn.banned { background: #f00; color: #fff; transform: scale(1.1); }
+        #bannedCount { font-size: 1.8em; color: #f00; margin: 20px 0; }
     </style>
 </head>
 <body>
     <div id="game">
-        <h1>🔥 <span class="locker">THE COMIC PASSWORD GAME</span> 🗝️</h1>
-        <p>Solve escalating comic puzzles! Keep Paul alive! Win ALL rules → DM <strong>@josephkerala</strong> screenshot for PRIZE! 🎁</p>
+        <h1>🔥 <span class="locker">COMIC BLUETOOTH ADVENTURE</span> 🗝️</h1>
+        <div class="locker">🔒 10 LEVELS • 20 LOCKERS • ESCAPE THE TECH COMICS! 💥</div>
+        <div id="levelDisplay">Level 1/10 🦸‍♂️</div>
+        <div id="idleTimer">⏰ 60s</div>
         <div>
-            <label>Password:</label>
-            <textarea id="pw1" placeholder="Start typing your epic password... 🦸‍♂️"></textarea>
-            <label>Confirm Password:</label>
-            <textarea id="pw2" placeholder="Match it exactly! 🔄"></textarea>
+            <label>🔐 Main Password:</label>
+            <textarea id="pw1" placeholder="Build your TECH password... Start with basics! 📱"></textarea>
+            <label>🔐 Confirm:</label>
+            <textarea id="pw2" placeholder="Exact match required! 🔄"></textarea>
+        </div>
+        <div id="hintSection">
+            <button id="hintBtn">💡 Hint (5 Free)</button>
+            <button id="buyBtn" style="display:none;">🛒 Buy Hint (Visit Ad!)</button>
+            <div id="hintText"></div>
         </div>
         <div id="rules">
-            <ul id="rulesList"></ul>
+            <ul id="rulesList">Loading rules...</ul>
         </div>
-        <button id="resetBtn" onclick="resetGame()">🔄 Reset Adventure</button>
+        <button id="resetBtn" onclick="resetGame()">🔄 Reset Tech Quest</button>
         <div id="win">
-            <div class="locker">🎉✅🗝️✅🎉</div>
-            <h1>YOU CONQUERED THE COMIC PASSWORD REALM! 🏆</h1>
-            <p>Legendary hero! DM <strong>@josephkerala</strong> Insta with proof for PRIZE! 📸🚀</p>
-            <button onclick="resetGame()">New Quest?</button>
+            <div class="locker">🎉🏆🗝️✅🎉</div>
+            <h1>🌟 YOU ESCAPED 10 LEVELS! TECH HERO LEGEND! 🌟</h1>
+            <p>All 20 lockers conquered! 🎁 DM <strong>@josephkerala</strong> on Insta with screenshot for PRIZE! 📸🚀</p>
+            <button onclick="resetGame()">New Adventure?</button>
         </div>
     </div>
 
+    <div id="levelStory"></div>
+
     <div id="banModal">
         <div id="banModalContent">
-            <h2>⚔️ Sacrifice 2 Letters!</h2>
-            <p>Pick 2 letters to ban forever! (Click A-Z)</p>
+            <h2>⚔️ BAN 2 SYMBOLS FOREVER!</h2>
+            <p>Tech glitch! Sacrifice symbols to proceed! Click 2 special chars</p>
             <div id="banButtons"></div>
-            <p id="bannedCount">0/2 selected</p>
+            <p id="bannedCount">0/2 BANNED</p>
         </div>
     </div>
 
     <script>
-        // Game Data
-        const months = ['january','february','march','april','may','june','july','august','september','october','november','december','jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
-        const affirmations = ['i am awesome', 'i am strong', 'i win'];
-        const wordleWords = ['crane','slate','trace','raise','stare','route','crate','races','react','stare','pride','trend','chore','score','snore','prune','drone','snare','tramp','stomp','cramp','grasp','clasp','flame','blame','shame','frame','drama','llama','mama','papa','gamma','comma','dogma','stoma','aroma','magma','enema','edema','lemma','dilemma','trauma','panama','pyjama','pagama','samba','mamba','lambda','guava','llama','mucosa','sierra','terra','verra','yucca','succah','tundra','laura','maura','nora','dora','flora','aura','bura','cura','dura','eura','fura','gura','hura','iura','jura','kura','lura','mura','nura','oura','pura','qura','rura','sura','tura','uura','vura','wura','xura','yura','zura']; // 100+ easy words
-        const countries = [
-            {flag: '🇺🇸', name: 'america'}, {flag: '🇨🇦', name: 'canada'}, {flag: '🇲🇽', name: 'mexico'},
-            {flag: '🇬🇧', name: 'england'}, {flag: '🇫🇷', name: 'france'}, {flag: '🇩🇪', name: 'germany'},
-            {flag: '🇮🇹', name: 'italy'}, {flag: '🇯🇵', name: 'japan'}, {flag: '🇰🇷', name: 'southkorea'},
-            {flag: '🇨🇳', name: 'china'}, {flag: '🇮🇳', name: 'india'}, {flag: '🇧🇷', name: 'brazil'},
-            {flag: '🇦🇺', name: 'australia'}, {flag: '🇷🇺', name: 'russia'}, {flag: '🇪🇸', name: 'spain'},
-            {flag: '🇳🇱', name: 'netherlands'}, {flag: '🇸🇪', name: 'sweden'}, {flag: '🇳🇴', name: 'norway'},
-            {flag: '🇫🇮', name: 'finland'}, {flag: '🇬🇷', name: 'greece'}
+        // Customizable
+        const AD_URL = 'https://www.bluetooth.com/';
+        const INSTAGRAM_HANDLE = '@josephkerala';
+        const DIGIT_SUM_TARGET = 42;
+        const ROMAN_PRODUCT_TARGET = 42;
+        const ATOMIC_SUM_TARGET = 150;
+
+        // Data
+        const seasons = ['spring','summer','autumn','winter','spr','sum','aut','win'];
+        const motivations = ['i can do it','dream big','tech rules','joseph wins'];
+        const riddleWords = ['pixel','virus','cloud','stream','cache','byte','code','debug','loop','server'];
+        const gadgets = [
+            {icon: '📱', name: 'smartphone'}, {icon: '💻', name: 'laptop'}, {icon: '⌚', name: 'smartwatch'},
+            {icon: '🎧', name: 'headphones'}, {icon: '🖥️', name: 'desktop'}, {icon: '📷', name: 'camera'},
+            {icon: '🔋', name: 'battery'}, {icon: '🖨️', name: 'printer'}, {icon: '🖱️', name: 'mouse'},
+            {icon: '⌨️', name: 'keyboard'}, {icon: '🕹️', name: 'joystick'}, {icon: '📡', name: 'router'}
         ];
-        const atomicNumbers = {
-            'H':1,'HE':2,'LI':3,'BE':4,'B':5,'C':6,'N':7,'O':8,'F':9,'NE':10,'NA':11,'MG':12,'AL':13,'SI':14,'P':15,'S':16,'CL':17,'AR':18,'K':19,'CA':20,
-            'SC':21,'TI':22,'V':23,'CR':24,'MN':25,'FE':26,'CO':27,'NI':28,'CU':29,'ZN':30,'GA':31,'GE':32,'AS':33,'SE':34,'BR':35,'KR':36,'RB':37,'SR':38,'Y':39,'ZR':40,
-            'NB':41,'MO':42,'TC':43,'RU':44,'RH':45,'PD':46,'AG':47,'CD':48,'IN':49,'SN':50,'SB':51,'TE':52,'I':53,'XE':54,'CS':55,'BA':56,'LA':57,'CE':58,'PR':59,'ND':60,
-            'PM':61,'SM':62,'EU':63,'GD':64,'TB':65,'DY':66,'HO':67,'ER':68,'TM':69,'YB':70,'LU':71,'HF':72,'TA':73,'W':74,'RE':75,'OS':76,'IR':77,'PT':78,'AU':79,'HG':80,
-            'TL':81,'PB':82,'BI':83,'PO':84,'AT':85,'RN':86,'FR':87,'RA':88,'AC':89,'TH':90,'PA':91,'U':92,'NP':93,'PU':94,'AM':95,'CM':96,'BK':97,'CF':98,'ES':99,'FM':100,
-            'MD':101,'NO':102,'LR':103,'RF':104,'DB':105,'SG':106,'BH':107,'HS':108,'MT':109,'DS':110,'RG':111,'CN':112,'NH':113,'FL':114,'MC':115,'LV':116,'TS':117,'OG':118
-        };
-        const moonEmojis = ['🌑','🌒','🌓','🌔','🌕','🌖','🌗','🌘'];
+        const starEmojis = ['⭐','🌟','✨','💫','🌠','🪐','☄️','🌌'];
+        const levelStories = [
+            "📱 Level 1: Zap into Tech World! Gadget locks buzz! ⚡",
+            "🦷 Level 2: Bluetooth tooth fairy! Blue smiles! 😁",
+            "📡 Level 3: Signal villain hacks! No wires! 🔗",
+            "🖱️ Level 4: Mouse clicks adventure! Count buttons! 🖲️",
+            "🔋 Level 5: Battery drain drama! Charge up! ⚡",
+            "🕹️ Level 6: Joystick jams! Gamer legs? 🎮",
+            "🎤 Level 7: Mic hero sings! Echo waves! 🎶",
+            "🤖 Level 8: Robot dances! AI lives! 🤖",
+            "🛡️ Level 9: Firewall shield! Code sides! 💻",
+            "🚀 Level 10: Final app launch! Tech eternal! 🏆"
+        ];
 
         // State
-        let maxRule = 1;
-        let wordleWord = '';
-        let currentCountry = null;
-        let paulState = 'none'; // none, egg, chick
-        let hatchTimer = null;
-        let feedInterval = null;
-        let fireInterval = null;
-        let bannedLetters = [];
-        let gameInit = false;
+        let maxRule = 1, currentLevel = 1, riddleWord = '', currentGadget = null, botState = 'none',
+            bootTimer = null, updateInterval = null, glitchInterval = null, bannedSymbols = [],
+            gameInit = false, idleTime = 60, idleInterval = null, hintUsed = 0, boughtCount = 0,
+            failingRule = null;
+        const els = {
+            pw1: document.getElementById('pw1'), pw2: document.getElementById('pw2'),
+            rulesList: document.getElementById('rulesList'), win: document.getElementById('win'),
+            hintBtn: document.getElementById('hintBtn'), buyBtn: document.getElementById('buyBtn'),
+            hintText: document.getElementById('hintText'), levelDisplay: document.getElementById('levelDisplay'),
+            idleTimer: document.getElementById('idleTimer'), levelStory: document.getElementById('levelStory'),
+            banModal: document.getElementById('banModal'), bannedCount: document.getElementById('bannedCount'),
+            banButtons: document.getElementById('banButtons')
+        };
 
-        const pw1 = document.getElementById('pw1');
-        const pw2 = document.getElementById('pw2');
-        const rulesList = document.getElementById('rulesList');
-        const winDiv = document.getElementById('win');
-        const banModal = document.getElementById('banModal');
-
-        // Rules Definition
+        // Rules: 0 match + 20 new engaging = 21 total
         const RULES = [
-            {id: 0, text: 'Passwords must match', check: () => pw1.value === pw2.value},
-            {id: 1, text: pw => `At least ${5} characters`, check: pw => pw.length >= 5},
-            {id: 2, text: 'Include a number 0-9', check: pw => /\d/.test(pw)},
-            {id: 3, text: 'Include an uppercase letter', check: pw => /[A-Z]/.test(pw)},
-            {id: 4, text: 'Include a special character', check: pw => /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`\~]/.test(pw)},
-            {id: 5, text: 'Digits must add up to 25', check: pw => digitSum(pw) === 25},
-            {id: 6, text: 'Include a month (jan, feb, etc.)', check: pw => months.some(m => pw.toLowerCase().includes(m))},
-            {id: 7, text: 'Include a Roman numeral (I,V,X,L,C,D,M)', check: pw => /[IVXLCDM]/i.test(pw)},
-            {id: 8, text: 'Roman numerals must multiply to 35', check: pw => getRomanProduct(pw) === 35},
-            {id: 9, text: 'Include sponsor: grok', check: pw => pw.toLowerCase().includes('grok')},
-            {id: 10, text: () => `Include Wordle answer (anagram: ${getAnagram(wordleWord)})`, check: pw => pw.toLowerCase().includes(wordleWord.toLowerCase())},
-            {id: 11, text: () => `Name this country ${currentCountry ? currentCountry.flag : ''}`, check: pw => currentCountry && pw.toLowerCase().includes(currentCountry.name)},
-            {id: 12, text: 'Include a leap year (xxxx ÷4=0)', check: pw => (pw.match(/\d{4}/g) || []).some(y => parseInt(y) % 4 === 0)},
-            {id: 13, text: () => `Include moon phase: ${getMoonPhase()}`, check: pw => pw.includes(getMoonPhase())},
-            {id: 14, text: getPaulText, check: getPaulCheck},
-            {id: 15, text: 'Delete any fire 🔥 quickly!', check: pw => !pw.includes('🔥')},
-            {id: 16, text: 'Password length must be prime', check: pw => isPrime(pw.length)},
-            {id: 17, text: 'Include your password length', check: pw => pw.includes(pw1.value.length.toString())},
-            {id: 18, text: 'No banned letters allowed!', check: pw => !bannedLetters.some(b => pw.toLowerCase().includes(b))},
-            {id: 19, text: 'Include affirmation', check: pw => affirmations.some(a => pw.toLowerCase().includes(a))},
-            {id: 20, text: () => `Include current time: ${getCurrentTimeStr()}`, check: pw => pw.includes(getCurrentTimeStr())},
-            {id: 21, text: 'Atomic numbers of elements must sum to 200', check: pw => getAtomicSum(pw) === 200}
+            {id: 0, text: '🔄 Passwords must MATCH exactly!', check: () => els.pw1.value === els.pw2.value, hint: 'Copy-paste to match both!'},
+            {id: 1, text: '📏 At least 8 characters long', check: pw => pw.length >= 8, hint: 'Add emojis or numbers!'},
+            {id: 2, text: '🔢 Include two numbers (0-9)', check: pw => (pw.match(/\d/g) || []).length >= 2, hint: 'Add 4 and 2 for 42 vibes!'},
+            {id: 3, text: '🔠 Include two UPPERCASE letters', check: pw => (pw.match(/[A-Z]/g) || []).length >= 2, hint: 'Shift + A B C!'},
+            {id: 4, text: '❗ Include two special chars (!@# etc)', check: pw => (pw.match(/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`\~]/g) || []).length >= 2, hint: 'Add @ and # for tech flair!'},
+            {id: 5, text: pw => `🔢 Digits must SUM to ${DIGIT_SUM_TARGET}`, check: pw => digitSum(pw) === DIGIT_SUM_TARGET, hint: `Numbers add to ${DIGIT_SUM_TARGET}! e.g. 999=27, add more!`},
+            {id: 6, text: '🦷 Include "bluetooth" (tooth to blue!)', check: pw => pw.toLowerCase().includes('bluetooth'), hint: 'Type bluetooth for wireless magic! 📡'},
+            {id: 7, text: '🌿 Include short season (spr, sum...)', check: pw => seasons.some(m => pw.toLowerCase().includes(m)), hint: 'Add spr sum aut win!'},
+            {id: 8, text: pw => `📐 Roman numerals (IVXLCDM) multiply to ${ROMAN_PRODUCT_TARGET}`, check: pw => getRomanProduct(pw) === ROMAN_PRODUCT_TARGET, hint: `e.g. VI VII=6*7=42! Find combos.`},
+            {id: 9, text: '🚀 Include sponsor: xai', check: pw => pw.toLowerCase().includes('xai'), hint: 'xAI grok power!'},
+            {id: 10, text: pw => `🧩 Riddle: scramble of ${getAnagram(riddleWord)}`, check: pw => riddleWord && pw.toLowerCase().includes(riddleWord.toLowerCase()), hint: 'Rearrange to tech word!'},
+            {id: 11, text: () => `📱 Name the ${currentGadget ? currentGadget.icon : '??'} gadget! <a href="https://en.wikipedia.org/wiki/List_of_electronic_devices" target="_blank">Visit list?</a>`, check: pw => currentGadget && pw.toLowerCase().includes(currentGadget.name), hint: 'Guess device from emoji! Click link.'},
+            {id: 12, text: '🕰️ Include a tech year (e.g. 2007 iPhone) <a href="https://en.wikipedia.org/wiki/Timeline_of_computing" target="_blank">Tech timeline</a>', check: pw => (pw.match(/\d{4}/g) || []).some(y => parseInt(y) > 1900 && parseInt(y) < 2100), hint: 'Add year like 1991 for WWW!'},
+            {id: 13, text: () => `🌟 Include shining star: ${getStarEmoji()}`, check: pw => pw.includes(getStarEmoji()), hint: 'Copy the star emoji shown! ⭐'},
+            {id: 14, text: getBotText, check: getBotCheck, hint: () => botState === 'none' ? 'Add 🤖 for Bot!' : botState === 'boot' ? 'Wait for boot...' : 'Add 3+ 🔄 updates NOW!'},
+            {id: 15, text: '🚫 Delete any ⚡ glitches FAST!', check: pw => !pw.includes('⚡'), hint: 'Backspace ⚡ immediately! It shocks!'},
+            {id: 16, text: pw => `📏 Length ${pw.length} must be EVEN number`, check: pw => pw.length % 2 === 0, hint: 'Add/remove to make length even (10,12,14...)!'},
+            {id: 17, text: pw => `🔢 Include half your length: ${Math.floor(pw.length / 2)}`, check: pw => pw.includes(Math.floor(pw.length / 2).toString()), hint: 'Type half the char count!'},
+            {id: 18, text: '🚫 No BANNED symbols allowed!', check: pw => !bannedSymbols.some(b => pw.includes(b)), hint: 'Avoid the 2 banned special chars you chose!'},
+            {id: 19, text: '💪 Include motivation', check: pw => motivations.some(a => pw.toLowerCase().includes(a)), hint: 'Add "i can do it" etc!'},
+            {id: 20, text: pw => `🧪 Tech elements sum to ${ATOMIC_SUM_TARGET}`, check: pw => getAtomicSum(pw) === ATOMIC_SUM_TARGET, hint: `Add elements like Si=14 C=6... sum ${ATOMIC_SUM_TARGET}! <a href="https://en.wikipedia.org/wiki/Periodic_table" target="_blank">Table</a>`}
         ];
 
-        // Helper Functions
-        function digitSum(pw) {
-            return [...pw].filter(c => !isNaN(parseInt(c))).reduce((a, c) => a + parseInt(c), 0);
-        }
-
+        // Helpers
+        function digitSum(pw) { return [...pw].filter(c => !isNaN(parseInt(c))).reduce((a,c)=>a+parseInt(c),0); }
         function romanToInt(s) {
             const val = {I:1,V:5,X:10,L:50,C:100,D:500,M:1000};
-            let total = 0;
-            for (let i = 0; i < s.length; i++) {
-                if (i + 1 < s.length && val[s[i]] < val[s[i + 1]]) {
-                    total -= val[s[i]];
-                } else {
-                    total += val[s[i]];
-                }
+            let total=0, i=0;
+            while(i<s.length){
+                if(i+1<s.length && val[s[i]] < val[s[i+1]]){ total -= val[s[i]]; i+=2; }
+                else{ total += val[s[i]]; i++; }
             }
             return total;
         }
-
         function getRomanProduct(pw) {
             const matches = pw.match(/[IVXLCDM]+/gi) || [];
-            let prod = 1;
-            for (let m of matches) {
+            let prod=1;
+            for(let m of matches){
                 const v = romanToInt(m.toUpperCase());
-                if (v === 0) return 0;
+                if(v===0) return 0;
                 prod *= v;
-                if (prod > 1000) return 0; // prevent overflow
+                if(prod > 10000) return 0;
             }
             return prod;
         }
-
         function getAtomicSum(pw) {
-            let sum = 0;
-            let i = 0;
-            pw = pw.toUpperCase();
-            while (i < pw.length) {
-                let found = false;
-                for (let len = 2; len >= 1; len--) {
-                    const sub = pw.slice(i, i + len);
-                    if (atomicNumbers[sub]) {
-                        sum += atomicNumbers[sub];
-                        i += len;
-                        found = true;
-                        break;
-                    }
+            let sum=0, i=0; pw=pw.toUpperCase();
+            while(i<pw.length){
+                let found=false;
+                for(let len=2; len>=1; len--){
+                    const sub = pw.slice(i,i+len);
+                    if(atomicNumbers[sub]){ sum += atomicNumbers[sub]; i+=len; found=true; break; }
                 }
-                if (!found) i++;
+                if(!found) i++;
             }
             return sum;
         }
+        const atomicNumbers = {H:1,HE:2,LI:3,BE:4,B:5,C:6,N:7,O:8,F:9,NE:10,NA:11,MG:12,AL:13,SI:14,P:15,S:16,CL:17,AR:18,K:19,CA:20,SC:21,TI:22,V:23,CR:24,MN:25,FE:26,CO:27,NI:28,CU:29,ZN:30,GA:31,GE:32,AS:33,SE:34,BR:35,KR:36,RB:37,SR:38,Y:39,ZR:40,NB:41,MO:42,TC:43,RU:44,RH:45,PD:46,AG:47,CD:48,IN:49,SN:50,SB:51,TE:52,I:53,XE:54,CS:55,BA:56,LA:57,CE:58,PR:59,ND:60,PM:61,SM:62,EU:63,GD:64,TB:65,DY:66,HO:67,ER:68,TM:69,YB:70,LU:71,HF:72,TA:73,W:74,RE:75,OS:76,IR:77,PT:78,AU:79,HG:80,TL:81,PB:82,BI:83,PO:84,AT:85,RN:86,FR:87,RA:88,AC:89,TH:90,PA:91,U:92,NP:93,PU:94,AM:95,CM:96,BK:97,CF:98,ES:99,FM:100,MD:101,NO:102,LR:103,RF:104,DB:105,SG:106,BH:107,HS:108,MT:109,DS:110,RG:111,CN:112,NH:113,FL:114,MC:115,LV:116,TS:117,OG:118 };
+        function getStarEmoji() {
+            const now = new Date(), seed = now.getHours();
+            return starEmojis[seed % starEmojis.length];
+        }
+        function getAnagram(word){ return word.split('').sort().join(' '); }
 
-        function getMoonPhase() {
-            const now = new Date();
-            const epoch = new Date(1970, 0, 1);
-            const days = (now - epoch) / 86400000;
-            const cycle = 29.530588853;
-            const phase = (days % cycle) / cycle;
-            const index = Math.floor(phase * 8);
-            return moonEmojis[index];
+        // Bot Mechanic (like Paul but tech bot)
+        function getBotText(){ 
+            return botState==='none'?'🤖 Add Bot the AI!':botState==='boot'?'🤖 Bot booting...':botState==='active'?'🤖 Update Bot 3 🔄 every 30s!':'❌ Bot crashed!'; 
+        }
+        function getBotCheck(pw){
+            if(botState==='none') return (pw.match(/🤖/g)||[]).length>0;
+            if(botState==='boot') return true;
+            return (pw.match(/🔄/g)||[]).length >=3;
+        }
+        function handleBot(pw){
+            if(botState==='none' && (pw.match(/🤖/g)||[]).length>0){
+                botState='boot'; setTimeout(bootBot,60000);
+            }
+        }
+        function bootBot(){
+            let pw=els.pw1.value, pos=pw.indexOf('🤖');
+            if(pos!==-1){
+                pw = pw.slice(0,pos)+'🦿'+pw.slice(pos+2); els.pw1.value=pw; els.pw1.focus();
+            }
+            botState='active'; updateInterval = setInterval(updateBot,30000);
+        }
+        function updateBot(){
+            let pw=els.pw1.value, updateCount=(pw.match(/🔄/g)||[]).length;
+            if(updateCount<3){ alert('😭 BOT CRASHED! Add more 🔄 FAST!'); return; }
+            for(let j=0;j<3;j++) pw=pw.replace(/🔄/,'');
+            els.pw1.value=pw; els.pw1.focus();
         }
 
-        function getCurrentTimeStr() {
-            const now = new Date();
-            return now.toLocaleString('en-US', {hour: '2-digit', minute: '2-digit', hour12: false});
+        // Hints (same)
+        function loadHints(){
+            const today = new Date().toDateString();
+            if(localStorage.getItem('hintDate') !== today){
+                localStorage.setItem('hintDate',today); localStorage.setItem('boughtCount','0'); localStorage.setItem('totalUsed','0');
+            }
+            boughtCount = parseInt(localStorage.getItem('boughtCount')||'0');
+            hintUsed = parseInt(localStorage.getItem('totalUsed')||'0');
         }
-
-        function isPrime(n) {
-            if (n < 2) return false;
-            for (let i = 2; i * i <= n; i++) if (n % i === 0) return false;
+        function getHintsLeft(){ return 5 + boughtCount - hintUsed; }
+        function useHint(){
+            let left = getHintsLeft();
+            if(left <=0) return false;
+            hintUsed++; localStorage.setItem('totalUsed',hintUsed);
+            updateHints();
             return true;
         }
-
-        function getAnagram(word) {
-            return word.split('').sort().join(' ');
+        function claimBuy(){
+            if(boughtCount >=5){ alert('Max 5 buys/day!'); return; }
+            boughtCount++; localStorage.setItem('boughtCount',boughtCount);
+            alert('✅ +1 Hint! Thanks tech hero! 📱');
+            updateHints();
+        }
+        function updateHints(){
+            let left = getHintsLeft();
+            els.hintBtn.textContent = `💡 Hint (${left})`;
+            els.hintBtn.disabled = left <=0;
+            els.buyBtn.style.display = left<=0 && boughtCount<5 ? 'inline-block' : 'none';
         }
 
-        function getPaulText() {
-            if (paulState === 'none') return '🥚 Add Paul the egg & keep safe!';
-            if (paulState === 'egg') return '🥚 Paul is hatching soon...';
-            if (paulState === 'chick') return '🐣 Paul hatched! Feed 🐛 every min (auto-eats 3)';
-            return 'Paul needs more 🐛!';
+        // Idle Timer (same)
+        function resetIdle(){
+            idleTime=60;
+            clearInterval(idleInterval);
+            idleInterval = setInterval(tickIdle,1000);
+            updateIdleTimer();
+        }
+        function tickIdle(){
+            idleTime--;
+            updateIdleTimer();
+            if(idleTime <=0){
+                clearInterval(idleInterval);
+                if(useHint() && failingRule){ showHint(); }
+                else{ alert('😴 Timeout! Wake up & use hint! ⏰'); }
+                resetIdle();
+            }
+        }
+        function updateIdleTimer(){ els.idleTimer.textContent = `⏰ Idle: ${idleTime}s`; if(idleTime<10) els.idleTimer.style.color='#f00'; }
+
+        // Level Story (same)
+        function showLevelStory(lvl){
+            els.levelStory.innerHTML = levelStories[lvl-1] + '<br><button onclick="this.parentElement.style.display=\'none\'" style="margin-top:20px;font-size:1.5em;padding:10px 20px;">Next →</button>';
+            els.levelStory.style.display = 'block';
+            setTimeout(()=> els.levelStory.style.display='none', 5000);
         }
 
-        function getPaulCheck(pw) {
-            if (paulState === 'none') return (pw.match(/🥚/g) || []).length > 0;
-            if (paulState === 'egg') return true;
-            return (pw.match(/🐛/g) || []).length >= 3; // will check in feed
+        // Ban Modal (now for symbols)
+        function showBanModal(){
+            els.banModal.style.display='block';
+            els.banButtons.innerHTML='';
+            const symbols = ['!','@','#','$','%','^','&','*','(',')','-','=','+','[',']','{','}',';',':','"','|',',','.','<','>','/','?','`','\~'];
+            for(let sym of symbols){
+                const btn=document.createElement('button'); btn.className='ban-btn';
+                btn.textContent=sym;
+                btn.onclick=()=>banSymbol(sym);
+                els.banButtons.appendChild(btn);
+            }
+        }
+        function banSymbol(sym){
+            if(bannedSymbols.includes(sym)) return;
+            bannedSymbols.push(sym);
+            els.bannedCount.textContent = `${bannedSymbols.length}/2 BANNED`;
+            if(bannedSymbols.length===2) els.banModal.style.display='none';
         }
 
-        // Init Game
-        function initGame() {
-            if (gameInit) return;
-            gameInit = true;
-            wordleWord = wordleWords[Math.floor(Math.random() * wordleWords.length)];
-            pw1.focus();
-            fireInterval = setInterval(insertFireRandom, 8000);
-        }
-
-        // Paul Management
-        function handlePaul(pw) {
-            const eggCount = (pw.match(/🥚/g) || []).length;
-            if (paulState === 'none' && eggCount > 0) {
-                paulState = 'egg';
-                setTimeout(hatchPaul, 70000); // 70s for fun
+        // Glitch (like fire but ⚡)
+        function insertGlitch(){
+            if(Math.random()<0.5 && !els.pw1.value.includes('⚡')){
+                const pos = Math.floor(Math.random()*(els.pw1.value.length+1));
+                els.pw1.value = els.pw1.value.slice(0,pos) + '⚡' + els.pw1.value.slice(pos);
+                els.pw1.focus();
+                document.body.style.animation='shake 0.8s';
+                setTimeout(()=>document.body.style.animation='',800);
             }
         }
 
-        function hatchPaul() {
-            let pw = pw1.value;
-            const pos = pw.indexOf('🥚');
-            if (pos !== -1) {
-                pw = pw.slice(0, pos) + '🐣' + pw.slice(pos + 2);
-                pw1.value = pw;
-                pw1.focus();
-                pw1.setSelectionRange(pos + 2, pos + 2);
-            }
-            paulState = 'chick';
-            setInterval(feedPaul, 35000); // faster for demo
-        }
-
-        function feedPaul() {
-            let pw = pw1.value;
-            let catCount = (pw.match(/🐛/g) || []).length;
-            if (catCount < 3) {
-                alert('😭 PAUL STARVED! GAME OVER! 💥');
-                pw1.value = '';
-                pw2.value = '';
-                resetPaul();
-                return;
-            }
-            // Eat 3
-            for (let j = 0; j < 3; j++) {
-                pw = pw.replace(/🐛/, '');
-            }
-            pw1.value = pw;
-            pw1.focus();
-        }
-
-        function resetPaul() {
-            paulState = 'none';
-            clearTimeout(hatchTimer);
-            clearInterval(feedInterval);
-        }
-
-        // Fire
-        function insertFireRandom() {
-            if (Math.random() < 0.4 && !pw1.value.includes('🔥')) {
-                const pos = Math.floor(Math.random() * (pw1.value.length + 1));
-                pw1.value = pw1.value.slice(0, pos) + '🔥' + pw1.value.slice(pos);
-                pw1.focus();
-                pw1.setSelectionRange(pos, pos + 1);
-                document.body.style.animation = 'shake 0.5s';
-                setTimeout(() => document.body.style.animation = '', 500);
-            }
-        }
-
-        // Banned Modal
-        function showBanModal() {
-            banModal.style.display = 'block';
-            const btns = document.getElementById('banButtons');
-            btns.innerHTML = '';
-            for (let c = 65; c <= 90; c++) {
-                const btn = document.createElement('button');
-                btn.className = 'ban-btn';
-                btn.textContent = String.fromCharCode(c).toLowerCase();
-                btn.onclick = () => banLetter(String.fromCharCode(c).toLowerCase());
-                btns.appendChild(btn);
-            }
-        }
-
-        function banLetter(letter) {
-            if (bannedLetters.includes(letter)) return;
-            bannedLetters.push(letter);
-            updateBanCount();
-            if (bannedLetters.length === 2) {
-                banModal.style.display = 'none';
-            }
-        }
-
-        function updateBanCount() {
-            document.getElementById('bannedCount').textContent = `${bannedLetters.length}/2 selected`;
-            const btns = document.querySelectorAll('.ban-btn');
-            btns.forEach((btn, i) => {
-                if (i < bannedLetters.length) btn.classList.add('banned');
-            });
-        }
-
-        // Validate & Render
-        function validateRules() {
-            initGame();
-            const pw = pw1.value;
-            handlePaul(pw);
-            let allGood = pw1.value === pw2.value;
-            let curMax = 1;
-            for (let i = 1; i < RULES.length; i++) {
-                const ruleOk = typeof RULES[i].check === 'function' ? RULES[i].check(pw) : false;
+        // Validate & Render (same)
+        function validateRules(){
+            loadHints();
+            const pw = els.pw1.value;
+            handleBot(pw);
+            let curMax=1, allGood = els.pw1.value === els.pw2.value;
+            for(let i=1; i<RULES.length; i++){
+                // Dynamic init
+                if(i===10 && !riddleWord) riddleWord = riddleWords[Math.floor(Math.random()*riddleWords.length)];
+                if(i===11 && !currentGadget) currentGadget = gadgets[Math.floor(Math.random()*gadgets.length)];
+                if(i===18 && bannedSymbols.length===0) showBanModal();
+                const ruleOk = RULES[i].check(pw);
                 allGood = allGood && ruleOk;
-                if (ruleOk) {
-                    curMax = i + 1;
-                    // Init new rules
-                    if (i === 10 && !wordleWord) wordleWord = wordleWords[Math.floor(Math.random() * wordleWords.length)];
-                    if (i === 11 && !currentCountry) currentCountry = countries[Math.floor(Math.random() * countries.length)];
-                    if (i === 18 && bannedLetters.length === 0) showBanModal();
-                } else break;
+                if(ruleOk) curMax = i+1;
+                else break;
             }
-            maxRule = Math.max(maxRule, curMax);
+            const newMaxRule = Math.max(maxRule, curMax);
+            if(newMaxRule > maxRule){
+                maxRule = newMaxRule;
+                const newLevel = Math.floor((maxRule-1)/2) +1;
+                if(newLevel > currentLevel){
+                    currentLevel = newLevel;
+                    els.levelDisplay.textContent = `Level ${currentLevel}/10 🦸‍♂️`;
+                    showLevelStory(currentLevel);
+                }
+            }
+            failingRule = maxRule < RULES.length ? RULES[maxRule] : null;
             renderRules();
-            if (allGood && maxRule >= RULES.length) {
-                winDiv.style.display = 'block';
-                confetti(); // simple confetti func
+            if(allGood && maxRule >= RULES.length){
+                els.win.style.display = 'block';
+                confetti();
+                clearInterval(glitchInterval);
+                clearInterval(updateInterval);
             }
         }
-
-        function renderRules() {
-            rulesList.innerHTML = '';
-            for (let i = 0; i < Math.min(maxRule, RULES.length); i++) {
-                const rule = RULES[i];
-                const pw = pw1.value;
-                const ok = i === 0 ? pw1.value === pw2.value : rule.check(pw);
-                const li = document.createElement('li');
-                li.className = `rule ${ok ? 'ok' : 'fail'}`;
-                const check = ok ? '✅' : '❌';
-                const text = typeof rule.text === 'function' ? rule.text(pw) : rule.text;
-                li.innerHTML = `<span class="rule-check">\( {check}</span> \){text}`;
-                rulesList.appendChild(li);
+        function renderRules(){
+            els.rulesList.innerHTML='';
+            for(let i=0; i<Math.min(maxRule, RULES.length); i++){
+                const pw=els.pw1.value;
+                const ok = i===0 ? els.pw1.value===els.pw2.value : RULES[i].check(pw);
+                const li=document.createElement('li'); li.className=`rule ${ok?'ok':'fail'}`;
+                const check=ok?'✅':'❌';
+                const text = typeof RULES[i].text ==='function' ? RULES[i].text(pw) : RULES[i].text;
+                li.innerHTML=`<span class="rule-check">\( {check}</span> \){text}`;
+                els.rulesList.appendChild(li);
             }
+        }
+        function showHint(){
+            if(!failingRule) return;
+            els.hintText.textContent = `💡 ${typeof failingRule.hint === 'function' ? failingRule.hint() : failingRule.hint}`;
+            els.hintText.style.display='block';
         }
 
         // Events
-        pw1.oninput = pw2.oninput = validateRules;
-        setInterval(validateRules, 1500);
+        els.pw1.oninput = els.pw2.oninput = ()=>{
+            validateRules(); resetIdle();
+        };
+        setInterval(validateRules, 2000);
+        els.hintBtn.onclick = ()=>{
+            if(useHint()) showHint();
+            else alert('No hints! Buy one?');
+        };
+        els.buyBtn.onclick = ()=>{
+            window.open(AD_URL,'_blank');
+            setTimeout(()=>{
+                if(confirm('✅ Visited Bluetooth page? Claim FREE hint!')) claimBuy();
+            },4000);
+        };
 
-        function resetGame() {
-            if (confirm('Reset the comic adventure? 😱')) {
-                pw1.value = '';
-                pw2.value = '';
-                maxRule = 1;
-                wordleWord = '';
-                currentCountry = null;
-                bannedLetters = [];
-                resetPaul();
-                validateRules();
-                winDiv.style.display = 'none';
-                banModal.style.display = 'none';
-            }
+        // Init
+        function initGame(){
+            glitchInterval = setInterval(insertGlitch,7000);
+            loadHints(); updateHints();
+            resetIdle();
+            els.pw1.focus();
+            validateRules();
         }
-
-        // Simple Confetti
-        function confetti() {
-            for (let i = 0; i < 100; i++) {
-                setTimeout(() => {
-                    const conf = document.createElement('div');
-                    conf.style.position = 'fixed';
-                    conf.style.left = Math.random() * 100 + '%';
-                    conf.style.top = '-10px';
-                    conf.style.width = '10px';
-                    conf.style.height = '10px';
-                    conf.style.background = `hsl(${Math.random()*360},100%,50%)`;
-                    conf.style.pointerEvents = 'none';
-                    conf.style.zIndex = '999';
-                    conf.style.animation = 'fall 3s linear forwards';
-                    document.body.appendChild(conf);
-                    setTimeout(() => conf.remove(), 3000);
-                }, i * 20);
-            }
+        function resetGame(){
+            if(!confirm('Reset ALL progress? 😱')) return;
+            els.pw1.value=''; els.pw2.value='';
+            maxRule=1; currentLevel=1; riddleWord=''; currentGadget=null; bannedSymbols=[];
+            botState='none'; clearInterval(glitchInterval); clearInterval(updateInterval); clearTimeout(bootTimer);
+            els.win.style.display='none'; els.banModal.style.display='none';
+            els.levelDisplay.textContent='Level 1/10 🦸‍♂️';
+            initGame();
         }
+        window.onload = initGame;
 
-        const style = document.createElement('style');
-        style.textContent = '@keyframes fall { to { transform: translateY(100vh) rotate(720deg); opacity: 0; } }';
-        document.head.appendChild(style);
-
-        // Auto focus
-        pw1.focus();
-        validateRules();
-    </script>
-</body>
-</html>
+        // Confetti
+        function conf
