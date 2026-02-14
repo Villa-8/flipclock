@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Chess Locker Escape — 25-Level Password Challenge</title>
+  <title>Cosmic Puzzle Locker — 25-Level Password Challenge</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -286,8 +286,8 @@
 
 <div id="container">
   <header>
-    <h1>Chess Locker Escape</h1>
-    <div class="subtitle">25-level escalating password challenge • Chess-themed logic & knowledge</div>
+    <h1>Cosmic Puzzle Locker</h1>
+    <div class="subtitle">25-level escalating password challenge • Space & science themed logic</div>
   </header>
 
   <div id="progress"><div id="progress-bar"></div></div>
@@ -298,7 +298,7 @@
   </div>
 
   <label for="password">Your Password</label>
-  <textarea id="password" placeholder="Start building your solution… ♟️ e4 …" rows="3" autofocus></textarea>
+  <textarea id="password" placeholder="Start building your solution… 🚀 🌌 …" rows="3" autofocus></textarea>
 
   <div id="controls">
     <button id="hint">Hint (<span id="hint-remaining">5</span>)</button>
@@ -311,7 +311,7 @@
   <div id="rules-container"></div>
 
   <div id="victory-screen">
-    <h2>CHECKMATE — All 25 Lockers Unlocked!</h2>
+    <h2>COSMIC WIN — All 25 Lockers Unlocked!</h2>
     <p style="font-size:1.3rem; margin:2rem 0;">
       Congratulations! You completed the challenge.<br>
       Take a screenshot and DM <strong>@akash</strong> on Instagram to claim your prize.
@@ -368,35 +368,35 @@ const UI = {
 };
 
 // ──────────────────────────────────────────────
-//  RULES (25 professional, fair, escalating)
+ //  RULES (25 advanced, general knowledge, emojis, fun logic)
 // ──────────────────────────────────────────────
 
 const RULES = [
-  { text: "Password must be at least 12 characters long",                     check: s => s.length >= 12,               hint: "Try adding more characters or emojis" },
-  { text: "Must contain at least 2 digits",                                   check: s => (s.match(/\d/g)||[]).length >= 2, hint: "Include numbers like 4 and 2" },
-  { text: "Must contain at least one uppercase letter",                       check: s => /[A-Z]/.test(s),               hint: "Use Shift + letter" },
-  { text: "Must contain at least one special character (!@#\( %^&*)",           check: s => /[!@# \)%^&*]/.test(s),          hint: "Add ! or @ or #" },
-  { text: "Digits in the password must sum to 42",                            check: s => digitSum(s) === 42,            hint: "Example: 9+9+9+9+6 = 42" },
-  { text: "Must include a white chess king ♔ or black ♚",                     check: s => /♔|♚/.test(s),                 hint: "Copy one of these: ♔ ♚" },
-  { text: "Must include one of the main chess openings: e4, d4, Nf3, c4",     check: s => /e4|d4|Nf3|c4/.test(s),        hint: "Common first moves" },
-  { text: "Must contain exactly 4 emoji characters",                          check: s => emojiCount(s) === 4,           hint: "Count only emoji — not letters/symbols" },
-  { text: "Must include the rainbow flag emoji 🌈",                           check: s => s.includes('🌈'),               hint: "Copy 🌈" },
-  { text: "Roman numerals in the password must multiply to 42",               check: s => romanProduct(s) === 42,        hint: "Example: VI × VII = 42" },
-  { text: "Password length must be a Fibonacci number (13,21,34,55…)",        check: s => isFibonacci(s.length),         hint: "Try length 13, 21, 34…" },
-  { text: "Must contain a chess piece emoji (at least one of ♔♕♖♗♘♙♚♛♜♝♞♟)", check: s => /♔|♕|♖|♗|♘|♙|♚|♛|♜|♝|♞|♟/.test(s), hint: "Any chess piece emoji" },
-  { text: "Must include the egg emoji 🥚",                                     check: s => s.includes('🥚'),               hint: "Add 🥚 to start the pet" },
-  { text: "After egg hatches, must contain at least 4 worms 🪱",              check: getPetFeedCheck,                    hint: "Feed your pet with 🪱" },
-  { text: "Must not contain the spider emoji 🕷",                              check: s => !s.includes('🕷'),              hint: "Remove 🕷 if it appears" },
-  { text: "Must not contain any banned letters",                              check: noBannedLetters,                    hint: "Avoid the two letters you banned" },
-  { text: "Must contain the Morse code for CHESS: -.-. .... . ... ...",       check: s => s.includes('-.-. .... . ... ...'), hint: "Copy the Morse sequence" },
-  { text: "Must contain the binary representation of 42: 101010",             check: s => s.includes('101010'),          hint: "Binary for 42 is 101010" },
-  { text: "Must contain one chess piece name (king, queen, rook, bishop, knight, pawn)", check: s => /king|queen|rook|bishop|knight|pawn/i.test(s), hint: "Write one piece name" },
-  { text: "Atomic numbers of elements must sum to 42",                        check: s => atomicSum(s) === 42,           hint: "C×7 = 42, or other combinations" },
-  { text: "Must include a black knight ♞",                                     check: s => s.includes('♞'),               hint: "Copy ♞" },
-  { text: "Must contain the name of a planet (mercury, venus, earth, mars, jupiter, saturn, uranus, neptune)", check: s => /mercury|venus|earth|mars|jupiter|saturn|uranus|neptune/i.test(s), hint: "Any planet name" },
-  { text: "Must contain a palindrome of 5+ characters",                       check: s => hasPalindrome(s,5),            hint: "Example: radar, level, civic…" },
-  { text: "Must contain exactly 4 different chess piece emojis",              check: s => uniqueChessPieces(s) === 4,    hint: "Use four different pieces" },
-  { text: "Must end with the word CHECKMATE",                                 check: s => s.trim().endsWith('CHECKMATE'), hint: "Finish with CHECKMATE" }
+  { text: "Password must be at least 15 characters long",                     check: s => s.length >= 15,               hint: "Extend your password with more content" },
+  { text: "Must contain at least 3 digits",                                   check: s => (s.match(/\d/g)||[]).length >= 3, hint: "Include numbers such as 1, 2, 3" },
+  { text: "Must contain at least 2 uppercase letters",                        check: s => (s.match(/[A-Z]/g)||[]).length >= 2, hint: "Use capital letters like A or B" },
+  { text: "Must contain at least 2 special characters (!@#\( %^&*)",            check: s => (s.match(/[!@# \)%^&*]/g)||[]).length >= 2, hint: "Add symbols like ! or #" },
+  { text: "Digits must sum to 42 (the answer to life)",                       check: s => digitSum(s) === 42,            hint: "Adjust numbers to total 42, e.g., 9+9+9+9+6" },
+  { text: "Must include a rocket emoji 🚀",                                    check: s => s.includes('🚀'),               hint: "Copy the rocket emoji 🚀" },
+  { text: "Must contain a space fact: galaxy or nebula",                      check: s => /galaxy|nebula/i.test(s),      hint: "Add 'galaxy' or 'nebula'" },
+  { text: "Must contain exactly 5 emojis",                                    check: s => emojiCount(s) === 5,           hint: "Ensure there are precisely 5 emojis" },
+  { text: "Must include a star emoji ⭐ or 🌟",                                 check: s => /⭐|🌟/.test(s),                 hint: "Add ⭐ or 🌟" },
+  { text: "Roman numerals must multiply to 42",                               check: s => romanProduct(s) === 42,        hint: "Use VI × VII or equivalent = 42" },
+  { text: "Length must be a Fibonacci number (13, 21, 34, 55…)",              check: s => isFibonacci(s.length),         hint: "Make length one of 13, 21, 34..." },
+  { text: "Must include a planet emoji 🪐",                                    check: s => s.includes('🪐'),               hint: "Add the planet emoji 🪐" },
+  { text: "Must include the egg emoji 🥚 to start the cosmic pet",             check: s => s.includes('🥚'),               hint: "Add 🥚 to begin the pet mechanic" },
+  { text: "After hatching, must contain at least 4 energy orbs ⚡",            check: getPetFeedCheck,                    hint: "Feed with ⚡ x4 or more" },
+  { text: "Must not contain the black hole emoji 🕳️",                         check: s => !s.includes('🕳️'),             hint: "Remove 🕳️ if it appears" },
+  { text: "Must not contain any banned letters",                              check: noBannedLetters,                    hint: "Avoid the letters you sacrificed" },
+  { text: "Must contain Morse code for SPACE: ... .--. .- -.-. .",            check: s => s.includes('... .--. .- -.-. .'), hint: "Copy the Morse for SPACE" },
+  { text: "Must contain binary for 42: 101010",                               check: s => s.includes('101010'),          hint: "Binary code for 42 is 101010" },
+  { text: "Must contain an unscrambled space term (e.g., scramble: rsta → star)", check: s => /star|moon|sun|comet|asteroid|quasar/i.test(s), hint: "Add a space word like star or comet" },
+  { text: "Atomic numbers must sum to 42",                                    check: s => atomicSum(s) === 42,           hint: "Elements like C×7 (6×7=42)" },
+  { text: "Must include a comet emoji ☄️",                                     check: s => s.includes('☄️'),               hint: "Add ☄️" },
+  { text: "Must contain a famous scientist name (einstein, newton, tesla, curie)", check: s => /einstein|newton|tesla|curie/i.test(s), hint: "Add Einstein or Newton" },
+  { text: "Must contain a palindrome of 5+ characters",                       check: s => hasPalindrome(s,5),            hint: "Words like level or radar" },
+  { text: "Must contain exactly 4 different space emojis",                    check: s => uniqueSpaceEmojis(s) === 4,    hint: "Four unique like 🚀🌌🪐⭐" },
+  { text: "Must end with the word UNIVERSE",                                  check: s => s.trim().endsWith('UNIVERSE'), hint: "Finish with UNIVERSE" }
 ];
 
 // ──────────────────────────────────────────────
@@ -434,18 +434,16 @@ function atomicSum(s)      {
 function hasPalindrome(s, minLen=5) {
   s = s.toLowerCase();
   for (let i = 0; i < s.length; i++) {
-    for (let len = minLen; len <= s.length-i; len += 2) {
-      let half = Math.floor(len/2);
-      let left = s.slice(i, i+half);
-      let right = s.slice(i+len-half, i+len);
-      if (left === right.split('').reverse().join('')) return true;
+    for (let len = minLen; len <= s.length - i; len++) {
+      const sub = s.slice(i, i+len);
+      if (sub === sub.split('').reverse().join('')) return true;
     }
   }
   return false;
 }
-function uniqueChessPieces(s) {
-  const pieces = s.match(/♔|♕|♖|♗|♘|♙|♚|♛|♜|♝|♞|♟/g) || [];
-  return new Set(pieces).size;
+function uniqueSpaceEmojis(s) {
+  const emojis = s.match(/🚀|🌌|🪐|⭐|🌟|☄️|🌠|🛰️|🔭|🌑|🌒|🌓|🌔|🌕|🌖|🌗|🌘/g) || [];
+  return new Set(emojis).size;
 }
 function noBannedLetters(s) {
   return !STATE.bannedLetters.some(l => s.toLowerCase().includes(l));
@@ -453,7 +451,7 @@ function noBannedLetters(s) {
 function getPetFeedCheck(s) {
   if (STATE.pet.state === 'none') return false;
   if (STATE.pet.state === 'egg') return true;
-  return (s.match(/🪱/g) || []).length >= 4;
+  return (s.match(/⚡/g) || []).length >= 4;
 }
 
 // ──────────────────────────────────────────────
@@ -480,26 +478,26 @@ function hatchPet() {
 
 function feedPet() {
   let val = UI.password.value;
-  const worms = (val.match(/🪱/g) || []).length;
-  if (worms < 4) {
-    alert("Your digital pet is starving! Add more 🪱 quickly!");
+  const orbs = (val.match(/⚡/g) || []).length;
+  if (orbs < 4) {
+    alert("Your cosmic pet needs energy! Add more ⚡ quickly!");
     return;
   }
   for (let i = 0; i < 4; i++) {
-    val = val.replace('🪱', '');
+    val = val.replace('⚡', '');
   }
   UI.password.value = val;
 }
 
 // ──────────────────────────────────────────────
-//  GLITCH / SPIDER
+//  GLITCH / BLACK HOLE
 // ──────────────────────────────────────────────
 
 function insertGlitch() {
-  if (Math.random() < 0.4 && !UI.password.value.includes('🕷')) {
+  if (Math.random() < 0.4 && !UI.password.value.includes('🕳️')) {
     const pos = Math.floor(Math.random() * (UI.password.value.length + 1));
     UI.password.value =
-      UI.password.value.slice(0,pos) + '🕷' + UI.password.value.slice(pos);
+      UI.password.value.slice(0,pos) + '🕳️' + UI.password.value.slice(pos);
   }
 }
 
@@ -566,7 +564,7 @@ UI.hint.addEventListener('click', () => {
 });
 
 UI.buyBtn.addEventListener('click', () => {
-  window.open('https://chess.com', '_blank');
+  window.open('https://nasa.gov', '_blank');
   setTimeout(() => {
     if (confirm('Did you visit the sponsor page?')) {
       STATE.hintsBought++;
@@ -619,7 +617,7 @@ function resetIdle() {
 // ──────────────────────────────────────────────
 
 function showLevelUp(lvl) {
-  UI.levelMessage.textContent = `Level ${lvl}/25 — Keep going! ♟️`;
+  UI.levelMessage.textContent = `Level ${lvl}/25 — Keep exploring! 🌌`;
   UI.levelPopup.style.display = 'grid';
   setTimeout(() => { UI.levelPopup.style.display = 'none'; }, 4000);
 }
@@ -656,7 +654,7 @@ function evaluatePassword() {
       confetti();
     }
 
-    // Ban modal appears after rule 15
+    // Ban modal after rule 15
     if (passed >= 16 && STATE.bannedLetters.length === 0) {
       showBanModal();
     }
@@ -726,6 +724,6 @@ function confetti() {
 const styleSheet = document.createElement('style');
 styleSheet.textContent = `@keyframes fall { to { transform: translateY(110vh) rotate(900deg); opacity:0; } }`;
 document.head.appendChild(styleSheet);
-    </script>
+</script>
 </body>
 </html>
