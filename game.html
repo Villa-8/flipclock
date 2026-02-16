@@ -3,149 +3,214 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>VILLA8 | Minimalist Puzzle</title>
+    <title>VILLA8 | Advanced Interface</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --slate: #121212;
             --lemon: #DFFF00;
-            --glass: rgba(255, 255, 255, 0.05);
-            --text: #f0f0f0;
+            --glass: rgba(255, 255, 255, 0.03);
+            --border: rgba(223, 255, 0, 0.15);
         }
+
+        * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
 
         body, html {
             margin: 0; padding: 0;
             background-color: var(--slate);
-            color: var(--text);
-            font-family: 'Inter', -apple-system, sans-serif;
-            height: 100%; overflow: hidden;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            height: 100vh; overflow: hidden;
+            display: flex; flex-direction: column; align-items: center;
         }
 
-        /* The Header */
-        #header {
-            position: absolute; top: 40px; width: 100%;
-            text-align: center; letter-spacing: 8px;
-            font-weight: 800; color: var(--lemon); opacity: 0.8;
-        }
-
-        /* The Game Container */
-        #game-container {
-            width: 320px; height: 480px;
-            background: var(--glass);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 40px;
+        /* --- UI FRAMEWORK --- */
+        #villa-ui {
             position: relative;
+            width: 100%; max-width: 400px; height: 100%;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            backdrop-filter: blur(10px);
+            padding: 20px;
         }
 
-        /* Puzzle Elements */
+        #header {
+            position: absolute; top: 60px;
+            letter-spacing: 12px; font-weight: 800;
+            color: var(--lemon); font-size: 1.2rem;
+            text-align: center; width: 100%;
+        }
+
+        .level-container {
+            width: 100%; height: 400px;
+            background: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: 40px;
+            display: flex; align-items: center; justify-content: center;
+            position: relative; transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        /* --- GESTURE ELEMENTS --- */
         .slider-rail {
-            width: 10px; height: 200px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 5px; position: relative;
+            width: 8px; height: 250px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px; position: relative;
         }
 
-        #slider-handle {
-            width: 30px; height: 30px;
+        #handle {
+            width: 44px; height: 44px;
             background: var(--lemon);
             border-radius: 50%; position: absolute;
-            left: -10px; cursor: pointer;
-            box-shadow: 0 0 15px var(--lemon);
+            left: -18px; cursor: grab;
+            box-shadow: 0 0 20px rgba(223, 255, 0, 0.4);
+            touch-action: none;
         }
 
-        /* Hint/Task Section */
-        #ui-footer {
-            position: absolute; bottom: 40px;
-            display: flex; gap: 20px;
+        /* --- TASK OVERLAYS --- */
+        .task-box {
+            text-align: center; padding: 20px;
         }
 
-        .btn {
-            padding: 10px 20px;
+        .input-field {
+            background: none; border: none; border-bottom: 2px solid var(--lemon);
+            color: var(--lemon); font-size: 2rem; width: 140px;
+            text-align: center; outline: none; margin-top: 20px;
+            font-family: 'Inter', sans-serif; font-weight: 800;
+        }
+
+        #footer-nav {
+            position: absolute; bottom: 50px;
+            display: flex; gap: 15px;
+        }
+
+        .action-btn {
+            padding: 12px 24px;
             border: 1px solid var(--lemon);
             color: var(--lemon);
-            border-radius: 20px;
-            font-size: 12px; cursor: pointer;
+            border-radius: 30px;
+            font-size: 10px; font-weight: 800;
             text-decoration: none; transition: 0.3s;
+            text-transform: uppercase; letter-spacing: 1px;
         }
 
-        .btn:hover { background: var(--lemon); color: var(--slate); }
+        .action-btn:hover { background: var(--lemon); color: var(--slate); }
 
-        /* Hidden Level State */
-        .hidden { display: none; }
+        .hint-text {
+            position: absolute; bottom: 120px;
+            font-size: 11px; color: rgba(255,255,255,0.3);
+            text-transform: uppercase; letter-spacing: 2px;
+        }
+
+        .hidden { display: none !important; opacity: 0; transform: scale(0.9); }
         
-        #message { margin-top: 20px; font-size: 14px; color: #888; }
+        /* Success Animation */
+        .success-flash { background: var(--lemon) !important; }
     </style>
 </head>
 <body>
 
-    <div id="header">VILLA8</div>
+    <div id="villa-ui">
+        <div id="header">VILLA8</div>
 
-    <div id="game-container">
-        <div id="level-1" class="level">
+        <div id="lvl-1" class="level-container">
             <div class="slider-rail">
-                <div id="slider-handle" style="top: 170px;"></div>
+                <div id="handle" style="top: 200px;"></div>
             </div>
         </div>
 
-        <div id="level-2" class="level hidden">
-            <p style="text-align:center; padding: 20px;">ZONE LOCKED.<br>Find the code on our site.</p>
-            <input type="text" id="passcode" placeholder="ENTER CODE" 
-                   style="background:none; border:1px solid var(--lemon); color:white; text-align:center; padding:10px;">
+        <div id="lvl-2" class="level-container hidden">
+            <div class="task-box">
+                <p style="font-size: 12px; letter-spacing: 1px; color: #888;">WORLD KEY REQUIRED</p>
+                <p style="font-size: 14px;">Find the code hidden in our<br><b>Official Studio Website</b></p>
+                <input type="text" id="web-code" class="input-field" maxlength="4" autocomplete="off">
+            </div>
+        </div>
+
+        <div id="lvl-3" class="level-container hidden">
+            <div class="task-box">
+                <p style="font-size: 12px; letter-spacing: 1px; color: #888;">VISUAL SYNC</p>
+                <p style="font-size: 14px;">Follow @Villa8_Studio<br>Check <b>Story Highlights</b> for the Key</p>
+                <input type="text" id="ig-code" class="input-field" maxlength="4" placeholder="••••">
+            </div>
+        </div>
+
+        <div class="hint-text" id="status-msg">Zone 01: Calibration</div>
+
+        <div id="footer-nav">
+            <a href="https://yourwebsite.com" target="_blank" class="action-btn">Visit Website</a>
+            <a href="https://instagram.com/yourprofile" target="_blank" class="action-btn">Hint (IG)</a>
         </div>
     </div>
 
-    <div id="message">Level 01: Balance the Frequency</div>
-
-    <div id="ui-footer">
-        <a href="https://yourwebsite.com" target="_blank" class="btn">VISIT SITE</a>
-        <a href="https://instagram.com/yourprofile" target="_blank" class="btn">HINT (IG)</a>
-    </div>
-
     <script>
-        const handle = document.getElementById('slider-handle');
-        const level1 = document.getElementById('level-1');
-        const level2 = document.getElementById('level-2');
-        const msg = document.getElementById('message');
+        const state = { currentLevel: 1 };
 
-        // --- LEVEL 1 LOGIC: THE SLIDER ---
+        // --- HAPTIC FEEDBACK ---
+        const haptic = () => { if ("vibrate" in navigator) navigator.vibrate(20); };
+
+        // --- LEVEL 1 ENGINE: PHYSICS SLIDE ---
+        const handle = document.getElementById('handle');
+        const rail = document.querySelector('.slider-rail');
         let isDragging = false;
 
-        handle.addEventListener('mousedown', () => isDragging = true);
-        window.addEventListener('mouseup', () => isDragging = false);
+        handle.addEventListener('pointerdown', () => { isDragging = true; haptic(); });
+        window.addEventListener('pointerup', () => isDragging = false);
 
-        window.addEventListener('mousemove', (e) => {
+        window.addEventListener('pointermove', (e) => {
             if (!isDragging) return;
-            let containerRect = document.querySelector('.slider-rail').getBoundingClientRect();
-            let newTop = e.clientY - containerRect.top - 15;
+            const rect = rail.getBoundingClientRect();
+            let pos = e.clientY - rect.top;
             
-            if (newTop >= 0 && newTop <= 170) {
-                handle.style.top = newTop + 'px';
-                
-                // Winning Condition (Exact Spot)
-                if (Math.abs(newTop - 50) < 5) {
-                    completeLevel1();
+            if (pos >= 0 && pos <= 206) {
+                handle.style.top = pos + 'px';
+                // Success Condition: Must be held at the very top (Zone 0)
+                if (pos < 5) {
+                    isDragging = false;
+                    completeLevel(1);
                 }
             }
         });
 
-        function completeLevel1() {
-            msg.innerText = "ACCESS GRANTED";
-            handle.style.background = "#fff";
-            setTimeout(() => {
-                level1.classList.add('hidden');
-                level2.classList.remove('hidden');
-                msg.innerText = "Task: Find code at Villa8.com";
-            }, 1000);
-        }
-
-        // --- LEVEL 2 LOGIC: THE WEBSITE CODE ---
-        document.getElementById('passcode').addEventListener('input', (e) => {
-            if (e.target.value === "8888") { // Example code hidden on your site
-                alert("World 2 Unlocked");
-                // Progress to Level 3...
+        // --- LEVEL 2 ENGINE: WEB CODE ---
+        document.getElementById('web-code').addEventListener('input', (e) => {
+            if (e.target.value === "1998") { // Hidden code on your site
+                haptic();
+                completeLevel(2);
             }
         });
+
+        // --- LEVEL 3 ENGINE: IG CODE ---
+        document.getElementById('ig-code').addEventListener('input', (e) => {
+            if (e.target.value.toUpperCase() === "V8X1") { // Code from IG Highlight
+                haptic();
+                completeLevel(3);
+            }
+        });
+
+        // --- LEVEL TRANSITION LOGIC ---
+        function completeLevel(lvl) {
+            const current = document.getElementById(`lvl-${lvl}`);
+            const next = document.getElementById(`lvl-${lvl + 1}`);
+            const status = document.getElementById('status-msg');
+
+            current.classList.add('success-flash');
+            haptic();
+
+            setTimeout(() => {
+                current.classList.add('hidden');
+                if (next) {
+                    next.classList.remove('hidden');
+                    state.currentLevel++;
+                    updateStatus();
+                } else {
+                    status.innerText = "ALL ZONES CALIBRATED";
+                }
+            }, 800);
+        }
+
+        function updateStatus() {
+            const msgs = ["", "Zone 01: Calibration", "Zone 02: External Fetch", "Zone 03: Social Sync"];
+            document.getElementById('status-msg').innerText = msgs[state.currentLevel];
+        }
     </script>
 </body>
 </html>
