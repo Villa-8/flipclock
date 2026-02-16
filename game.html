@@ -1,260 +1,195 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>VILLA8</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VILLA8 | Think. Observe. Decode.</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #FFFCEB;
+            --card: #F2E8CF;
+            --text: #121212;
+            --accent: #E6CC00;
+            --muted: #757575;
+            --transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-<style>
-:root{
-  --bg:#fff6d6;
-  --card:rgba(255,255,255,0.65);
-  --text:#111;
-  --accent:#000;
-}
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-*{
-  box-sizing:border-box;
-  font-family:system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-}
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
 
-body{
-  margin:0;
-  background:var(--bg);
-  height:100vh;
-  display:flex;
-  justify-content:center;
-}
+        /* --- UI Components --- */
+        #game-container {
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: var(--transition);
+        }
 
-.app{
-  width:100%;
-  max-width:420px;
-  padding:16px;
-  display:flex;
-  flex-direction:column;
-  height:100vh;
-}
+        .level-indicator {
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            color: var(--muted);
+        }
 
-header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
+        .puzzle-card {
+            background: var(--card);
+            padding: 60px 20px;
+            border-radius: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+            min-height: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            position: relative;
+        }
 
-header h1{
-  margin:0;
-  letter-spacing:4px;
-  font-size:22px;
-}
+        input {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            background: transparent;
+            border-bottom: 2px solid var(--text);
+            font-family: inherit;
+            font-size: 1.2rem;
+            text-align: center;
+            outline: none;
+            margin-top: 20px;
+        }
 
-#levelText{
-  font-size:14px;
-  opacity:.7;
-}
+        .btn-hint {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            background: var(--text);
+            color: var(--bg);
+            border: none;
+            padding: 12px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.8rem;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
 
-.card{
-  flex:1;
-  margin:20px 0;
-  background:var(--card);
-  backdrop-filter:blur(14px);
-  border-radius:18px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-  padding:20px;
-  font-size:22px;
-  user-select:none;
-}
+        /* --- Animations --- */
+        .active { opacity: 1 !important; transform: translateY(0) !important; }
+        
+        .shake { animation: shake 0.4s ease; }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
 
-.input-area{
-  display:flex;
-  gap:10px;
-}
-
-input{
-  flex:1;
-  padding:14px;
-  border-radius:14px;
-  border:none;
-  font-size:16px;
-}
-
-button{
-  padding:14px 18px;
-  border-radius:14px;
-  border:none;
-  background:var(--accent);
-  color:#fff;
-  font-size:14px;
-  cursor:pointer;
-}
-
-footer{
-  margin-top:10px;
-  display:flex;
-  justify-content:center;
-}
-
-#hint{
-  background:none;
-  color:#000;
-  opacity:.6;
-}
-
-@media(min-width:768px){
-  .app{max-width:500px;}
-}
-</style>
+        /* Special Level Styles */
+        .upside-down { transform: rotate(180deg); }
+    </style>
 </head>
-
 <body>
 
-<main class="app">
-  <header>
-    <h1>VILLA8</h1>
-    <span id="levelText"></span>
-  </header>
+    <div id="game-container">
+        <div class="level-indicator" id="level-label">WORLD 1 • LEVEL 1</div>
+        
+        <div class="puzzle-card" id="puzzle-box">
+            </div>
 
-  <section class="card" id="puzzle"></section>
+        <div id="input-area">
+            <input type="text" id="answer-input" placeholder="ENTER GATE" autocomplete="off">
+        </div>
+    </div>
 
-  <section class="input-area" id="inputArea">
-    <input type="text" id="answer" placeholder="Enter password..." />
-    <button id="submit">ENTER</button>
-  </section>
+    <button class="btn-hint" onclick="showHint()">HINT 🔒</button>
 
-  <footer>
-    <button id="hint">🔒 Hint</button>
-  </footer>
-</main>
+    <script>
+        // --- LEVEL DATA ---
+        const levels = [
+            { id: 1, type: "input", display: "WELCOME", answer: "WELCOME", hint: "The answer is literally looking at you." },
+            { id: 2, type: "tap", display: "<span id='tap-target' style='border:1px solid #121212; padding:10px;'>TAP ME</span>", answer: "TAP", hint: "Tap the text, not the box." },
+            { id: 3, type: "input", display: "12321", answer: "12321", hint: "It reads the same forward and backward." },
+            { id: 4, type: "input", display: "<span class='upside-down'>generate</span>", answer: "generate", hint: "Turn your world around." }
+        ];
 
-<script>
-/* ================= LEVEL DATA ================= */
+        let currentLevelIndex = localStorage.getItem('v8_level') || 0;
+        const container = document.getElementById('game-container');
+        const puzzleBox = document.getElementById('puzzle-box');
+        const inputField = document.getElementById('answer-input');
+        const levelLabel = document.getElementById('level-label');
 
-const levels = [
-  { puzzle:"WELCOME", answer:"WELCOME", hint:"Sometimes the answer is already given." },
-  { puzzle:"TAP ME", action:"tap", hint:"Do exactly what it says." },
-  { puzzle:"12321", answer:"12321", hint:"Symmetry matters." },
-  { puzzle:"•••", action:"timing", hint:"Tap dots in order." },
-  { puzzle:"INPUT DISABLED", action:"longpress", hint:"Hold longer." },
-  { puzzle:"ɘʇɐɹǝuǝƃ", answer:"GENERATE", hint:"Change perspective." },
-  { puzzle:"DON'T TAP", action:"wait", hint:"Opposite action." },
-  { puzzle:"THIS IS NOT A PASSWORD", answer:"PASSWORD", hint:"Read carefully." },
-  { puzzle:"•••••", answer:"5", hint:"Count." },
-  { puzzle:"", action:"swipe", hint:"Explore the screen." },
+        // --- CORE ENGINE ---
+        function loadLevel() {
+            const lvl = levels[currentLevelIndex];
+            container.classList.remove('active');
+            
+            setTimeout(() => {
+                levelLabel.innerText = `WORLD 1 • LEVEL ${lvl.id}`;
+                puzzleBox.innerHTML = lvl.display;
+                inputField.value = "";
+                
+                // Show/Hide input based on type
+                inputField.style.display = (lvl.type === "input") ? "block" : "none";
+                
+                // Specialized Logic for Tapping Levels
+                if(lvl.id === 2) {
+                    document.getElementById('tap-target').onclick = () => nextLevel();
+                }
 
-  { puzzle:"V I L L A E I G H T", answer:"VILLA8", hint:"Remove noise." },
-  { puzzle:"2 + 2", answer:"4", hint:"Basic." },
-  { puzzle:"A=1 B=2", answer:"3", hint:"Alphabet order." },
-  { puzzle:"08:00", answer:"8", hint:"Game name." },
-  { puzzle:"VISIT WEBSITE", action:"external", hint:"Visit site to unlock." },
+                container.classList.add('active');
+            }, 500);
+        }
 
-  { puzzle:"FOLLOW INSTAGRAM", action:"external", hint:"Social unlock." },
-  { puzzle:"2,4,8", answer:"16", hint:"Double." },
-  { puzzle:"BALANCE", action:"center", hint:"Middle is key." },
-  { puzzle:"404", answer:"NOTFOUND", hint:"Missing." },
-  { puzzle:"WORLD COMPLETE", action:"tap", hint:"Acknowledge." },
+        function checkAnswer() {
+            const lvl = levels[currentLevelIndex];
+            const val = inputField.value.trim().toUpperCase();
+            
+            if (val === lvl.answer.toUpperCase()) {
+                nextLevel();
+            } else if (val !== "") {
+                puzzleBox.classList.add('shake');
+                setTimeout(() => puzzleBox.classList.remove('shake'), 400);
+            }
+        }
 
-  { puzzle:"LOOP", action:"swipeBack", hint:"Break the loop." },
-  { puzzle:"EMPTY", answer:"", hint:"Nothing is something." },
-  { puzzle:"SCROLL", action:"scroll", hint:"Move." },
-  { puzzle:"YES / NO", action:"background", hint:"Neither." },
-  { puzzle:"GLITCH", action:"hold", hint:"Pause it." },
+        function nextLevel() {
+            currentLevelIndex++;
+            if (currentLevelIndex < levels.length) {
+                localStorage.setItem('v8_level', currentLevelIndex);
+                loadLevel();
+            } else {
+                puzzleBox.innerHTML = "YOU'VE ENTERED VILLA8 CORE.";
+                inputField.style.display = "none";
+            }
+        }
 
-  { puzzle:"SHAKE", action:"still", hint:"Stay still." },
-  { puzzle:"WAIT", action:"wait30", hint:"Patience." },
-  { puzzle:"WRONG", action:"tapText", hint:"Accept it." },
-  { puzzle:"SILENCE", action:"nothing", hint:"Do nothing." },
-  { puzzle:"MIRROR", answer:"RORRIM", hint:"Reverse." },
+        function showHint() {
+            alert(levels[currentLevelIndex].hint);
+            // This is where you'd trigger the AdMob/Rewarded Ad logic
+        }
 
-  { puzzle:"URL LEVEL", action:"url", hint:"Change query." },
-  { puzzle:"EDGES", action:"edges", hint:"Corners." },
-  { puzzle:"INVISIBLE", action:"random", hint:"Search." },
-  { puzzle:"READ SITE", action:"external", hint:"Hidden word." },
-  { puzzle:"COMPLETE", action:"tap", hint:"Proceed." },
+        // Listen for "Enter" key
+        inputField.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') checkAnswer();
+        });
 
-  { puzzle:"MEMORY", action:"remember", hint:"Recall earlier." },
-  { puzzle:"PATTERN", answer:"8", hint:"Repeated theme." },
-  { puzzle:"FALSE FAIL", action:"tap", hint:"Ignore error." },
-  { puzzle:"ONE TRY", answer:"READY", hint:"Confidence." },
-  { puzzle:"YOU ARE READY", answer:"READY", hint:"Believe it." }
-];
-
-/* ================= GAME ENGINE ================= */
-
-let level = Number(localStorage.getItem("villa8Level")) || 0;
-
-const puzzle = document.getElementById("puzzle");
-const answer = document.getElementById("answer");
-const submit = document.getElementById("submit");
-const hintBtn = document.getElementById("hint");
-const levelText = document.getElementById("levelText");
-const inputArea = document.getElementById("inputArea");
-
-function loadLevel(){
-  const l = levels[level];
-  puzzle.textContent = l.puzzle || " ";
-  levelText.textContent = `Level ${level + 1}`;
-  answer.value = "";
-  inputArea.style.display = l.answer !== undefined ? "flex" : "none";
-}
-
-function nextLevel(){
-  level++;
-  localStorage.setItem("villa8Level", level);
-  if(level >= levels.length){
-    puzzle.textContent = "VILLA8 COMPLETED";
-    inputArea.style.display = "none";
-    return;
-  }
-  loadLevel();
-}
-
-submit.onclick = ()=>{
-  const l = levels[level];
-  if(l.answer !== undefined && answer.value.trim().toUpperCase() === l.answer){
-    nextLevel();
-  }else{
-    shake();
-  }
-};
-
-hintBtn.onclick = ()=>{
-  alert("HINT:\n" + levels[level].hint + "\n\nUnlock by Ad / Website / Instagram");
-};
-
-/* ================= INTERACTIONS ================= */
-
-puzzle.onclick = ()=> {
-  if(levels[level].action === "tap") nextLevel();
-};
-
-let pressTimer;
-puzzle.addEventListener("touchstart",()=>{
-  pressTimer = setTimeout(()=>{
-    if(levels[level].action === "longpress") nextLevel();
-  },800);
-});
-puzzle.addEventListener("touchend",()=>clearTimeout(pressTimer));
-
-let startX;
-puzzle.addEventListener("touchstart",e=>startX=e.touches[0].clientX);
-puzzle.addEventListener("touchend",e=>{
-  let dx = e.changedTouches[0].clientX - startX;
-  if(Math.abs(dx) > 60 && levels[level].action === "swipe") nextLevel();
-});
-
-function shake(){
-  puzzle.animate([
-    {transform:"translateX(0)"},
-    {transform:"translateX(-8px)"},
-    {transform:"translateX(8px)"},
-    {transform:"translateX(0)"}
-  ],{duration:300});
-}
-
-loadLevel();
-</script>
-
+        // Initialize
+        window.onload = loadLevel;
+    </script>
 </body>
 </html>
