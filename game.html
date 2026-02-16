@@ -3,193 +3,188 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>VILLA8 | Think. Observe. Decode.</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+    <title>VILLA8 | Gate</title>
     <style>
         :root {
             --bg: #FFFCEB;
             --card: #F2E8CF;
             --text: #121212;
+            --muted: #A09B8E;
             --accent: #E6CC00;
-            --muted: #757575;
-            --transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
 
         body {
-            font-family: 'Inter', sans-serif;
             background-color: var(--bg);
             color: var(--text);
             height: 100vh;
             display: flex;
-            flex-direction: column;
-            align-items: center;
             justify-content: center;
+            align-items: center;
             overflow: hidden;
+            touch-action: manipulation;
         }
 
-        /* --- UI Components --- */
-        #game-container {
-            width: 90%;
+        #game-wrapper {
+            width: 100%;
             max-width: 400px;
+            padding: 20px;
             text-align: center;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: var(--transition);
+            transition: opacity 0.4s ease;
         }
 
-        .level-indicator {
-            font-size: 0.8rem;
-            font-weight: 700;
-            letter-spacing: 2px;
-            margin-bottom: 20px;
+        .level-header {
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 3px;
             color: var(--muted);
+            margin-bottom: 30px;
+            text-transform: uppercase;
         }
 
         .puzzle-card {
             background: var(--card);
-            padding: 60px 20px;
-            border-radius: 30px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.05);
-            margin-bottom: 30px;
-            min-height: 250px;
+            min-height: 280px;
+            border-radius: 40px;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
-            position: relative;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.03);
+            margin-bottom: 40px;
+            padding: 30px;
+            transition: transform 0.3s ease;
+        }
+
+        /* Level Specific Styles */
+        .display-text { font-size: 32px; font-weight: 300; letter-spacing: -1px; }
+        .upside-down { transform: rotate(180deg); }
+        .tap-btn { 
+            padding: 15px 30px; 
+            border: 1px solid var(--text); 
+            border-radius: 10px; 
+            cursor: pointer;
+            user-select: none;
         }
 
         input {
-            width: 100%;
-            padding: 15px;
-            border: none;
+            width: 80%;
             background: transparent;
+            border: none;
             border-bottom: 2px solid var(--text);
-            font-family: inherit;
-            font-size: 1.2rem;
+            padding: 10px;
+            font-size: 20px;
             text-align: center;
             outline: none;
-            margin-top: 20px;
+            text-transform: uppercase;
         }
 
-        .btn-hint {
+        .hint-trigger {
             position: fixed;
-            bottom: 40px;
-            right: 40px;
-            background: var(--text);
-            color: var(--bg);
-            border: none;
-            padding: 12px 20px;
-            border-radius: 50px;
+            bottom: 30px;
+            font-size: 12px;
+            font-weight: bold;
+            text-decoration: underline;
             cursor: pointer;
-            font-weight: 600;
-            font-size: 0.8rem;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            color: var(--muted);
         }
 
-        /* --- Animations --- */
-        .active { opacity: 1 !important; transform: translateY(0) !important; }
-        
-        .shake { animation: shake 0.4s ease; }
+        /* Feedback Anims */
+        .shake { animation: shake 0.4s; }
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
             25% { transform: translateX(-10px); }
             75% { transform: translateX(10px); }
         }
-
-        /* Special Level Styles */
-        .upside-down { transform: rotate(180deg); }
     </style>
 </head>
 <body>
 
-    <div id="game-container">
-        <div class="level-indicator" id="level-label">WORLD 1 • LEVEL 1</div>
+    <div id="game-wrapper">
+        <div class="level-header" id="lvl-info">WORLD 1 • LEVEL 1</div>
         
-        <div class="puzzle-card" id="puzzle-box">
-            </div>
-
-        <div id="input-area">
-            <input type="text" id="answer-input" placeholder="ENTER GATE" autocomplete="off">
+        <div class="puzzle-card" id="card">
+            <div id="puzzle-content" class="display-text">WELCOME</div>
         </div>
+
+        <div id="input-zone">
+            <input type="text" id="answer-box" placeholder="TYPE HERE" spellcheck="false" autocomplete="off">
+        </div>
+
+        <div class="hint-trigger" onclick="alert(levels[currentIndex].hint)">NEED A HINT?</div>
     </div>
 
-    <button class="btn-hint" onclick="showHint()">HINT 🔒</button>
-
     <script>
-        // --- LEVEL DATA ---
         const levels = [
-            { id: 1, type: "input", display: "WELCOME", answer: "WELCOME", hint: "The answer is literally looking at you." },
-            { id: 2, type: "tap", display: "<span id='tap-target' style='border:1px solid #121212; padding:10px;'>TAP ME</span>", answer: "TAP", hint: "Tap the text, not the box." },
-            { id: 3, type: "input", display: "12321", answer: "12321", hint: "It reads the same forward and backward." },
-            { id: 4, type: "input", display: "<span class='upside-down'>generate</span>", answer: "generate", hint: "Turn your world around." }
+            { type: "input", display: "WELCOME", answer: "WELCOME", hint: "It's written right there." },
+            { type: "tap", display: "<div class='tap-btn' id='tap-target'>TAP ME</div>", answer: "TRIGGER", hint: "Click exactly on the text." },
+            { type: "input", display: "12321", answer: "12321", hint: "Symmetry is key." },
+            { type: "input", display: "<div class='upside-down'>GENERATE</div>", answer: "GENERATE", hint: "Look at it from another perspective." }
         ];
 
-        let currentLevelIndex = localStorage.getItem('v8_level') || 0;
-        const container = document.getElementById('game-container');
-        const puzzleBox = document.getElementById('puzzle-box');
-        const inputField = document.getElementById('answer-input');
-        const levelLabel = document.getElementById('level-label');
+        let currentIndex = 0;
+        const wrapper = document.getElementById('game-wrapper');
+        const card = document.getElementById('card');
+        const content = document.getElementById('puzzle-content');
+        const answerBox = document.getElementById('answer-box');
+        const lvlInfo = document.getElementById('lvl-info');
 
-        // --- CORE ENGINE ---
-        function loadLevel() {
-            const lvl = levels[currentLevelIndex];
-            container.classList.remove('active');
+        function initLevel() {
+            const data = levels[currentIndex];
+            
+            // Fade out
+            wrapper.style.opacity = "0";
             
             setTimeout(() => {
-                levelLabel.innerText = `WORLD 1 • LEVEL ${lvl.id}`;
-                puzzleBox.innerHTML = lvl.display;
-                inputField.value = "";
+                lvlInfo.innerText = `WORLD 1 • LEVEL ${currentIndex + 1}`;
+                content.innerHTML = data.display;
+                answerBox.value = "";
                 
-                // Show/Hide input based on type
-                inputField.style.display = (lvl.type === "input") ? "block" : "none";
+                // Show/Hide input
+                answerBox.parentElement.style.display = (data.type === "input") ? "block" : "none";
                 
-                // Specialized Logic for Tapping Levels
-                if(lvl.id === 2) {
+                // If it's a tap level, set up the click listener
+                if (data.type === "tap") {
                     document.getElementById('tap-target').onclick = () => nextLevel();
                 }
 
-                container.classList.add('active');
-            }, 500);
-        }
-
-        function checkAnswer() {
-            const lvl = levels[currentLevelIndex];
-            const val = inputField.value.trim().toUpperCase();
-            
-            if (val === lvl.answer.toUpperCase()) {
-                nextLevel();
-            } else if (val !== "") {
-                puzzleBox.classList.add('shake');
-                setTimeout(() => puzzleBox.classList.remove('shake'), 400);
-            }
+                // Fade in
+                wrapper.style.opacity = "1";
+                if(data.type === "input") answerBox.focus();
+            }, 400);
         }
 
         function nextLevel() {
-            currentLevelIndex++;
-            if (currentLevelIndex < levels.length) {
-                localStorage.setItem('v8_level', currentLevelIndex);
-                loadLevel();
+            currentIndex++;
+            if (currentIndex < levels.length) {
+                initLevel();
             } else {
-                puzzleBox.innerHTML = "YOU'VE ENTERED VILLA8 CORE.";
-                inputField.style.display = "none";
+                content.innerText = "VILLA8 UNLOCKED";
+                answerBox.style.display = "none";
             }
         }
 
-        function showHint() {
-            alert(levels[currentLevelIndex].hint);
-            // This is where you'd trigger the AdMob/Rewarded Ad logic
-        }
-
-        // Listen for "Enter" key
-        inputField.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') checkAnswer();
+        // Logic: Check answer as user types
+        answerBox.addEventListener('input', (e) => {
+            const input = e.target.value.toUpperCase();
+            const correct = levels[currentIndex].answer.toUpperCase();
+            
+            if (input === correct) {
+                nextLevel();
+            }
         });
 
-        // Initialize
-        window.onload = loadLevel;
+        // If they press Enter but it's wrong, shake the card
+        answerBox.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && answerBox.value.toUpperCase() !== levels[currentIndex].answer) {
+                card.classList.add('shake');
+                setTimeout(() => card.classList.remove('shake'), 400);
+            }
+        });
+
+        // Start
+        initLevel();
     </script>
 </body>
 </html>
