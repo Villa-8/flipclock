@@ -6,185 +6,163 @@
     <title>VILLA8 | Gate</title>
     <style>
         :root {
-            --bg: #FFFCEB;
-            --card: #F2E8CF;
-            --text: #121212;
-            --muted: #A09B8E;
-            --accent: #E6CC00;
+            --bg: #FFFCEB; --card: #F2E8CF; --text: #121212; --muted: #A09B8E; --accent: #E6CC00;
         }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
+        body { background: var(--bg); color: var(--text); height: 100dvh; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+        
+        #app { width: 100%; max-width: 400px; padding: 20px; text-align: center; transition: opacity 0.3s; }
+        .header { font-size: 10px; font-weight: 900; letter-spacing: 4px; color: var(--muted); margin-bottom: 25px; }
+        
+        .card { background: var(--card); min-height: 280px; border-radius: 40px; display: flex; align-items: center; justify-content: center; box-shadow: 0 15px 40px rgba(0,0,0,0.04); margin-bottom: 40px; padding: 30px; }
+        .display { font-size: 26px; }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        input { width: 80%; background: transparent; border: none; border-bottom: 2px solid var(--text); padding: 10px; font-size: 22px; text-align: center; outline: none; text-transform: uppercase; }
 
-        body {
-            background-color: var(--bg);
-            color: var(--text);
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-            touch-action: manipulation;
+        /* Hint System UI */
+        .hint-container { position: fixed; bottom: 30px; width: 100%; max-width: 400px; padding: 0 20px; }
+        .hint-btn { font-size: 11px; font-weight: 700; color: var(--muted); cursor: pointer; text-decoration: underline; }
+        
+        #hint-modal { 
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(255, 252, 235, 0.95); z-index: 100; flex-direction: column; align-items: center; justify-content: center;
         }
-
-        #game-wrapper {
-            width: 100%;
-            max-width: 400px;
-            padding: 20px;
-            text-align: center;
-            transition: opacity 0.4s ease;
-        }
-
-        .level-header {
-            font-size: 12px;
-            font-weight: 800;
-            letter-spacing: 3px;
-            color: var(--muted);
-            margin-bottom: 30px;
-            text-transform: uppercase;
-        }
-
-        .puzzle-card {
-            background: var(--card);
-            min-height: 280px;
-            border-radius: 40px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.03);
-            margin-bottom: 40px;
-            padding: 30px;
-            transition: transform 0.3s ease;
-        }
-
-        /* Level Specific Styles */
-        .display-text { font-size: 32px; font-weight: 300; letter-spacing: -1px; }
-        .upside-down { transform: rotate(180deg); }
-        .tap-btn { 
-            padding: 15px 30px; 
-            border: 1px solid var(--text); 
-            border-radius: 10px; 
-            cursor: pointer;
-            user-select: none;
-        }
-
-        input {
-            width: 80%;
-            background: transparent;
-            border: none;
-            border-bottom: 2px solid var(--text);
-            padding: 10px;
-            font-size: 20px;
-            text-align: center;
-            outline: none;
-            text-transform: uppercase;
-        }
-
-        .hint-trigger {
-            position: fixed;
-            bottom: 30px;
-            font-size: 12px;
-            font-weight: bold;
-            text-decoration: underline;
-            cursor: pointer;
-            color: var(--muted);
-        }
-
-        /* Feedback Anims */
-        .shake { animation: shake 0.4s; }
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            75% { transform: translateX(10px); }
-        }
+        .modal-content { background: var(--card); padding: 30px; border-radius: 30px; width: 85%; }
+        .reward-link { display: block; padding: 15px; margin: 10px 0; background: var(--text); color: var(--bg); text-decoration: none; border-radius: 10px; font-weight: bold; font-size: 14px; }
+        .close-modal { margin-top: 20px; font-size: 12px; cursor: pointer; color: var(--muted); }
     </style>
 </head>
 <body>
 
-    <div id="game-wrapper">
-        <div class="level-header" id="lvl-info">WORLD 1 • LEVEL 1</div>
+    <div id="app">
+        <div class="header" id="lvl-tag">WORLD 1 • LEVEL 1</div>
+        <div class="card" id="main-card"><div id="content" class="display">WELCOME</div></div>
+        <input type="text" id="entry" placeholder="ENTER">
         
-        <div class="puzzle-card" id="card">
-            <div id="puzzle-content" class="display-text">WELCOME</div>
+        <div class="hint-container">
+            <span class="hint-btn" onclick="handleHintRequest()">HINTS REMAINING: <span id="hint-count">5</span></span>
         </div>
+    </div>
 
-        <div id="input-zone">
-            <input type="text" id="answer-box" placeholder="TYPE HERE" spellcheck="false" autocomplete="off">
+    <div id="hint-modal">
+        <div class="modal-content">
+            <h2 style="margin-bottom:10px">OUT OF HINTS</h2>
+            <p style="font-size:13px; margin-bottom:20px; color:var(--muted)">Follow us to unlock more logic gates.</p>
+            <a href="https://villa-8.github.io/flipclock/" target="_blank" class="reward-link" onclick="reward(2)">VISIT WEBSITE (+2)</a>
+            <a href="https://villa-8.github.io/flipclock/#qa" target="_blank" class="reward-link" onclick="reward(1)">WATCH VIDEO (+1)</a>
+            <a href="https://instagram.com/@rage bait" target="_blank" class="reward-link" onclick="reward(1)">FOLLOW IG (+1)</a>
+            <div class="close-modal" onclick="toggleModal(false)">GO BACK</div>
         </div>
-
-        <div class="hint-trigger" onclick="alert(levels[currentIndex].hint)">NEED A HINT?</div>
     </div>
 
     <script>
         const levels = [
-            { type: "input", display: "WELCOME", answer: "WELCOME", hint: "It's written right there." },
-            { type: "tap", display: "<div class='tap-btn' id='tap-target'>TAP ME</div>", answer: "TRIGGER", hint: "Click exactly on the text." },
-            { type: "input", display: "12321", answer: "12321", hint: "Symmetry is key." },
-            { type: "input", display: "<div class='upside-down'>GENERATE</div>", answer: "GENERATE", hint: "Look at it from another perspective." }
-        ];
+    // --- WORLD 1: OBSERVE (Levels 1-10) ---
+    { d: "WELCOME", a: "WELCOME", h: "The answer is on the screen." },
+    { d: "TAP THE SCREEN", a: "_TAP", h: "Do exactly what it says." },
+    { d: "12321", a: "12321", h: "It reads the same backward." },
+    { d: "4, 5, 6, ?", a: "7", h: "Just the next number." },
+    { d: "HOLD FOR 3s", a: "_HOLD", h: "Don't let go too soon." },
+    { d: "WHITE", a: "BLACK", h: "Think of the opposite." },
+    { d: "3 + 3 x 3", a: "12", h: "Order of operations: Multiply first." },
+    { d: "•••••", a: "5", h: "Count the dots." },
+    { d: "<div class='upside-down'>UP</div>", a: "DOWN", h: "The text is flipped, what's the opposite?" },
+    { d: "SWIPE LEFT", a: "_SWIPE_LEFT", h: "Use your thumb to slide left." },
 
-        let currentIndex = 0;
-        const wrapper = document.getElementById('game-wrapper');
-        const card = document.getElementById('card');
-        const content = document.getElementById('puzzle-content');
-        const answerBox = document.getElementById('answer-box');
-        const lvlInfo = document.getElementById('lvl-info');
+    // --- WORLD 2: DECODE (Levels 11-20) ---
+    { d: "V I L L A 8", a: "VILLA8", h: "Remove the spaces." },
+    { d: "M, T, W, T, ?", a: "F", h: "Days of the week: Mon, Tue, Wed..." },
+    { d: "1, 2, 4, 8, ?", a: "16", h: "Double it." },
+    { d: "RED + YELLOW", a: "ORANGE", h: "What color do they make?" },
+    { d: "3.1415", a: "PI", h: "This is a famous mathematical constant." },
+    { d: "08:00 PM", a: "20:00", h: "Convert to 24-hour time." },
+    { d: "SILENCE", a: "_WAIT", h: "Stop typing. Wait 5 seconds." },
+    { d: "O, T, T, F, F, S, ?", a: "S", h: "One, Two, Three, Four, Five, Six..." },
+    { d: "dlrow olleh", a: "hello world", h: "It's spelled backward." },
+    { d: "10-9-8-...", a: "0", h: "Complete the countdown." },
 
-        function initLevel() {
-            const data = levels[currentIndex];
-            
-            // Fade out
-            wrapper.style.opacity = "0";
-            
-            setTimeout(() => {
-                lvlInfo.innerText = `WORLD 1 • LEVEL ${currentIndex + 1}`;
-                content.innerHTML = data.display;
-                answerBox.value = "";
-                
-                // Show/Hide input
-                answerBox.parentElement.style.display = (data.type === "input") ? "block" : "none";
-                
-                // If it's a tap level, set up the click listener
-                if (data.type === "tap") {
-                    document.getElementById('tap-target').onclick = () => nextLevel();
-                }
+    // --- WORLD 3: LOGIC LOOP (Levels 21-30) ---
+    { d: "DON'T TAP", a: "_WAIT", h: "The greatest test of patience." },
+    { d: "BLUE (Written in Red)", a: "RED", h: "Ignore the word, look at the color." },
+    { d: "A=1, B=2, C=3", a: "VILLA8", h: "No, actually just type the game name." },
+    { d: "111 = 3<br>222 = 6<br>333 = ?", a: "9", h: "Add the digits together." },
+    { d: "SHAKE ME", a: "_SHAKE", h: "Physically move your device." },
+    { d: "THE ANSWER IS 8", a: "8", h: "Don't overthink this one." },
+    { d: "√64", a: "8", h: "What number times itself is 64?" },
+    { d: "0, 1, 1, 2, 3, 5, ?", a: "8", h: "Fibonacci: Add the last two numbers." },
+    { d: "LEVEL 29", a: "29", h: "The answer is hiding in the header." },
+    { d: "CLICK THE HINT", a: "_HINT_CLICK", h: "You just did it. Type 'HINT'." },
 
-                // Fade in
-                wrapper.style.opacity = "1";
-                if(data.type === "input") answerBox.focus();
-            }, 400);
+    // --- WORLD 4: HIDDEN SYSTEMS (Levels 31-40) ---
+    { d: "7 x 7", a: "49", h: "Standard multiplication." },
+    { d: "G-A-T-E", a: "71205", h: "A=1, B=2... Convert the letters." },
+    { d: "404", a: "NOT FOUND", h: "The standard internet error code." },
+    { d: "AM I A ROBOT?", a: "NO", h: "A simple answer for a human." },
+    { d: "S-M-H-D-W", a: "MONTH", h: "Seconds, Minutes, Hours, Days, Weeks..." },
+    { d: "INVISIBLE", a: "VILLA8", h: "Highlight the text or look closely." },
+    { d: "01000001", a: "A", h: "Binary for the first letter of the alphabet." },
+    { d: "FF0000", a: "RED", h: "The hex code for this color." },
+    { d: "99, 98, 97...", a: "0", h: "Skip to the end." },
+    { d: "SECRET", a: "VILLA8.COM", h: "Visit the website in the menu." },
+
+    // --- WORLD 5: VILLA8 CORE (Levels 41-50) ---
+    { d: "LIFE, UNIVERSE, EVERYTHING", a: "42", h: "The answer to everything." },
+    { d: "IQ TEST: 1=5, 2=25, 5=?", a: "1", h: "Look at the first equation again." },
+    { d: "MIRROR", a: "RORRIM", h: "Reflect the word." },
+    { d: "THE LAST KEY", a: "Z", h: "The final letter of the alphabet." },
+    { d: "1, 3, 6, 10, 15, ?", a: "21", h: "Add 2, then 3, then 4, then 5..." },
+    { d: "V8", a: "VILLAVILLAVILLAVILLAVILLAVILLAVILLAVILLA", h: "VILLA x 8." },
+    { d: "NO HINTS LEFT", a: "CORE", h: "The password is CORE." },
+    { d: "WAIT... NOW", a: "_TAP_TIMED", h: "Wait for the screen to blink, then tap." },
+    { d: "ALMOST THERE", a: "99", h: "The level before the end." },
+    { d: "YOU ARE READY", a: "READY", h: "Final gate. Enter it." }
+];
+
+        let cur = parseInt(localStorage.getItem('v8_prog')) || 0;
+        let hints = parseInt(localStorage.getItem('v8_hints')) ?? 5; // Start with 5
+
+        const entry = document.getElementById('entry');
+        const hintDisplay = document.getElementById('hint-count');
+
+        function updateUI() {
+            const l = levels[cur];
+            document.getElementById('lvl-tag').innerText = `WORLD ${Math.floor(cur/10)+1} • LEVEL ${cur+1}`;
+            document.getElementById('content').innerText = l.d;
+            entry.value = "";
+            hintDisplay.innerText = hints;
         }
 
-        function nextLevel() {
-            currentIndex++;
-            if (currentIndex < levels.length) {
-                initLevel();
+        function handleHintRequest() {
+            if (hints > 0) {
+                hints--;
+                localStorage.setItem('v8_hints', hints);
+                hintDisplay.innerText = hints;
+                alert("HINT: " + levels[cur].h);
             } else {
-                content.innerText = "VILLA8 UNLOCKED";
-                answerBox.style.display = "none";
+                toggleModal(true);
             }
         }
 
-        // Logic: Check answer as user types
-        answerBox.addEventListener('input', (e) => {
-            const input = e.target.value.toUpperCase();
-            const correct = levels[currentIndex].answer.toUpperCase();
-            
-            if (input === correct) {
-                nextLevel();
+        function toggleModal(show) {
+            document.getElementById('hint-modal').style.display = show ? 'flex' : 'none';
+        }
+
+        function reward(amount) {
+            hints += amount;
+            localStorage.setItem('v8_hints', hints);
+            hintDisplay.innerText = hints;
+            setTimeout(() => toggleModal(false), 500);
+        }
+
+        entry.addEventListener('input', (e) => {
+            if (e.target.value.toUpperCase() === levels[cur].a.toUpperCase()) {
+                cur++;
+                localStorage.setItem('v8_prog', cur);
+                cur < levels.length ? updateUI() : alert("VILLA8 CLEARED");
             }
         });
 
-        // If they press Enter but it's wrong, shake the card
-        answerBox.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && answerBox.value.toUpperCase() !== levels[currentIndex].answer) {
-                card.classList.add('shake');
-                setTimeout(() => card.classList.remove('shake'), 400);
-            }
-        });
-
-        // Start
-        initLevel();
+        updateUI();
     </script>
 </body>
 </html>
