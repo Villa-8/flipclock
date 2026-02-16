@@ -2,328 +2,116 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Villa8 Flow - Modern Puzzle Adventure</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Villa8 | System Logic</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --spotify-yellow: #FDFD96;
+            --spotify-dark: #121212;
+            --glass: rgba(255, 255, 255, 0.05);
+        }
         body {
-            background: linear-gradient(135deg, #0a0a0a 0%, #121212 50%, #1a1a1a 100%);
-            color: #ffffff;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--spotify-dark);
+            color: white;
+            font-family: 'Inter', -apple-system, sans-serif;
             overflow: hidden;
-            height: 100vh;
+            touch-action: manipulation;
         }
-        #container { position: relative; width: 100vw; height: 100vh; }
-        #canvas { display: block; width: 100%; height: 100%; cursor: pointer; touch-action: none; }
-        
-        /* --- UI ELEMENTS --- */
-        #ui { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
-        
-        #topbar {
-            position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
-            display: flex; align-items: center; gap: 20px;
-            background: rgba(18, 18, 18, 0.9); backdrop-filter: blur(20px);
-            padding: 12px 24px; border-radius: 50px; border: 1px solid #ffeb3b;
-            box-shadow: 0 8px 32px rgba(255, 235, 59, 0.3); pointer-events: auto;
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(253, 253, 150, 0.1);
+            border-radius: 24px;
         }
-        #topbar > div { font-size: 16px; font-weight: 600; letter-spacing: 1px; }
-        #stars { color: #ffeb3b; }
-        #hints-count { background: rgba(255, 235, 59, 0.2); padding: 4px 12px; border-radius: 20px; border: 1px solid #ffeb3b; }
-
-        #sidebar {
-            position: absolute; left: -320px; top: 0; width: 320px; height: 100%;
-            background: rgba(10, 10, 10, 0.98); backdrop-filter: blur(20px);
-            transition: left 0.4s cubic-bezier(0.19, 1, 0.22, 1);
-            padding: 30px; overflow-y: auto; pointer-events: auto; border-right: 1px solid var(--lemon);
+        .yellow-glow {
+            box-shadow: 0 0 20px rgba(253, 253, 150, 0.3);
         }
-        #sidebar.open { left: 0; }
-        .world { margin-bottom: 25px; }
-        .world h3 { color: #ffeb3b; margin-bottom: 12px; font-size: 14px; text-transform: uppercase; letter-spacing: 2px; }
-        .level-row { display: flex; flex-wrap: wrap; gap: 8px; }
-        .level {
-            width: 38px; height: 38px; background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px; display: flex; align-items: center; justify-content: center;
-            font-size: 12px; border: 1px solid rgba(255, 255, 255, 0.1); cursor: pointer; transition: 0.2s;
+        /* Portrait vs Landscape logic */
+        @media (orientation: portrait) {
+            .game-container { width: 90vw; height: 70vh; }
         }
-        .level.unlocked { border-color: rgba(255, 235, 59, 0.5); color: #ffeb3b; }
-        .level.completed { background: #ffeb3b; color: #000; font-weight: bold; }
-
-        #bottombar { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); display: flex; gap: 20px; pointer-events: auto; }
-        .nav-btn {
-            width: 55px; height: 55px; border: none; border-radius: 50%;
-            background: rgba(255, 235, 59, 0.9); color: #000; font-size: 20px;
-            cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.3); transition: 0.2s;
+        @media (orientation: landscape) {
+            .game-container { width: 60vw; height: 80vh; }
         }
-        .nav-btn:active { transform: scale(0.9); }
-
-        /* --- MODALS --- */
-        #modal {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center;
-            z-index: 100; pointer-events: auto;
-        }
-        #modal.show { display: flex; }
-        .modal-content {
-            background: #181818; padding: 40px; border-radius: 24px; border: 1px solid #ffeb3b;
-            text-align: center; max-width: 350px; width: 90%;
-        }
-        .modal-btn {
-            display: block; width: 100%; padding: 12px; margin-top: 15px;
-            background: #ffeb3b; border: none; border-radius: 12px; font-weight: bold; cursor: pointer;
-        }
-        input[type="text"] {
-            width: 100%; padding: 12px; margin: 15px 0; background: #222; border: 1px solid #444;
-            color: #ffeb3b; text-align: center; border-radius: 8px; font-size: 18px;
-        }
-
-        #complete-screen {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.8);
-            background: #ffeb3b; color: #000; padding: 40px; border-radius: 30px;
-            text-align: center; display: none; opacity: 0; transition: 0.3s; z-index: 50;
-        }
-        #complete-screen.show { display: block; opacity: 1; transform: translate(-50%, -50%) scale(1); }
     </style>
 </head>
-<body>
-    <div id="container">
-        <canvas id="canvas"></canvas>
-        <div id="ui">
-            <div id="topbar">
-                <div id="level-info">World 1 - Level 1</div>
-                <div id="hints-count">Hints: 3</div>
-            </div>
-            <div id="sidebar">
-                <div id="worlds-list"></div>
-            </div>
-            <div id="bottombar">
-                <button class="nav-btn" onclick="toggleSidebar()">☰</button>
-                <button class="nav-btn" onclick="giveHint()">💡</button>
-                <button class="nav-btn" onclick="loadLevel()">↻</button>
-            </div>
-        </div>
+<body class="flex flex-col items-center justify-center min-h-screen p-4">
 
-        <div id="complete-screen">
-            <h1 style="font-size: 2rem; margin-bottom: 10px;">SUCCESS</h1>
-            <div id="complete-stars" style="font-size: 1.5rem; margin-bottom: 20px;">★★★</div>
-            <button class="modal-btn" onclick="nextLevel()" style="background: #000; color: #fff;">NEXT FLOW</button>
+    <header class="fixed top-0 w-full p-6 flex justify-between items-center z-50">
+        <h1 class="text-2xl font-bold tracking-tighter" style="color: var(--spotify-yellow)">VILLA8</h1>
+        <div class="flex gap-4">
+            <button onclick="showHint()" class="px-4 py-2 glass-card text-xs uppercase tracking-widest hover:bg-yellow-100 hover:text-black transition">Hint</button>
+            <div id="level-display" class="px-4 py-2 border border-white/20 rounded-full text-xs">LVL 01</div>
         </div>
+    </header>
 
-        <div id="modal">
-            <div class="modal-content" id="modal-content"></div>
+    <main id="game-stage" class="game-container glass-card flex items-center justify-center relative overflow-hidden">
+        <div id="puzzle-content" class="w-full h-full flex flex-col items-center justify-center p-8 text-center">
+            <h2 id="task-title" class="text-3xl font-light mb-8">System Booting...</h2>
+            <div id="interactive-element" class="relative">
+                </div>
+        </div>
+    </main>
+
+    <footer class="fixed bottom-0 w-full p-6 flex justify-center gap-8 bg-gradient-to-t from-black to-transparent">
+        <a href="https://instagram.com/villa8" target="_blank" class="opacity-50 hover:opacity-100 transition"><i class="fab fa-instagram text-xl"></i></a>
+        <a href="https://villa8.com" target="_blank" class="opacity-50 hover:opacity-100 transition"><i class="fas fa-globe text-xl"></i></a>
+    </footer>
+
+    <div id="hint-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-[100] flex items-center justify-center p-6">
+        <div class="glass-card p-8 max-w-sm w-full text-center">
+            <h3 class="text-xl mb-4" style="color: var(--spotify-yellow)">Data Access Required</h3>
+            <p class="text-sm text-gray-400 mb-6">To unlock the master hint for this level, visit our secure terminal.</p>
+            <button onclick="visitSiteForHint()" class="w-full py-3 bg-[#FDFD96] text-black font-bold rounded-full mb-4">VISIT WEBSITE</button>
+            <button onclick="closeHint()" class="text-xs uppercase tracking-widest opacity-50">Close</button>
         </div>
     </div>
 
     <script>
-        const IG_LINK = 'https://www.instagram.com/villa8'; 
-        const SITE_LINK = 'https://villa8.in'; 
-        const UNLOCK_CODE = 'VILLA8';
-
-        let canvas, ctx, dpr;
-        let game = {
-            w: 5, h: 5, cellW: 0, cellH: 0,
-            endpoints: [], paths: [], currentPath: [],
-            dragging: false, startIdx: -1,
-            hints: 3, currentWorld: 0, currentLevel: 0, maxWorld: 0,
-            completed: {}, particles: [], animTime: 0
+        // Game State Logic
+        let currentLevel = 1;
+        
+        const levels = {
+            1: {
+                title: "Calibration",
+                hint: "Find the center of the frequency.",
+                action: () => renderLevel1()
+            }
+            // Add more levels here...
         };
 
-        const COLORS = ['#4fc3f7', '#ab47bc', '#ffa726', '#ffeb3b', '#ef5350', '#26c6da'];
-        const WORLD_NAMES = ['Neon Core', 'Flux Grid', 'Data Vault', 'Pulse Nexus', 'Quantum Loop'];
-
-        function init() {
-            canvas = document.getElementById('canvas');
-            ctx = canvas.getContext('2d');
-            dpr = window.devicePixelRatio || 1;
-            window.addEventListener('resize', resize);
-            canvas.addEventListener('pointerdown', onPointerDown);
-            canvas.addEventListener('pointermove', onPointerMove);
-            canvas.addEventListener('pointerup', onPointerUp);
-
-            loadProgress();
-            resize();
-            loadLevel();
-            requestAnimationFrame(loop);
-        }
-
-        function resize() {
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
-            layout();
-        }
-
-        function layout() {
-            const size = Math.min(canvas.width/dpr, canvas.height/dpr) * 0.8;
-            game.cellW = size / game.w;
-            game.cellH = size / game.h;
-            game.offsetX = (canvas.width/dpr - size) / 2;
-            game.offsetY = (canvas.height/dpr - size) / 2;
-        }
-
-        function loadLevel() {
-            if (game.currentWorld === 2 && !localStorage.getItem('v8_unlocked')) {
-                showUnlockModal(); return;
-            }
+        function renderLevel1() {
+            const stage = document.getElementById('interactive-element');
+            stage.innerHTML = `
+                <div id='ring' class='w-32 h-32 border-4 border-[#FDFD96] rounded-full animate-pulse flex items-center justify-center cursor-pointer'>
+                    <div class='w-4 h-4 bg-white rounded-full'></div>
+                </div>
+            `;
+            document.getElementById('task-title').innerText = levels[1].title;
             
-            // Basic Procedural Generation Logic
-            game.w = game.h = 5 + game.currentWorld;
-            game.endpoints = [];
-            game.paths = [];
-            
-            // Fixed levels for demo, randomized by World
-            const numPipes = 3 + game.currentWorld;
-            for(let i=0; i<numPipes; i++) {
-                let r1 = Math.floor(Math.random()*game.h), c1 = Math.floor(Math.random()*game.w);
-                let r2 = Math.floor(Math.random()*game.h), c2 = Math.floor(Math.random()*game.w);
-                game.endpoints.push({r: r1, c: c1, color: i % COLORS.length, connected: false});
-                game.endpoints.push({r: r2, c: c2, color: i % COLORS.length, connected: false});
-            }
-            
-            layout();
-            updateUI();
+            document.getElementById('ring').onclick = () => {
+                alert("System Calibrated. Moving to Level 2...");
+                // Progress logic here
+            };
         }
 
-        function onPointerDown(e) {
-            const rect = canvas.getBoundingClientRect();
-            const x = (e.clientX - rect.left) - game.offsetX;
-            const y = (e.clientY - rect.top) - game.offsetY;
-            const c = Math.floor(x / game.cellW), r = Math.floor(y / game.cellH);
-
-            const idx = game.endpoints.findIndex(ep => ep.r === r && ep.c === c && !ep.connected);
-            if (idx !== -1) {
-                game.dragging = true;
-                game.startIdx = idx;
-                game.currentPath = [{r, c}];
-            }
+        function showHint() {
+            document.getElementById('hint-modal').classList.remove('hidden');
         }
 
-        function onPointerMove(e) {
-            if (!game.dragging) return;
-            const rect = canvas.getBoundingClientRect();
-            const x = (e.clientX - rect.left) - game.offsetX;
-            const y = (e.clientY - rect.top) - game.offsetY;
-            const c = Math.floor(x / game.cellW), r = Math.floor(y / game.cellH);
-
-            const last = game.currentPath[game.currentPath.length - 1];
-            if (r >= 0 && r < game.h && c >= 0 && c < game.w && (r !== last.r || c !== last.c)) {
-                if (Math.abs(r - last.r) + Math.abs(c - last.c) === 1) {
-                    game.currentPath.push({r, c});
-                }
-            }
+        function closeHint() {
+            document.getElementById('hint-modal').classList.add('hidden');
         }
 
-        function onPointerUp(e) {
-            if (!game.dragging) return;
-            const last = game.currentPath[game.currentPath.length - 1];
-            const startNode = game.endpoints[game.startIdx];
-            
-            const endIdx = game.endpoints.findIndex(ep => ep.r === last.r && ep.c === last.c && ep.color === startNode.color && ep !== startNode);
-            
-            if (endIdx !== -1) {
-                game.endpoints[game.startIdx].connected = true;
-                game.endpoints[endIdx].connected = true;
-                game.paths.push({cells: [...game.currentPath], color: startNode.color});
-                checkWin();
-            }
-            game.dragging = false;
+        function visitSiteForHint() {
+            window.open('https://villa8.com', '_blank');
+            // Log logic to unlock hint after return
         }
 
-        function checkWin() {
-            if (game.endpoints.every(ep => ep.connected)) {
-                document.getElementById('complete-screen').classList.add('show');
-                if (game.currentLevel === game.maxWorld * 20) game.maxWorld++;
-                saveProgress();
-            }
-        }
-
-        function nextLevel() {
-            document.getElementById('complete-screen').classList.remove('show');
-            game.currentLevel++;
-            loadLevel();
-        }
-
-        function giveHint() {
-            if (game.hints <= 0) { showRefillModal(); return; }
-            game.hints--;
-            updateUI();
-            alert("Hint: Connect matching colors without crossing!");
-        }
-
-        function showRefillModal() {
-            const m = document.getElementById('modal-content');
-            m.innerHTML = `<h3>REFILL HINTS</h3><p>Follow us to unlock.</p>
-            <button class="modal-btn" onclick="window.open('${IG_LINK}')">INSTAGRAM</button>
-            <button class="modal-btn" onclick="refill()">CLAIM +3</button>`;
-            document.getElementById('modal').classList.add('show');
-        }
-
-        function showUnlockModal() {
-            const m = document.getElementById('modal-content');
-            m.innerHTML = `<h3>DATA VAULT</h3><p>Enter code from ${SITE_LINK}</p>
-            <input type="text" id="ucode" placeholder="CODE">
-            <button class="modal-btn" onclick="verifyUnlock()">UNLOCK</button>`;
-            document.getElementById('modal').classList.add('show');
-        }
-
-        function verifyUnlock() {
-            if (document.getElementById('ucode').value.toUpperCase() === UNLOCK_CODE) {
-                localStorage.setItem('v8_unlocked', true);
-                document.getElementById('modal').classList.remove('show');
-                loadLevel();
-            }
-        }
-
-        function refill() { game.hints += 3; document.getElementById('modal').classList.remove('show'); updateUI(); }
-        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
-        function updateUI() { 
-            document.getElementById('level-info').innerText = `${WORLD_NAMES[game.currentWorld]} - Level ${game.currentLevel + 1}`;
-            document.getElementById('hints-count').innerText = `Hints: ${game.hints}`;
-        }
-
-        function loadProgress() {
-            const data = JSON.parse(localStorage.getItem('v8_save') || '{}');
-            game.maxWorld = data.maxWorld || 0;
-            game.hints = data.hints ?? 3;
-        }
-
-        function saveProgress() {
-            localStorage.setItem('v8_save', JSON.stringify({maxWorld: game.maxWorld, hints: game.hints}));
-        }
-
-        function loop() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.save();
-            ctx.translate(game.offsetX, game.offsetY);
-
-            // Draw Paths
-            game.paths.concat(game.dragging ? [{cells: game.currentPath, color: game.endpoints[game.startIdx].color}] : []).forEach(p => {
-                ctx.beginPath();
-                ctx.lineWidth = 15;
-                ctx.strokeStyle = COLORS[p.color];
-                ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-                p.cells.forEach((c, i) => {
-                    const x = c.c * game.cellW + game.cellW/2;
-                    const y = c.r * game.cellH + game.cellH/2;
-                    if(i===0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-                });
-                ctx.stroke();
-            });
-
-            // Draw Endpoints
-            game.endpoints.forEach(ep => {
-                ctx.beginPath();
-                ctx.arc(ep.c * game.cellW + game.cellW/2, ep.r * game.cellH + game.cellH/2, 12, 0, Math.PI*2);
-                ctx.fillStyle = COLORS[ep.color];
-                ctx.shadowBlur = 15; ctx.shadowColor = COLORS[ep.color];
-                ctx.fill();
-            });
-
-            ctx.restore();
-            requestAnimationFrame(loop);
-        }
-
-        init();
+        // Initialize
+        renderLevel1();
     </script>
 </body>
 </html>
