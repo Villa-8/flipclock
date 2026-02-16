@@ -2,215 +2,852 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>VILLA8 | Advanced Interface</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;800&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Villa8 Flow - Modern Puzzle Adventure</title>
     <style>
-        :root {
-            --slate: #121212;
-            --lemon: #DFFF00;
-            --glass: rgba(255, 255, 255, 0.03);
-            --border: rgba(223, 255, 0, 0.15);
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #121212 50%, #1a1a1a 100%);
+            color: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            overflow: hidden;
+            height: 100vh;
         }
-
-        * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
-
-        body, html {
-            margin: 0; padding: 0;
-            background-color: var(--slate);
-            color: white;
-            font-family: 'Inter', sans-serif;
-            height: 100vh; overflow: hidden;
-            display: flex; flex-direction: column; align-items: center;
-        }
-
-        /* --- UI FRAMEWORK --- */
-        #villa-ui {
+        #container {
             position: relative;
-            width: 100%; max-width: 400px; height: 100%;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            padding: 20px;
+            width: 100vw;
+            height: 100vh;
         }
-
-        #header {
-            position: absolute; top: 60px;
-            letter-spacing: 12px; font-weight: 800;
-            color: var(--lemon); font-size: 1.2rem;
-            text-align: center; width: 100%;
-        }
-
-        .level-container {
-            width: 100%; height: 400px;
-            background: var(--glass);
-            border: 1px solid var(--border);
-            border-radius: 40px;
-            display: flex; align-items: center; justify-content: center;
-            position: relative; transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-        }
-
-        /* --- GESTURE ELEMENTS --- */
-        .slider-rail {
-            width: 8px; height: 250px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 10px; position: relative;
-        }
-
-        #handle {
-            width: 44px; height: 44px;
-            background: var(--lemon);
-            border-radius: 50%; position: absolute;
-            left: -18px; cursor: grab;
-            box-shadow: 0 0 20px rgba(223, 255, 0, 0.4);
+        #canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
             touch-action: none;
         }
-
-        /* --- TASK OVERLAYS --- */
-        .task-box {
-            text-align: center; padding: 20px;
+        #ui {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
         }
-
-        .input-field {
-            background: none; border: none; border-bottom: 2px solid var(--lemon);
-            color: var(--lemon); font-size: 2rem; width: 140px;
-            text-align: center; outline: none; margin-top: 20px;
-            font-family: 'Inter', sans-serif; font-weight: 800;
-        }
-
-        #footer-nav {
-            position: absolute; bottom: 50px;
-            display: flex; gap: 15px;
-        }
-
-        .action-btn {
+        #topbar {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background: rgba(18, 18, 18, 0.9);
+            backdrop-filter: blur(20px);
             padding: 12px 24px;
-            border: 1px solid var(--lemon);
-            color: var(--lemon);
-            border-radius: 30px;
-            font-size: 10px; font-weight: 800;
-            text-decoration: none; transition: 0.3s;
-            text-transform: uppercase; letter-spacing: 1px;
+            border-radius: 50px;
+            border: 1px solid #ffeb3b;
+            box-shadow: 0 8px 32px rgba(255, 235, 59, 0.3);
+            pointer-events: auto;
         }
-
-        .action-btn:hover { background: var(--lemon); color: var(--slate); }
-
-        .hint-text {
-            position: absolute; bottom: 120px;
-            font-size: 11px; color: rgba(255,255,255,0.3);
-            text-transform: uppercase; letter-spacing: 2px;
+        #topbar > div {
+            font-size: 18px;
+            font-weight: 600;
         }
-
-        .hidden { display: none !important; opacity: 0; transform: scale(0.9); }
-        
-        /* Success Animation */
-        .success-flash { background: var(--lemon) !important; }
+        #stars {
+            color: #ffeb3b;
+        }
+        #hints {
+            background: rgba(255, 235, 59, 0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+            border: 1px solid #ffeb3b;
+        }
+        #sidebar {
+            position: absolute;
+            left: -320px;
+            top: 0;
+            width: 320px;
+            height: 100%;
+            background: rgba(26, 26, 26, 0.95);
+            backdrop-filter: blur(20px);
+            transition: left 0.3s ease;
+            padding: 20px;
+            overflow-y: auto;
+            pointer-events: auto;
+        }
+        #sidebar.open { left: 0; }
+        .world {
+            margin-bottom: 20px;
+            padding: 20px;
+            background: rgba(255, 235, 59, 0.1);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 235, 59, 0.3);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .world:hover {
+            background: rgba(255, 235, 59, 0.2);
+            box-shadow: 0 0 20px rgba(255, 235, 59, 0.4);
+        }
+        .world h3 { color: #ffeb3b; margin-bottom: 10px; }
+        .level-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .level {
+            width: 36px;
+            height: 36px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.2s;
+        }
+        .level.unlocked { background: rgba(255, 235, 59, 0.3); border-color: #ffeb3b; }
+        .level.completed { background: #ffeb3b; color: #000; }
+        #bottombar {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 16px;
+            pointer-events: auto;
+        }
+        button {
+            width: 60px;
+            height: 60px;
+            border: none;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #ffeb3b, #ffc107);
+            color: #000;
+            font-size: 24px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 8px 24px rgba(255, 235, 59, 0.4);
+            transition: all 0.2s;
+            backdrop-filter: blur(10px);
+        }
+        button:hover, button:active {
+            transform: scale(1.05);
+            box-shadow: 0 12px 32px rgba(255, 235, 59, 0.6);
+        }
+        button:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
+        #modal {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+            pointer-events: auto;
+        }
+        #modal.show { display: flex; }
+        .modal-content {
+            background: rgba(18, 18, 18, 0.95);
+            backdrop-filter: blur(30px);
+            padding: 40px;
+            border-radius: 24px;
+            border: 1px solid #ffeb3b;
+            box-shadow: 0 20px 60px rgba(255, 235, 59, 0.3);
+            text-align: center;
+            max-width: 400px;
+        }
+        .modal-content h2 { color: #ffeb3b; margin-bottom: 20px; }
+        .modal-content p { margin-bottom: 20px; font-size: 16px; }
+        .modal-content a {
+            display: block;
+            background: linear-gradient(145deg, #ffeb3b, #ffc107);
+            color: #000;
+            padding: 12px 24px;
+            margin: 10px 0;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .modal-content a:hover { transform: scale(1.05); box-shadow: 0 8px 24px rgba(255, 235, 59, 0.5); }
+        input[type="text"] {
+            width: 200px;
+            padding: 12px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid #ffeb3b;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 16px;
+            margin: 10px 0;
+        }
+        #complete-screen {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 235, 59, 0.95);
+            color: #000;
+            padding: 40px;
+            border-radius: 24px;
+            text-align: center;
+            display: none;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+            z-index: 15;
+        }
+        #complete-screen.show { display: block; animation: pop 0.5s; }
+        @keyframes pop { 0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; } }
     </style>
 </head>
 <body>
-
-    <div id="villa-ui">
-        <div id="header">VILLA8</div>
-
-        <div id="lvl-1" class="level-container">
-            <div class="slider-rail">
-                <div id="handle" style="top: 200px;"></div>
+    <div id="container">
+        <canvas id="canvas"></canvas>
+        <div id="ui">
+            <div id="topbar">
+                <div id="level-info">World 1 - Level 1</div>
+                <div id="stars">★★★</div>
+                <div id="hints">Hints: 3</div>
+            </div>
+            <div id="sidebar">
+                <div id="worlds-list"></div>
+            </div>
+            <div id="bottombar">
+                <button id="menu" title="Menu">☰</button>
+                <button id="hint" title="Hint">💡</button>
+                <button id="restart" title="Restart">↻</button>
             </div>
         </div>
-
-        <div id="lvl-2" class="level-container hidden">
-            <div class="task-box">
-                <p style="font-size: 12px; letter-spacing: 1px; color: #888;">WORLD KEY REQUIRED</p>
-                <p style="font-size: 14px;">Find the code hidden in our<br><b>Official Studio Website</b></p>
-                <input type="text" id="web-code" class="input-field" maxlength="4" autocomplete="off">
-            </div>
+        <div id="complete-screen">
+            <h1>Level Complete!</h1>
+            <div id="complete-stars">★★★</div>
+            <button onclick="nextLevel()">Next Level</button>
+            <button onclick="openSidebar()">Levels</button>
         </div>
-
-        <div id="lvl-3" class="level-container hidden">
-            <div class="task-box">
-                <p style="font-size: 12px; letter-spacing: 1px; color: #888;">VISUAL SYNC</p>
-                <p style="font-size: 14px;">Follow @Villa8_Studio<br>Check <b>Story Highlights</b> for the Key</p>
-                <input type="text" id="ig-code" class="input-field" maxlength="4" placeholder="••••">
+        <div id="modal">
+            <div class="modal-content" id="modal-content">
+                <!-- Dynamic content -->
             </div>
-        </div>
-
-        <div class="hint-text" id="status-msg">Zone 01: Calibration</div>
-
-        <div id="footer-nav">
-            <a href="https://yourwebsite.com" target="_blank" class="action-btn">Visit Website</a>
-            <a href="https://instagram.com/yourprofile" target="_blank" class="action-btn">Hint (IG)</a>
         </div>
     </div>
-
     <script>
-        const state = { currentLevel: 1 };
+        // Villa8 Flow - Professional HD Puzzle Game
+        // Spotify-inspired light yellow theme (no green)
+        // Modern satisfying flow connect puzzles
+        // Many levels (5 worlds x 20+ endless loop)
+        // Hints refill via "ads" (IG follow + site visit)
+        // World 3 unlocked by visiting site & entering code "VILLA8"
+        // Web game: mouse/touch drag gestures
+        // Techy neon glows, particles, smooth 60fps
+        // Deploy: Save as index.html, host on GitHub Pages/Netlify
+        // Edit: Change IG/site links & unlock code below
 
-        // --- HAPTIC FEEDBACK ---
-        const haptic = () => { if ("vibrate" in navigator) navigator.vibrate(20); };
+        const IG_LINK = 'https://www.instagram.com/villa8'; // CHANGE TO YOUR IG
+        const SITE_LINK = 'https://villa8.in'; // CHANGE TO YOUR SITE
+        const UNLOCK_CODE = 'VILLA8'; // CHANGE UNLOCK CODE
 
-        // --- LEVEL 1 ENGINE: PHYSICS SLIDE ---
-        const handle = document.getElementById('handle');
-        const rail = document.querySelector('.slider-rail');
-        let isDragging = false;
+        let canvas, ctx, dpr;
+        let game = {
+            w: 0, h: 0, // grid size
+            cellW: 0, cellH: 0,
+            offsetX: 0, offsetY: 0,
+            occupied: [],
+            endpoints: [],
+            paths: [],
+            currentPath: [],
+            dragging: false,
+            startEndpointIdx: -1,
+            hints: 3,
+            hintsUsed: 0,
+            particles: [],
+            currentWorld: 0,
+            currentLevel: 0,
+            maxWorld: 0,
+            completed: {}, // {world: {level: stars}}
+            animTime: 0
+        };
 
-        handle.addEventListener('pointerdown', () => { isDragging = true; haptic(); });
-        window.addEventListener('pointerup', () => isDragging = false);
+        const NUM_COLORS = 6;
+        const COLORS = [
+            '#4fc3f7', '#ab47bc', '#ffa726', '#66bb6a', '#ef5350', '#26c6da'
+        ]; // Blues, purples etc, no green dominant
 
-        window.addEventListener('pointermove', (e) => {
-            if (!isDragging) return;
-            const rect = rail.getBoundingClientRect();
-            let pos = e.clientY - rect.top;
-            
-            if (pos >= 0 && pos <= 206) {
-                handle.style.top = pos + 'px';
-                // Success Condition: Must be held at the very top (Zone 0)
-                if (pos < 5) {
-                    isDragging = false;
-                    completeLevel(1);
+        const WORLD_NAMES = [
+            'Neon Core',
+            'Flux Grid',
+            'Data Vault', // Special unlock
+            'Pulse Nexus',
+            'Quantum Loop'
+        ];
+        const LEVELS_PER_WORLD = 20;
+
+        // Seeded random
+        function seededRandom(seed) {
+            let s = seed >>> 0;
+            return function() {
+                s ^= s << 13;
+                s ^= s >> 17;
+                s ^= s << 5;
+                return (s >>> 0) / 0x100000000;
+            };
+        }
+
+        // Init
+        function init() {
+            canvas = document.getElementById('canvas');
+            ctx = canvas.getContext('2d');
+            dpr = window.devicePixelRatio || 1;
+
+            window.addEventListener('resize', resize);
+            canvas.addEventListener('pointerdown', onPointerDown);
+            canvas.addEventListener('pointermove', onPointerMove);
+            canvas.addEventListener('pointerup', onPointerUp);
+            canvas.addEventListener('pointerleave', onPointerUp);
+
+            loadProgress();
+            resize();
+            loadLevel();
+            requestAnimationFrame(loop);
+            updateUI();
+        }
+
+        function resize() {
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+            layout();
+        }
+
+        function layout() {
+            const padding = 80;
+            const size = Math.min(canvas.width / dpr - padding * 2, canvas.height / dpr - padding * 2);
+            game.cellW = size / Math.max(game.w, game.h);
+            game.cellH = game.cellW;
+            game.offsetX = (canvas.width / dpr - game.w * game.cellW) / 2;
+            game.offsetY = (canvas.height / dpr - game.h * game.cellH) / 2;
+        }
+
+        function loadProgress() {
+            const saved = localStorage.getItem('villa8flow');
+            if (saved) {
+                const data = JSON.parse(saved);
+                game.completed = data.completed || {};
+                game.maxWorld = data.maxWorld || 0;
+                game.hints = data.hints || 3;
+                if (data.specialUnlocked) game.maxWorld = Math.max(game.maxWorld, 2);
+            } else {
+                game.completed = {};
+                game.maxWorld = 0;
+            }
+            // Unlock world 3 if code entered before
+            if (localStorage.getItem('villa8_unlocked')) game.maxWorld = Math.max(game.maxWorld, 2);
+        }
+
+        function saveProgress() {
+            localStorage.setItem('villa8flow', JSON.stringify({
+                completed: game.completed,
+                maxWorld: game.maxWorld,
+                hints: game.hints
+            }));
+        }
+
+        function loadLevel() {
+            if (game.currentWorld > 4) {
+                // Endless loop mode
+                game.currentLevel = Math.floor(Math.random() * 100) + 1;
+            } else if (game.currentLevel >= LEVELS_PER_WORLD) {
+                game.currentLevel = 0;
+                game.currentWorld++;
+                if (game.currentWorld > game.maxWorld) game.maxWorld = game.currentWorld;
+            }
+
+            // Check unlock
+            if (game.currentWorld > game.maxWorld && game.currentWorld !== 2) {
+                game.currentWorld = game.maxWorld;
+                game.currentLevel = 0;
+            } else if (game.currentWorld === 2 && !localStorage.getItem('villa8_unlocked')) {
+                showUnlockModal();
+                return;
+            }
+
+            const seed = game.currentWorld * 1000 + game.currentLevel;
+            const rand = seededRandom(seed);
+            const baseSize = 5 + Math.floor(game.currentWorld / 2);
+            const sizeVar = Math.floor(rand() * 3);
+            game.w = game.h = Math.min(baseSize + sizeVar, 12);
+            const numPipes = Math.floor((game.w * game.h / 25) + game.currentWorld * 0.5 + rand() * 2);
+
+            const pipes = [];
+            const used = new Set();
+            const getRandPos = () => {
+                let r, c, key;
+                do {
+                    r = Math.floor(rand() * game.h);
+                    c = Math.floor(rand() * game.w);
+                    key = `\( {r}_ \){c}`;
+                } while (used.has(key));
+                used.add(key);
+                return {r, c};
+            };
+
+            for (let i = 0; i < numPipes; i++) {
+                const p1 = getRandPos();
+                const p2 = getRandPos();
+                pipes.push({color: Math.floor(rand() * NUM_COLORS), p1, p2});
+            }
+
+            game.occupied = Array(game.h).fill().map(() => Array(game.w).fill(false));
+            game.endpoints = [];
+            game.paths = [];
+            pipes.forEach(pipe => {
+                game.endpoints.push({r: pipe.p1.r, c: pipe.p1.c, color: pipe.color, connected: false});
+                game.endpoints.push({r: pipe.p2.r, c: pipe.p2.c, color: pipe.color, connected: false});
+            });
+
+            game.currentPath = [];
+            game.dragging = false;
+            game.hintsUsed = 0;
+            game.particles = [];
+            layout();
+            updateUI();
+        }
+
+        function updateUI() {
+            document.getElementById('level-info').textContent = 
+                game.currentWorld > 4 ? `Endless Loop - ${game.currentLevel}` : 
+                `${WORLD_NAMES[game.currentWorld]} - Level ${game.currentLevel + 1}`;
+            document.getElementById('hints').textContent = `Hints: ${game.hints}`;
+            updateStars();
+            updateSidebar();
+            saveProgress();
+        }
+
+        function updateStars() {
+            const starsEl = document.getElementById('stars');
+            starsEl.textContent = '★★★';
+        }
+
+        function updateSidebar() {
+            const list = document.getElementById('worlds-list');
+            list.innerHTML = '';
+            for (let w = 0; w < WORLD_NAMES.length; w++) {
+                const worldDiv = document.createElement('div');
+                worldDiv.className = 'world';
+                worldDiv.innerHTML = `<h3>${WORLD_NAMES[w]}</h3>`;
+                const levelsRow = document.createElement('div');
+                levelsRow.className = 'level-row';
+                for (let l = 0; l < LEVELS_PER_WORLD; l++) {
+                    const levelBtn = document.createElement('div');
+                    levelBtn.className = 'level';
+                    levelBtn.textContent = l + 1;
+                    if (w < game.maxWorld || (w === game.maxWorld && l === 0)) {
+                        levelBtn.classList.add('unlocked');
+                    }
+                    if (game.completed[w] && game.completed[w][l]) {
+                        levelBtn.classList.add('completed');
+                        levelBtn.textContent = '★';
+                    }
+                    levelBtn.onclick = () => selectLevel(w, l);
+                    levelsRow.appendChild(levelBtn);
+                }
+                worldDiv.appendChild(levelsRow);
+                list.appendChild(worldDiv);
+            }
+            // Endless
+            const endlessDiv = document.createElement('div');
+            endlessDiv.className = 'world unlocked';
+            endlessDiv.innerHTML = '<h3>Endless Loop</h3><p>Infinite challenges!</p>';
+            endlessDiv.onclick = () => { game.currentWorld = 5; game.currentLevel = 0; loadLevel(); closeSidebar(); };
+            list.appendChild(endlessDiv);
+        }
+
+        function selectLevel(world, level) {
+            if (world > game.maxWorld) return;
+            game.currentWorld = world;
+            game.currentLevel = level;
+            loadLevel();
+            closeSidebar();
+        }
+
+        // Pointer events
+        function getGridPos(clientX, clientY) {
+            const rect = canvas.getBoundingClientRect();
+            const x = (clientX - rect.left) * (canvas.width / rect.width) / dpr - game.offsetX;
+            const y = (clientY - rect.top) * (canvas.height / rect.height) / dpr - game.offsetY;
+            const r = Math.floor(y / game.cellH);
+            const c = Math.floor(x / game.cellW);
+            return {r: Math.max(0, Math.min(game.h - 1, r)), c: Math.max(0, Math.min(game.w - 1, c))};
+        }
+
+        function isOnEndpoint(gr, gc, threshold = 0.4) {
+            for (let i = 0; i < game.endpoints.length; i++) {
+                const e = game.endpoints[i];
+                if (e.r === gr && e.c === gc && !e.connected) return i;
+            }
+            return -1;
+        }
+
+        function onPointerDown(e) {
+            e.preventDefault();
+            const pos = getGridPos(e.clientX, e.clientY);
+            const idx = isOnEndpoint(pos.r, pos.c);
+            if (idx !== -1) {
+                game.startEndpointIdx = idx;
+                game.dragging = true;
+                game.currentPath = [{r: pos.r, c: pos.c}];
+            }
+        }
+
+        function onPointerMove(e) {
+            if (!game.dragging) return;
+            e.preventDefault();
+            const pos = getGridPos(e.clientX, e.clientY);
+            const last = game.currentPath[game.currentPath.length - 1];
+            const dr = Math.abs(pos.r - last.r);
+            const dc = Math.abs(pos.c - last.c);
+            if ((dr + dc === 1) && !game.occupied[pos.r][pos.c] &&
+                !game.currentPath.some(p => p.r === pos.r && p.c === pos.c)) {
+                game.currentPath.push({r: pos.r, c: pos.c});
+            }
+        }
+
+        function onPointerUp(e) {
+            if (!game.dragging) return;
+            e.preventDefault();
+            const pos = getGridPos(e.clientX, e.clientY);
+            const endIdx = isOnEndpoint(pos.r, pos.c);
+            if (endIdx !== -1 && endIdx !== game.startEndpointIdx &&
+                game.endpoints[endIdx].color === game.endpoints[game.startEndpointIdx].color &&
+                !game.endpoints[endIdx].connected) {
+                // Connect!
+                game.endpoints[game.startEndpointIdx].connected = true;
+                game.endpoints[endIdx].connected = true;
+                for (let p of game.currentPath) {
+                    game.occupied[p.r][p.c] = true;
+                }
+                game.paths.push({cells: [...game.currentPath], color: game.endpoints[game.startEndpointIdx].color});
+                checkWin();
+            }
+            game.currentPath = [];
+            game.dragging = false;
+            game.startEndpointIdx = -1;
+        }
+
+        function checkWin() {
+            if (game.endpoints.every(e => e.connected)) {
+                game.hintsUsed = Math.min(game.hintsUsed, game.hints); // Track used
+                addParticles();
+                document.getElementById('complete-screen').classList.add('show');
+                // Stars logic
+                const stars = game.hintsUsed === 0 ? 3 : game.hintsUsed < 3 ? 2 : 1;
+                document.getElementById('complete-stars').textContent = '★'.repeat(stars);
+                if (!game.completed[game.currentWorld]) game.completed[game.currentWorld] = {};
+                game.completed[game.currentWorld][game.currentLevel] = stars;
+                updateStars(); // Update top
+                saveProgress();
+            }
+        }
+
+        function nextLevel() {
+            document.getElementById('complete-screen').classList.remove('show');
+            game.currentLevel++;
+            loadLevel();
+        }
+
+        // Hint
+        function giveHint() {
+            if (game.hints <= 0) {
+                showRefillModal();
+                return;
+            }
+            game.hints--;
+            game.hintsUsed = Math.min(game.hintsUsed + 1, 3);
+            // Find a hint path
+            for (let i = 0; i < game.endpoints.length; i++) {
+                if (!game.endpoints[i].connected) {
+                    const start = game.endpoints[i];
+                    for (let j = i + 1; j < game.endpoints.length; j++) {
+                        const end = game.endpoints[j];
+                        if (!end.connected && start.color === end.color) {
+                            const path = bfs(start.r, start.c, end.r, end.c);
+                            if (path) {
+                                // Temp draw path
+                                const tempPath = {cells: path, color: start.color, temp: true};
+                                setTimeout(() => {
+                                    game.paths = game.paths.filter(p => !p.temp);
+                                }, 3000);
+                                game.paths.push(tempPath);
+                                updateUI();
+                                return;
+                            }
+                        }
+                    }
                 }
             }
-        });
+            game.hints++; // No hint found
+        }
 
-        // --- LEVEL 2 ENGINE: WEB CODE ---
-        document.getElementById('web-code').addEventListener('input', (e) => {
-            if (e.target.value === "1998") { // Hidden code on your site
-                haptic();
-                completeLevel(2);
+        function bfs(sr, sc, tr, tc) {
+            const queue = [];
+            const vis = Array(game.h).fill().map(() => Array(game.w).fill(false));
+            const parent = Array(game.h).fill().map(() => Array(game.w).fill(null));
+            queue.push({r: sr, c: sc});
+            vis[sr][sc] = true;
+            const dirs = [[0,1],[1,0],[0,-1],[-1,0]];
+            let found = false;
+            while (queue.length > 0 && !found) {
+                const curr = queue.shift();
+                if (curr.r === tr && curr.c === tc) {
+                    found = true;
+                    break;
+                }
+                for (let d = 0; d < 4; d++) {
+                    const nr = curr.r + dirs[d][0];
+                    const nc = curr.c + dirs[d][1];
+                    if (nr >= 0 && nr < game.h && nc >= 0 && nc < game.w &&
+                        !vis[nr][nc] && !game.occupied[nr][nc]) {
+                        vis[nr][nc] = true;
+                        parent[nr][nc] = {r: curr.r, c: curr.c};
+                        queue.push({r: nr, c: nc});
+                    }
+                }
             }
-        });
-
-        // --- LEVEL 3 ENGINE: IG CODE ---
-        document.getElementById('ig-code').addEventListener('input', (e) => {
-            if (e.target.value.toUpperCase() === "V8X1") { // Code from IG Highlight
-                haptic();
-                completeLevel(3);
+            if (!found || !vis[tr][tc]) return null;
+            // Reconstruct
+            const path = [];
+            let curr = {r: tr, c: tc};
+            while (curr.r !== sr || curr.c !== sc) {
+                path.push({r: curr.r, c: curr.c});
+                curr = parent[curr.r][curr.c];
             }
-        });
+            path.push({r: sr, c: sc});
+            path.reverse();
+            return path;
+        }
 
-        // --- LEVEL TRANSITION LOGIC ---
-        function completeLevel(lvl) {
-            const current = document.getElementById(`lvl-${lvl}`);
-            const next = document.getElementById(`lvl-${lvl + 1}`);
-            const status = document.getElementById('status-msg');
+        function refillHints() {
+            game.hints += 3;
+            updateUI();
+            document.getElementById('modal').classList.remove('show');
+        }
 
-            current.classList.add('success-flash');
-            haptic();
+        function showRefillModal() {
+            const content = document.getElementById('modal-content');
+            content.innerHTML = `
+                <h2>🔥 Refill Hints</h2>
+                <p>Get 3 more hints to continue your flow!</p>
+                <a href="${IG_LINK}" target="_blank">Follow @villa8 on Instagram</a>
+                <a href="${SITE_LINK}" target="_blank">Visit Villa8 Site</a>
+                <button onclick="refillHints()">Claim +3 Hints</button>
+            `;
+            document.getElementById('modal').classList.add('show');
+        }
 
-            setTimeout(() => {
-                current.classList.add('hidden');
-                if (next) {
-                    next.classList.remove('hidden');
-                    state.currentLevel++;
-                    updateStatus();
+        function showUnlockModal() {
+            const content = document.getElementById('modal-content');
+            content.innerHTML = `
+                <h2>🚀 Unlock Data Vault</h2>
+                <p>Visit <a href="\( {SITE_LINK}" target="_blank"> \){SITE_LINK}</a> to get the unlock code!</p>
+                <input type="text" id="unlock-input" placeholder="Enter code" maxlength="10">
+                <button onclick="checkUnlock()">Unlock World</button>
+            `;
+            document.getElementById('modal').classList.add('show');
+        }
+
+        function checkUnlock() {
+            const input = document.getElementById('unlock-input').value.toUpperCase().trim();
+            if (input === UNLOCK_CODE) {
+                localStorage.setItem('villa8_unlocked', 'true');
+                game.maxWorld = Math.max(game.maxWorld, 2);
+                document.getElementById('modal').classList.remove('show');
+                updateSidebar();
+                loadLevel();
+            } else {
+                alert('Wrong code! Visit the site for the correct one.');
+            }
+        }
+
+        function addParticles() {
+            const cx = canvas.width / (2 * dpr);
+            const cy = canvas.height / (2 * dpr);
+            for (let i = 0; i < 50; i++) {
+                game.particles.push({
+                    x: cx,
+                    y: cy,
+                    vx: (Math.random() - 0.5) * 20,
+                    vy: (Math.random() - 0.5) * 20 - 5,
+                    life: 1.0,
+                    maxLife: 1.0
+                });
+            }
+        }
+
+        // Draw
+        function draw() {
+            const cw = canvas.width / dpr;
+            const ch = canvas.height / dpr;
+            ctx.fillStyle = '#0a0a0a';
+            ctx.fillRect(0, 0, cw, ch);
+
+            // Vignette
+            const grad = ctx.createRadialGradient(cw/2, ch/2, 0, cw/2, ch/2, Math.max(cw, ch)/2);
+            grad.addColorStop(0, 'rgba(255,255,255,0)');
+            grad.addColorStop(0.7, 'rgba(0,0,0,0.3)');
+            grad.addColorStop(1, 'rgba(0,0,0,0.8)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, cw, ch);
+
+            ctx.save();
+            ctx.translate(game.offsetX, game.offsetY);
+
+            // Grid
+            ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i <= game.w; i++) {
+                ctx.beginPath();
+                ctx.moveTo(i * game.cellW, 0);
+                ctx.lineTo(i * game.cellW, game.h * game.cellH);
+                ctx.stroke();
+            }
+            for (let i = 0; i <= game.h; i++) {
+                ctx.beginPath();
+                ctx.moveTo(0, i * game.cellH);
+                ctx.lineTo(game.w * game.cellW, i * game.cellH);
+                ctx.stroke();
+            }
+
+            // Paths
+            game.paths.forEach(path => {
+                if (path.temp) {
+                    ctx.setLineDash([5, 5]);
                 } else {
-                    status.innerText = "ALL ZONES CALIBRATED";
+                    ctx.setLineDash([]);
                 }
-            }, 800);
+                ctx.shadowColor = COLORS[path.color];
+                ctx.shadowBlur = 20;
+                ctx.lineWidth = game.cellW * 0.7;
+                ctx.strokeStyle = path.temp ? 'rgba(255,235,59,0.8)' : COLORS[path.color];
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                ctx.beginPath();
+                const first = path.cells[0];
+                ctx.moveTo(first.c * game.cellW + game.cellW / 2, first.r * game.cellH + game.cellH / 2);
+                for (let k = 1; k < path.cells.length; k++) {
+                    const p = path.cells[k];
+                    ctx.lineTo(p.c * game.cellW + game.cellW / 2, p.r * game.cellH + game.cellH / 2);
+                }
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+            });
+            ctx.setLineDash([]);
+
+            // Current path
+            if (game.currentPath.length > 1) {
+                ctx.shadowColor = '#ffeb3b';
+                ctx.shadowBlur = 10;
+                ctx.lineWidth = game.cellW * 0.4;
+                ctx.strokeStyle = 'rgba(255,235,59,0.6)';
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                ctx.beginPath();
+                const first = game.currentPath[0];
+                ctx.moveTo(first.c * game.cellW + game.cellW / 2, first.r * game.cellH + game.cellH / 2);
+                for (let k = 1; k < game.currentPath.length; k++) {
+                    const p = game.currentPath[k];
+                    ctx.lineTo(p.c * game.cellW + game.cellW / 2, p.r * game.cellH + game.cellH / 2);
+                }
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+            }
+
+            // Endpoints
+            game.endpoints.forEach((e, idx) => {
+                const x = e.c * game.cellW + game.cellW / 2;
+                const y = e.r * game.cellH + game.cellH / 2;
+                const isCurrent = game.dragging && (idx === game.startEndpointIdx || game.currentPath[game.currentPath.length - 1]?.r === e.r && game.currentPath[game.currentPath.length - 1]?.c === e.c);
+                const scale = e.connected ? 1 : (isCurrent ? 1.3 : 1.1 + Math.sin(game.animTime * 0.1) * 0.1);
+                const size = game.cellW * 0.35 * scale;
+
+                // Glow
+                ctx.shadowColor = COLORS[e.color];
+                ctx.shadowBlur = isCurrent ? 30 : e.connected ? 15 : 25;
+
+                // Gradient
+                const grad = ctx.createRadialGradient(x, y, 0, x, y, size);
+                grad.addColorStop(0, '#ffffff');
+                grad.addColorStop(0.7, COLORS[e.color]);
+                grad.addColorStop(1, 'rgba(0,0,0,0.5)');
+                ctx.fillStyle = grad;
+                ctx.beginPath();
+                ctx.arc(x, y, size, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Outer glow yellow
+                ctx.shadowColor = '#ffeb3b';
+                ctx.shadowBlur = 15;
+                ctx.strokeStyle = 'rgba(255,235,59,0.6)';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(x, y, size * 1.2, 0, Math.PI * 2);
+                ctx.stroke();
+
+                ctx.shadowBlur = 0;
+            });
+
+            ctx.restore();
+
+            // Particles
+            game.particles = game.particles.filter(p => {
+                p.x += p.vx * 0.016;
+                p.y += p.vy * 0.016;
+                p.vy += 0.3;
+                p.life -= 0.02;
+                if (p.life > 0) {
+                    ctx.save();
+                    ctx.globalAlpha = p.life;
+                    ctx.shadowColor = '#ffeb3b';
+                    ctx.shadowBlur = 10;
+                    ctx.fillStyle = '#ffeb3b';
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.life * 8, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+                    return true;
+                }
+                return false;
+            });
+
+            game.animTime += 0.016;
         }
 
-        function updateStatus() {
-            const msgs = ["", "Zone 01: Calibration", "Zone 02: External Fetch", "Zone 03: Social Sync"];
-            document.getElementById('status-msg').innerText = msgs[state.currentLevel];
+        function loop() {
+            draw();
+            requestAnimationFrame(loop);
         }
+
+        // UI Controls
+        document.getElementById('menu').onclick = () => document.getElementById('sidebar').classList.toggle('open');
+        document.getElementById('hint').onclick = giveHint;
+        document.getElementById('restart').onclick = loadLevel;
+        function openSidebar() { document.getElementById('sidebar').classList.add('open'); }
+        function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); }
+
+        // Swipe for sidebar (touch)
+        let startX = 0;
+        canvas.addEventListener('touchstart', e => { startX = e.touches[0].clientX; });
+        canvas.addEventListener('touchend', e => {
+            const endX = e.changedTouches[0].clientX;
+            if (startX - endX > 50) openSidebar();
+        });
+
+        init();
     </script>
 </body>
 </html>
