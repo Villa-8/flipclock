@@ -1,729 +1,151 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Cosmic Puzzle Locker — 25-Level Password Challenge</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg:        #0f0f1a;
-      --surface:   #161627;
-      --text:      #e0e0ff;
-      --text-dim:  #a0a0cc;
-      --accent:    #00d4ff;
-      --accent-dim:#0099bb;
-      --success:   #33ffaa;
-      --warning:   #ffaa33;
-      --danger:    #ff3366;
-      --border:    rgba(0,212,255,0.18);
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VILLA8 | Minimalist Puzzle</title>
+    <style>
+        :root {
+            --slate: #121212;
+            --lemon: #DFFF00;
+            --glass: rgba(255, 255, 255, 0.05);
+            --text: #f0f0f0;
+        }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+        body, html {
+            margin: 0; padding: 0;
+            background-color: var(--slate);
+            color: var(--text);
+            font-family: 'Inter', -apple-system, sans-serif;
+            height: 100%; overflow: hidden;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
 
-    body {
-      font-family: 'Inter', system-ui, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      line-height: 1.5;
-    }
+        /* The Header */
+        #header {
+            position: absolute; top: 40px; width: 100%;
+            text-align: center; letter-spacing: 8px;
+            font-weight: 800; color: var(--lemon); opacity: 0.8;
+        }
 
-    #container {
-      max-width: 1100px;
-      margin: 2rem auto;
-      padding: 2rem;
-      background: var(--surface);
-      border-radius: 16px;
-      border: 1px solid var(--border);
-      box-shadow: 0 10px 40px rgba(0,0,0,0.6);
-    }
+        /* The Game Container */
+        #game-container {
+            width: 320px; height: 480px;
+            background: var(--glass);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 40px;
+            position: relative;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            backdrop-filter: blur(10px);
+        }
 
-    header {
-      text-align: center;
-      margin-bottom: 2.5rem;
-    }
+        /* Puzzle Elements */
+        .slider-rail {
+            width: 10px; height: 200px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 5px; position: relative;
+        }
 
-    h1 {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: clamp(2.2rem, 5.5vw, 3.8rem);
-      color: var(--accent);
-      letter-spacing: -1px;
-      margin-bottom: 0.5rem;
-    }
+        #slider-handle {
+            width: 30px; height: 30px;
+            background: var(--lemon);
+            border-radius: 50%; position: absolute;
+            left: -10px; cursor: pointer;
+            box-shadow: 0 0 15px var(--lemon);
+        }
 
-    .subtitle {
-      color: var(--text-dim);
-      font-size: 1.1rem;
-    }
+        /* Hint/Task Section */
+        #ui-footer {
+            position: absolute; bottom: 40px;
+            display: flex; gap: 20px;
+        }
 
-    #progress {
-      height: 10px;
-      background: rgba(255,255,255,0.08);
-      border-radius: 5px;
-      overflow: hidden;
-      margin: 1.5rem 0;
-    }
+        .btn {
+            padding: 10px 20px;
+            border: 1px solid var(--lemon);
+            color: var(--lemon);
+            border-radius: 20px;
+            font-size: 12px; cursor: pointer;
+            text-decoration: none; transition: 0.3s;
+        }
 
-    #progress-bar {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, var(--accent), #00aaff);
-      transition: width 0.6s ease;
-    }
+        .btn:hover { background: var(--lemon); color: var(--slate); }
 
-    #status {
-      display: flex;
-      justify-content: space-between;
-      font-size: 1.05rem;
-      margin-bottom: 1.5rem;
-      color: var(--text-dim);
-    }
-
-    label {
-      display: block;
-      margin: 1.8rem 0 0.7rem;
-      font-weight: 600;
-      color: var(--accent);
-    }
-
-    #password {
-      width: 100%;
-      min-height: 90px;
-      padding: 1.2rem;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 1.35rem;
-      background: rgba(0,0,0,0.4);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      color: var(--text);
-      resize: vertical;
-      transition: border-color 0.25s, box-shadow 0.25s;
-    }
-
-    #password:focus {
-      outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(0,212,255,0.2);
-    }
-
-    #controls {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
-      margin: 1.8rem 0;
-      justify-content: center;
-    }
-
-    button {
-      padding: 0.9rem 1.8rem;
-      font-size: 1rem;
-      font-weight: 600;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.22s;
-    }
-
-    #hintBtn {
-      background: var(--accent);
-      color: #000;
-    }
-
-    #buyBtn {
-      background: var(--warning);
-      color: #000;
-    }
-
-    #resetBtn {
-      background: var(--danger);
-      color: white;
-    }
-
-    button:hover:not(:disabled) {
-      filter: brightness(1.15);
-      transform: translateY(-1px);
-    }
-
-    button:disabled {
-      opacity: 0.45;
-      cursor: not-allowed;
-    }
-
-    #hint-message {
-      display: none;
-      margin: 1.5rem 0;
-      padding: 1.2rem;
-      background: rgba(0,212,255,0.08);
-      border: 1px solid rgba(0,212,255,0.25);
-      border-radius: 10px;
-      color: var(--accent);
-    }
-
-    #rules-container {
-      margin-top: 2rem;
-    }
-
-    .rule {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      padding: 1rem;
-      margin-bottom: 0.8rem;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 10px;
-      transition: all 0.25s;
-    }
-
-    .rule.success {
-      background: rgba(51,255,170,0.12);
-      border-color: rgba(51,255,170,0.3);
-    }
-
-    .rule.fail {
-      background: rgba(255,51,102,0.08);
-      border-color: rgba(255,51,102,0.25);
-    }
-
-    .rule-icon {
-      font-size: 1.8rem;
-      min-width: 40px;
-      text-align: center;
-    }
-
-    .rule-text {
-      flex: 1;
-      font-size: 1.05rem;
-    }
-
-    #victory-screen {
-      display: none;
-      text-align: center;
-      padding: 4rem 1rem;
-    }
-
-    #victory-screen h2 {
-      font-size: 3rem;
-      color: var(--success);
-      margin-bottom: 1.5rem;
-    }
-
-    #level-popup {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.85);
-      display: none;
-      place-items: center;
-      z-index: 1000;
-    }
-
-    .popup-content {
-      background: var(--surface);
-      padding: 2.5rem;
-      border-radius: 16px;
-      border: 1px solid var(--border);
-      max-width: 90%;
-      text-align: center;
-    }
-
-    .ban-modal {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.9);
-      display: none;
-      place-items: center;
-      z-index: 1000;
-    }
-
-    .ban-dialog {
-      background: var(--surface);
-      padding: 2rem;
-      border-radius: 16px;
-      max-width: 500px;
-      width: 90%;
-      text-align: center;
-    }
-
-    .letter-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
-      gap: 0.8rem;
-      margin: 1.5rem 0;
-    }
-
-    .letter-btn {
-      padding: 1.2rem;
-      font-size: 1.3rem;
-      background: rgba(255,255,255,0.08);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      color: white;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .letter-btn.banned {
-      background: var(--danger);
-      border-color: var(--danger);
-      transform: scale(1.08);
-    }
-
-    @media (max-width: 640px) {
-      #container { padding: 1.5rem; }
-      h1 { font-size: 2.4rem; }
-      .rule { font-size: 0.95rem; padding: 0.9rem; }
-    }
-  </style>
+        /* Hidden Level State */
+        .hidden { display: none; }
+        
+        #message { margin-top: 20px; font-size: 14px; color: #888; }
+    </style>
 </head>
 <body>
 
-<div id="container">
-  <header>
-    <h1>Cosmic Puzzle Locker</h1>
-    <div class="subtitle">25-level escalating password challenge • Space & science themed logic</div>
-  </header>
+    <div id="header">VILLA8</div>
 
-  <div id="progress"><div id="progress-bar"></div></div>
+    <div id="game-container">
+        <div id="level-1" class="level">
+            <div class="slider-rail">
+                <div id="slider-handle" style="top: 170px;"></div>
+            </div>
+        </div>
 
-  <div id="status">
-    <div>Level <span id="level">1</span> / 25</div>
-    <div>Idle: <span id="idle">60</span>s</div>
-  </div>
+        <div id="level-2" class="level hidden">
+            <p style="text-align:center; padding: 20px;">ZONE LOCKED.<br>Find the code on our site.</p>
+            <input type="text" id="passcode" placeholder="ENTER CODE" 
+                   style="background:none; border:1px solid var(--lemon); color:white; text-align:center; padding:10px;">
+        </div>
+    </div>
 
-  <label for="password">Your Password</label>
-  <textarea id="password" placeholder="Start building your solution… 🚀 🌌 …" rows="3" autofocus></textarea>
+    <div id="message">Level 01: Balance the Frequency</div>
 
-  <div id="controls">
-    <button id="hint">Hint (<span id="hint-remaining">5</span>)</button>
-    <button id="buy-hint" style="display:none;">Get Hint via Ad</button>
-    <button id="reset">Reset Game</button>
-  </div>
+    <div id="ui-footer">
+        <a href="https://yourwebsite.com" target="_blank" class="btn">VISIT SITE</a>
+        <a href="https://instagram.com/yourprofile" target="_blank" class="btn">HINT (IG)</a>
+    </div>
 
-  <div id="hint-message"></div>
+    <script>
+        const handle = document.getElementById('slider-handle');
+        const level1 = document.getElementById('level-1');
+        const level2 = document.getElementById('level-2');
+        const msg = document.getElementById('message');
 
-  <div id="rules-container"></div>
+        // --- LEVEL 1 LOGIC: THE SLIDER ---
+        let isDragging = false;
 
-  <div id="victory-screen">
-    <h2>COSMIC WIN — All 25 Lockers Unlocked!</h2>
-    <p style="font-size:1.3rem; margin:2rem 0;">
-      Congratulations! You completed the challenge.<br>
-      Take a screenshot and DM <strong>@akash</strong> on Instagram to claim your prize.
-    </p>
-    <button onclick="location.reload()">Play Again</button>
-  </div>
-</div>
+        handle.addEventListener('mousedown', () => isDragging = true);
+        window.addEventListener('mouseup', () => isDragging = false);
 
-<div id="level-popup">
-  <div class="popup-content" id="level-message"></div>
-</div>
+        window.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            let containerRect = document.querySelector('.slider-rail').getBoundingClientRect();
+            let newTop = e.clientY - containerRect.top - 15;
+            
+            if (newTop >= 0 && newTop <= 170) {
+                handle.style.top = newTop + 'px';
+                
+                // Winning Condition (Exact Spot)
+                if (Math.abs(newTop - 50) < 5) {
+                    completeLevel1();
+                }
+            }
+        });
 
-<div class="ban-modal" id="ban-modal">
-  <div class="ban-dialog">
-    <h2>Sacrifice 2 Letters</h2>
-    <p>Choose 2 letters that will be permanently banned from your password.</p>
-    <div class="letter-grid" id="letter-grid"></div>
-    <p id="ban-progress">0 / 2 selected</p>
-  </div>
-</div>
-
-<script>
-// ──────────────────────────────────────────────
-//  GAME STATE & CONSTANTS
-// ──────────────────────────────────────────────
-
-const STATE = {
-  maxRule: 0,
-  level: 1,
-  idleSeconds: 60,
-  hintsRemaining: 5,
-  hintsBought: 0,
-  bannedLetters: [],
-  pet: { state: 'none', timer: null, feed: null }
-};
-
-const UI = {
-  password: document.getElementById('password'),
-  rulesContainer: document.getElementById('rules-container'),
-  hintBtn: document.getElementById('hint'),
-  hintCount: document.getElementById('hint-remaining'),
-  buyBtn: document.getElementById('buy-hint'),
-  resetBtn: document.getElementById('reset'),
-  hintMessage: document.getElementById('hint-message'),
-  levelEl: document.getElementById('level'),
-  progressBar: document.getElementById('progress-bar'),
-  idleEl: document.getElementById('idle'),
-  victory: document.getElementById('victory-screen'),
-  levelPopup: document.getElementById('level-popup'),
-  levelMessage: document.getElementById('level-message'),
-  banModal: document.getElementById('ban-modal'),
-  banGrid: document.getElementById('letter-grid'),
-  banProgress: document.getElementById('ban-progress')
-};
-
-// ──────────────────────────────────────────────
- //  RULES (25 advanced, general knowledge, emojis, fun logic)
-// ──────────────────────────────────────────────
-
-const RULES = [
-  { text: "Password must be at least 15 characters long",                     check: s => s.length >= 15,               hint: "Extend your password with more content" },
-  { text: "Must contain at least 3 digits",                                   check: s => (s.match(/\d/g)||[]).length >= 3, hint: "Include numbers such as 1, 2, 3" },
-  { text: "Must contain at least 2 uppercase letters",                        check: s => (s.match(/[A-Z]/g)||[]).length >= 2, hint: "Use capital letters like A or B" },
-  { text: "Must contain at least 2 special characters (!@#\( %^&*)",            check: s => (s.match(/[!@# \)%^&*]/g)||[]).length >= 2, hint: "Add symbols like ! or #" },
-  { text: "Digits must sum to 42 (the answer to life)",                       check: s => digitSum(s) === 42,            hint: "Adjust numbers to total 42, e.g., 9+9+9+9+6" },
-  { text: "Must include a rocket emoji 🚀",                                    check: s => s.includes('🚀'),               hint: "Copy the rocket emoji 🚀" },
-  { text: "Must contain a space fact: galaxy or nebula",                      check: s => /galaxy|nebula/i.test(s),      hint: "Add 'galaxy' or 'nebula'" },
-  { text: "Must contain exactly 5 emojis",                                    check: s => emojiCount(s) === 5,           hint: "Ensure there are precisely 5 emojis" },
-  { text: "Must include a star emoji ⭐ or 🌟",                                 check: s => /⭐|🌟/.test(s),                 hint: "Add ⭐ or 🌟" },
-  { text: "Roman numerals must multiply to 42",                               check: s => romanProduct(s) === 42,        hint: "Use VI × VII or equivalent = 42" },
-  { text: "Length must be a Fibonacci number (13, 21, 34, 55…)",              check: s => isFibonacci(s.length),         hint: "Make length one of 13, 21, 34..." },
-  { text: "Must include a planet emoji 🪐",                                    check: s => s.includes('🪐'),               hint: "Add the planet emoji 🪐" },
-  { text: "Must include the egg emoji 🥚 to start the cosmic pet",             check: s => s.includes('🥚'),               hint: "Add 🥚 to begin the pet mechanic" },
-  { text: "After hatching, must contain at least 4 energy orbs ⚡",            check: getPetFeedCheck,                    hint: "Feed with ⚡ x4 or more" },
-  { text: "Must not contain the black hole emoji 🕳️",                         check: s => !s.includes('🕳️'),             hint: "Remove 🕳️ if it appears" },
-  { text: "Must not contain any banned letters",                              check: noBannedLetters,                    hint: "Avoid the letters you sacrificed" },
-  { text: "Must contain Morse code for SPACE: ... .--. .- -.-. .",            check: s => s.includes('... .--. .- -.-. .'), hint: "Copy the Morse for SPACE" },
-  { text: "Must contain binary for 42: 101010",                               check: s => s.includes('101010'),          hint: "Binary code for 42 is 101010" },
-  { text: "Must contain an unscrambled space term (e.g., scramble: rsta → star)", check: s => /star|moon|sun|comet|asteroid|quasar/i.test(s), hint: "Add a space word like star or comet" },
-  { text: "Atomic numbers must sum to 42",                                    check: s => atomicSum(s) === 42,           hint: "Elements like C×7 (6×7=42)" },
-  { text: "Must include a comet emoji ☄️",                                     check: s => s.includes('☄️'),               hint: "Add ☄️" },
-  { text: "Must contain a famous scientist name (einstein, newton, tesla, curie)", check: s => /einstein|newton|tesla|curie/i.test(s), hint: "Add Einstein or Newton" },
-  { text: "Must contain a palindrome of 5+ characters",                       check: s => hasPalindrome(s,5),            hint: "Words like level or radar" },
-  { text: "Must contain exactly 4 different space emojis",                    check: s => uniqueSpaceEmojis(s) === 4,    hint: "Four unique like 🚀🌌🪐⭐" },
-  { text: "Must end with the word UNIVERSE",                                  check: s => s.trim().endsWith('UNIVERSE'), hint: "Finish with UNIVERSE" }
-];
-
-// ──────────────────────────────────────────────
-//  HELPER FUNCTIONS
-// ──────────────────────────────────────────────
-
-function digitSum(s)       { return (s.match(/\d/g)||[]).reduce((a,c)=>a+Number(c),0); }
-function emojiCount(s)     { return (s.match(/[\p{Emoji}\p{Emoji_Modifier}\p{Emoji_Component}]+/gu)||[]).length; }
-function romanProduct(s)   {
-  const m = s.match(/[IVXLCDM]+/gi); if(!m) return 0;
-  let prod = 1;
-  for (let r of m) prod *= romanToNumber(r.toUpperCase());
-  return prod;
-}
-function romanToNumber(s)  {
-  const map = {I:1,V:5,X:10,L:50,C:100,D:500,M:1000};
-  let total = 0;
-  for (let i = 0; i < s.length; i++) {
-    if (i+1 < s.length && map[s[i]] < map[s[i+1]]) total -= map[s[i]];
-    else total += map[s[i]];
-  }
-  return total;
-}
-function isFibonacci(n)    { let a=0,b=1; while(b<n){[a,b]=[b,a+b];} return b===n; }
-function atomicSum(s)      {
-  let sum = 0, i = 0; s = s.toUpperCase();
-  while (i < s.length) {
-    let two = s.slice(i,i+2), one = s[i];
-    if (atomicNumbers[two]) { sum += atomicNumbers[two]; i+=2; }
-    else if (atomicNumbers[one]) { sum += atomicNumbers[one]; i++; }
-    else i++;
-  }
-  return sum;
-}
-function hasPalindrome(s, minLen=5) {
-  s = s.toLowerCase();
-  for (let i = 0; i < s.length; i++) {
-    for (let len = minLen; len <= s.length - i; len++) {
-      const sub = s.slice(i, i+len);
-      if (sub === sub.split('').reverse().join('')) return true;
-    }
-  }
-  return false;
-}
-function uniqueSpaceEmojis(s) {
-  const emojis = s.match(/🚀|🌌|🪐|⭐|🌟|☄️|🌠|🛰️|🔭|🌑|🌒|🌓|🌔|🌕|🌖|🌗|🌘/g) || [];
-  return new Set(emojis).size;
-}
-function noBannedLetters(s) {
-  return !STATE.bannedLetters.some(l => s.toLowerCase().includes(l));
-}
-function getPetFeedCheck(s) {
-  if (STATE.pet.state === 'none') return false;
-  if (STATE.pet.state === 'egg') return true;
-  return (s.match(/⚡/g) || []).length >= 4;
-}
-
-// ──────────────────────────────────────────────
-//  PET MECHANIC
-// ──────────────────────────────────────────────
-
-function handlePet(s) {
-  if (STATE.pet.state === 'none' && s.includes('🥚')) {
-    STATE.pet.state = 'egg';
-    STATE.pet.timer = setTimeout(hatchPet, 45000);
-  }
-}
-
-function hatchPet() {
-  let val = UI.password.value;
-  const idx = val.indexOf('🥚');
-  if (idx !== -1) {
-    val = val.slice(0,idx) + '🐥' + val.slice(idx+2);
-    UI.password.value = val;
-  }
-  STATE.pet.state = 'chick';
-  STATE.pet.feed = setInterval(feedPet, 25000);
-}
-
-function feedPet() {
-  let val = UI.password.value;
-  const orbs = (val.match(/⚡/g) || []).length;
-  if (orbs < 4) {
-    alert("Your cosmic pet needs energy! Add more ⚡ quickly!");
-    return;
-  }
-  for (let i = 0; i < 4; i++) {
-    val = val.replace('⚡', '');
-  }
-  UI.password.value = val;
-}
-
-// ──────────────────────────────────────────────
-//  GLITCH / BLACK HOLE
-// ──────────────────────────────────────────────
-
-function insertGlitch() {
-  if (Math.random() < 0.4 && !UI.password.value.includes('🕳️')) {
-    const pos = Math.floor(Math.random() * (UI.password.value.length + 1));
-    UI.password.value =
-      UI.password.value.slice(0,pos) + '🕳️' + UI.password.value.slice(pos);
-  }
-}
-
-// ──────────────────────────────────────────────
-//  BAN LETTERS MODAL
-// ──────────────────────────────────────────────
-
-function showBanModal() {
-  UI.banModal.style.display = 'grid';
-  UI.banGrid.innerHTML = '';
-  for (let i = 97; i <= 122; i++) {
-    const letter = String.fromCharCode(i);
-    const btn = document.createElement('button');
-    btn.className = 'letter-btn';
-    btn.textContent = letter;
-    btn.onclick = () => {
-      if (STATE.bannedLetters.length < 2 && !STATE.bannedLetters.includes(letter)) {
-        STATE.bannedLetters.push(letter);
-        btn.classList.add('banned');
-        UI.banProgress.textContent = `${STATE.bannedLetters.length} / 2`;
-        if (STATE.bannedLetters.length === 2) {
-          UI.banModal.style.display = 'none';
+        function completeLevel1() {
+            msg.innerText = "ACCESS GRANTED";
+            handle.style.background = "#fff";
+            setTimeout(() => {
+                level1.classList.add('hidden');
+                level2.classList.remove('hidden');
+                msg.innerText = "Task: Find code at Villa8.com";
+            }, 1000);
         }
-      }
-    };
-    UI.banGrid.appendChild(btn);
-  }
-}
 
-// ──────────────────────────────────────────────
-//  HINT SYSTEM
-// ──────────────────────────────────────────────
-
-function loadHintState() {
-  const today = new Date().toDateString();
-  const savedDate = localStorage.getItem('hintDate');
-  if (savedDate !== today) {
-    localStorage.setItem('hintDate', today);
-    localStorage.setItem('hintsUsed', '0');
-    localStorage.setItem('hintsBought', '0');
-  }
-  STATE.hintsRemaining = 5 - parseInt(localStorage.getItem('hintsUsed') || '0');
-  STATE.hintsBought   = parseInt(localStorage.getItem('hintsBought') || '0');
-}
-
-function saveHintState() {
-  localStorage.setItem('hintsUsed', 5 - STATE.hintsRemaining);
-  localStorage.setItem('hintsBought', STATE.hintsBought);
-}
-
-function updateHintUI() {
-  UI.hintCount.textContent = STATE.hintsRemaining;
-  UI.hintBtn.disabled = STATE.hintsRemaining <= 0;
-  UI.buyBtn.style.display = (STATE.hintsRemaining <= 0 && STATE.hintsBought < 5) ? 'inline-block' : 'none';
-}
-
-UI.hint.addEventListener('click', () => {
-  if (STATE.hintsRemaining > 0) {
-    STATE.hintsRemaining--;
-    saveHintState();
-    updateHintUI();
-    showHint();
-  }
-});
-
-UI.buyBtn.addEventListener('click', () => {
-  window.open('https://nasa.gov', '_blank');
-  setTimeout(() => {
-    if (confirm('Did you visit the sponsor page?')) {
-      STATE.hintsBought++;
-      STATE.hintsRemaining++;
-      saveHintState();
-      updateHintUI();
-      alert('Extra hint added.');
-    }
-  }, 4000);
-});
-
-function showHint() {
-  if (STATE.maxRule < RULES.length) {
-    const rule = RULES[STATE.maxRule];
-    UI.hintMessage.innerHTML = `<strong>Next rule hint:</strong><br>${rule.hint}`;
-    UI.hintMessage.style.display = 'block';
-  }
-}
-
-// ──────────────────────────────────────────────
-//  IDLE TIMER
-// ──────────────────────────────────────────────
-
-let idleTimer;
-
-function resetIdle() {
-  clearInterval(idleTimer);
-  STATE.idleSeconds = 60;
-  UI.idleEl.textContent = STATE.idleSeconds;
-  idleTimer = setInterval(() => {
-    STATE.idleSeconds--;
-    UI.idleEl.textContent = STATE.idleSeconds;
-    if (STATE.idleSeconds <= 0) {
-      clearInterval(idleTimer);
-      if (STATE.hintsRemaining > 0) {
-        STATE.hintsRemaining--;
-        saveHintState();
-        updateHintUI();
-        showHint();
-      } else {
-        alert("Time's up! No hints left.");
-      }
-      resetIdle();
-    }
-  }, 1000);
-}
-
-// ──────────────────────────────────────────────
-//  LEVEL POPUP
-// ──────────────────────────────────────────────
-
-function showLevelUp(lvl) {
-  UI.levelMessage.textContent = `Level ${lvl}/25 — Keep exploring! 🌌`;
-  UI.levelPopup.style.display = 'grid';
-  setTimeout(() => { UI.levelPopup.style.display = 'none'; }, 4000);
-}
-
-// ──────────────────────────────────────────────
-//  CORE LOGIC
-// ──────────────────────────────────────────────
-
-function evaluatePassword() {
-  const value = UI.password.value;
-  handlePet(value);
-
-  let passed = 0;
-  for (let i = 0; i < RULES.length; i++) {
-    if (!RULES[i].check(value)) break;
-    passed = i + 1;
-  }
-
-  if (passed > STATE.maxRule) {
-    const oldLevel = STATE.level;
-    STATE.maxRule = passed;
-    STATE.level = Math.ceil(passed / 1); // one rule ≈ one sub-level
-    UI.levelEl.textContent = STATE.level;
-    UI.progressBar.style.width = `${(STATE.maxRule / RULES.length) * 100}%`;
-
-    if (STATE.level > oldLevel) showLevelUp(STATE.level);
-
-    if (STATE.maxRule === RULES.length) {
-      UI.victory.style.display = 'block';
-      UI.password.disabled = true;
-      clearInterval(idleTimer);
-      clearInterval(STATE.pet.feed);
-      clearTimeout(STATE.pet.timer);
-      confetti();
-    }
-
-    // Ban modal after rule 15
-    if (passed >= 16 && STATE.bannedLetters.length === 0) {
-      showBanModal();
-    }
-  }
-
-  renderRules(passed);
-}
-
-function renderRules(passedCount) {
-  UI.rulesContainer.innerHTML = '';
-  for (let i = 0; i < Math.min(passedCount + 2, RULES.length); i++) {
-    const rule = RULES[i];
-    const success = i < passedCount;
-    const el = document.createElement('div');
-    el.className = `rule ${success ? 'success' : 'fail'}`;
-    el.innerHTML = `
-      <div class="rule-icon">${success ? '✔' : '✖'}</div>
-      <div class="rule-text">${typeof rule.text === 'function' ? rule.text(value) : rule.text}</div>
-    `;
-    UI.rulesContainer.appendChild(el);
-  }
-}
-
-// ──────────────────────────────────────────────
-//  EVENT LISTENERS
-// ──────────────────────────────────────────────
-
-UI.password.addEventListener('input', () => {
-  evaluatePassword();
-  resetIdle();
-});
-
-UI.reset.addEventListener('click', () => {
-  if (confirm("Reset everything and start over?")) {
-    location.reload();
-  }
-});
-
-// ──────────────────────────────────────────────
-//  INIT
-// ──────────────────────────────────────────────
-
-loadHintState();
-updateHintUI();
-resetIdle();
-setInterval(insertGlitch, 9000);
-
-UI.password.focus();
-evaluatePassword();
-
-// Simple confetti on win
-function confetti() {
-  for (let i = 0; i < 180; i++) {
-    setTimeout(() => {
-      const conf = document.createElement('div');
-      conf.style.cssText = `
-        position:fixed; left:${Math.random()*100}%; top:-10px;
-        width:10px; height:10px; background:hsl(${Math.random()*360},100%,60%);
-        pointer-events:none; z-index:999;
-        animation: fall 3.5s linear forwards;
-      `;
-      document.body.appendChild(conf);
-      setTimeout(() => conf.remove(), 3500);
-    }, i * 12);
-  }
-}
-const styleSheet = document.createElement('style');
-styleSheet.textContent = `@keyframes fall { to { transform: translateY(110vh) rotate(900deg); opacity:0; } }`;
-document.head.appendChild(styleSheet);
-</script>
+        // --- LEVEL 2 LOGIC: THE WEBSITE CODE ---
+        document.getElementById('passcode').addEventListener('input', (e) => {
+            if (e.target.value === "8888") { // Example code hidden on your site
+                alert("World 2 Unlocked");
+                // Progress to Level 3...
+            }
+        });
+    </script>
 </body>
 </html>
