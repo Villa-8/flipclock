@@ -160,6 +160,62 @@
                 localStorage.setItem('v8_prog', cur);
                 cur < levels.length ? updateUI() : alert("VILLA8 CLEARED");
             }
+        }
+        function setupInteractions(l) {
+    // 1. Reset all previous behavior
+    card.onclick = null;
+    card.onmousedown = null;
+    card.onmouseup = null;
+    card.ontouchstart = null;
+    card.ontouchend = null;
+    
+    // 2. Clear any active "Wait" timers from previous levels
+    if (window.levelTimer) clearTimeout(window.levelTimer);
+
+    // 3. Logic Branching
+    if (l.a === "_TAP") {
+        card.onclick = () => win();
+    } 
+    
+    else if (l.a === "_HOLD") {
+        card.onmousedown = card.ontouchstart = () => {
+            window.levelTimer = setTimeout(() => {
+                card.style.transform = "scale(1)";
+                win();
+            }, 3000); // 3 Seconds
+            card.style.transform = "scale(0.95)";
+        };
+        card.onmouseup = card.ontouchend = () => {
+            clearTimeout(window.levelTimer);
+            card.style.transform = "scale(1)";
+        };
+    } 
+    
+    else if (l.a === "_WAIT") {
+        // Automatically trigger win after 5 seconds of doing nothing
+        window.levelTimer = setTimeout(win, 5000);
+    }
+
+    else if (l.a === "_SWIPE_LEFT") {
+        let touchstartX = 0;
+        card.ontouchstart = (e) => touchstartX = e.changedTouches[0].screenX;
+        card.ontouchend = (e) => {
+            let touchendX = e.changedTouches[0].screenX;
+            if (touchendX < touchstartX - 100) win(); // Detected left swipe
+        };
+    }
+        }
+ function enableShake() {
+    if (typeof DeviceMotionEvent.requestPermission === 'function') {
+        DeviceMotionEvent.requestPermission().then(state => {
+            if (state === 'granted') {
+                window.addEventListener('devicemotion', (e) => {
+                    const acc = e.acceleration;
+                    if (Math.abs(acc.x) > 15 || Math.abs(acc.y) > 15) win();
+                });
+            }
+        });
+    }
         });
 
         updateUI();
