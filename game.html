@@ -1,117 +1,260 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Villa8 | System Logic</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        :root {
-            --spotify-yellow: #FDFD96;
-            --spotify-dark: #121212;
-            --glass: rgba(255, 255, 255, 0.05);
-        }
-        body {
-            background-color: var(--spotify-dark);
-            color: white;
-            font-family: 'Inter', -apple-system, sans-serif;
-            overflow: hidden;
-            touch-action: manipulation;
-        }
-        .glass-card {
-            background: var(--glass);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(253, 253, 150, 0.1);
-            border-radius: 24px;
-        }
-        .yellow-glow {
-            box-shadow: 0 0 20px rgba(253, 253, 150, 0.3);
-        }
-        /* Portrait vs Landscape logic */
-        @media (orientation: portrait) {
-            .game-container { width: 90vw; height: 70vh; }
-        }
-        @media (orientation: landscape) {
-            .game-container { width: 60vw; height: 80vh; }
-        }
-    </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>VILLA8</title>
+
+<style>
+:root{
+  --bg:#fff6d6;
+  --card:rgba(255,255,255,0.65);
+  --text:#111;
+  --accent:#000;
+}
+
+*{
+  box-sizing:border-box;
+  font-family:system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+body{
+  margin:0;
+  background:var(--bg);
+  height:100vh;
+  display:flex;
+  justify-content:center;
+}
+
+.app{
+  width:100%;
+  max-width:420px;
+  padding:16px;
+  display:flex;
+  flex-direction:column;
+  height:100vh;
+}
+
+header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+header h1{
+  margin:0;
+  letter-spacing:4px;
+  font-size:22px;
+}
+
+#levelText{
+  font-size:14px;
+  opacity:.7;
+}
+
+.card{
+  flex:1;
+  margin:20px 0;
+  background:var(--card);
+  backdrop-filter:blur(14px);
+  border-radius:18px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:20px;
+  font-size:22px;
+  user-select:none;
+}
+
+.input-area{
+  display:flex;
+  gap:10px;
+}
+
+input{
+  flex:1;
+  padding:14px;
+  border-radius:14px;
+  border:none;
+  font-size:16px;
+}
+
+button{
+  padding:14px 18px;
+  border-radius:14px;
+  border:none;
+  background:var(--accent);
+  color:#fff;
+  font-size:14px;
+  cursor:pointer;
+}
+
+footer{
+  margin-top:10px;
+  display:flex;
+  justify-content:center;
+}
+
+#hint{
+  background:none;
+  color:#000;
+  opacity:.6;
+}
+
+@media(min-width:768px){
+  .app{max-width:500px;}
+}
+</style>
 </head>
-<body class="flex flex-col items-center justify-center min-h-screen p-4">
 
-    <header class="fixed top-0 w-full p-6 flex justify-between items-center z-50">
-        <h1 class="text-2xl font-bold tracking-tighter" style="color: var(--spotify-yellow)">VILLA8</h1>
-        <div class="flex gap-4">
-            <button onclick="showHint()" class="px-4 py-2 glass-card text-xs uppercase tracking-widest hover:bg-yellow-100 hover:text-black transition">Hint</button>
-            <div id="level-display" class="px-4 py-2 border border-white/20 rounded-full text-xs">LVL 01</div>
-        </div>
-    </header>
+<body>
 
-    <main id="game-stage" class="game-container glass-card flex items-center justify-center relative overflow-hidden">
-        <div id="puzzle-content" class="w-full h-full flex flex-col items-center justify-center p-8 text-center">
-            <h2 id="task-title" class="text-3xl font-light mb-8">System Booting...</h2>
-            <div id="interactive-element" class="relative">
-                </div>
-        </div>
-    </main>
+<main class="app">
+  <header>
+    <h1>VILLA8</h1>
+    <span id="levelText"></span>
+  </header>
 
-    <footer class="fixed bottom-0 w-full p-6 flex justify-center gap-8 bg-gradient-to-t from-black to-transparent">
-        <a href="https://instagram.com/villa8" target="_blank" class="opacity-50 hover:opacity-100 transition"><i class="fab fa-instagram text-xl"></i></a>
-        <a href="https://villa8.com" target="_blank" class="opacity-50 hover:opacity-100 transition"><i class="fas fa-globe text-xl"></i></a>
-    </footer>
+  <section class="card" id="puzzle"></section>
 
-    <div id="hint-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-[100] flex items-center justify-center p-6">
-        <div class="glass-card p-8 max-w-sm w-full text-center">
-            <h3 class="text-xl mb-4" style="color: var(--spotify-yellow)">Data Access Required</h3>
-            <p class="text-sm text-gray-400 mb-6">To unlock the master hint for this level, visit our secure terminal.</p>
-            <button onclick="visitSiteForHint()" class="w-full py-3 bg-[#FDFD96] text-black font-bold rounded-full mb-4">VISIT WEBSITE</button>
-            <button onclick="closeHint()" class="text-xs uppercase tracking-widest opacity-50">Close</button>
-        </div>
-    </div>
+  <section class="input-area" id="inputArea">
+    <input type="text" id="answer" placeholder="Enter password..." />
+    <button id="submit">ENTER</button>
+  </section>
 
-    <script>
-        // Game State Logic
-        let currentLevel = 1;
-        
-        const levels = {
-            1: {
-                title: "Calibration",
-                hint: "Find the center of the frequency.",
-                action: () => renderLevel1()
-            }
-            // Add more levels here...
-        };
+  <footer>
+    <button id="hint">🔒 Hint</button>
+  </footer>
+</main>
 
-        function renderLevel1() {
-            const stage = document.getElementById('interactive-element');
-            stage.innerHTML = `
-                <div id='ring' class='w-32 h-32 border-4 border-[#FDFD96] rounded-full animate-pulse flex items-center justify-center cursor-pointer'>
-                    <div class='w-4 h-4 bg-white rounded-full'></div>
-                </div>
-            `;
-            document.getElementById('task-title').innerText = levels[1].title;
-            
-            document.getElementById('ring').onclick = () => {
-                alert("System Calibrated. Moving to Level 2...");
-                // Progress logic here
-            };
-        }
+<script>
+/* ================= LEVEL DATA ================= */
 
-        function showHint() {
-            document.getElementById('hint-modal').classList.remove('hidden');
-        }
+const levels = [
+  { puzzle:"WELCOME", answer:"WELCOME", hint:"Sometimes the answer is already given." },
+  { puzzle:"TAP ME", action:"tap", hint:"Do exactly what it says." },
+  { puzzle:"12321", answer:"12321", hint:"Symmetry matters." },
+  { puzzle:"•••", action:"timing", hint:"Tap dots in order." },
+  { puzzle:"INPUT DISABLED", action:"longpress", hint:"Hold longer." },
+  { puzzle:"ɘʇɐɹǝuǝƃ", answer:"GENERATE", hint:"Change perspective." },
+  { puzzle:"DON'T TAP", action:"wait", hint:"Opposite action." },
+  { puzzle:"THIS IS NOT A PASSWORD", answer:"PASSWORD", hint:"Read carefully." },
+  { puzzle:"•••••", answer:"5", hint:"Count." },
+  { puzzle:"", action:"swipe", hint:"Explore the screen." },
 
-        function closeHint() {
-            document.getElementById('hint-modal').classList.add('hidden');
-        }
+  { puzzle:"V I L L A E I G H T", answer:"VILLA8", hint:"Remove noise." },
+  { puzzle:"2 + 2", answer:"4", hint:"Basic." },
+  { puzzle:"A=1 B=2", answer:"3", hint:"Alphabet order." },
+  { puzzle:"08:00", answer:"8", hint:"Game name." },
+  { puzzle:"VISIT WEBSITE", action:"external", hint:"Visit site to unlock." },
 
-        function visitSiteForHint() {
-            window.open('https://villa8.com', '_blank');
-            // Log logic to unlock hint after return
-        }
+  { puzzle:"FOLLOW INSTAGRAM", action:"external", hint:"Social unlock." },
+  { puzzle:"2,4,8", answer:"16", hint:"Double." },
+  { puzzle:"BALANCE", action:"center", hint:"Middle is key." },
+  { puzzle:"404", answer:"NOTFOUND", hint:"Missing." },
+  { puzzle:"WORLD COMPLETE", action:"tap", hint:"Acknowledge." },
 
-        // Initialize
-        renderLevel1();
-    </script>
+  { puzzle:"LOOP", action:"swipeBack", hint:"Break the loop." },
+  { puzzle:"EMPTY", answer:"", hint:"Nothing is something." },
+  { puzzle:"SCROLL", action:"scroll", hint:"Move." },
+  { puzzle:"YES / NO", action:"background", hint:"Neither." },
+  { puzzle:"GLITCH", action:"hold", hint:"Pause it." },
+
+  { puzzle:"SHAKE", action:"still", hint:"Stay still." },
+  { puzzle:"WAIT", action:"wait30", hint:"Patience." },
+  { puzzle:"WRONG", action:"tapText", hint:"Accept it." },
+  { puzzle:"SILENCE", action:"nothing", hint:"Do nothing." },
+  { puzzle:"MIRROR", answer:"RORRIM", hint:"Reverse." },
+
+  { puzzle:"URL LEVEL", action:"url", hint:"Change query." },
+  { puzzle:"EDGES", action:"edges", hint:"Corners." },
+  { puzzle:"INVISIBLE", action:"random", hint:"Search." },
+  { puzzle:"READ SITE", action:"external", hint:"Hidden word." },
+  { puzzle:"COMPLETE", action:"tap", hint:"Proceed." },
+
+  { puzzle:"MEMORY", action:"remember", hint:"Recall earlier." },
+  { puzzle:"PATTERN", answer:"8", hint:"Repeated theme." },
+  { puzzle:"FALSE FAIL", action:"tap", hint:"Ignore error." },
+  { puzzle:"ONE TRY", answer:"READY", hint:"Confidence." },
+  { puzzle:"YOU ARE READY", answer:"READY", hint:"Believe it." }
+];
+
+/* ================= GAME ENGINE ================= */
+
+let level = Number(localStorage.getItem("villa8Level")) || 0;
+
+const puzzle = document.getElementById("puzzle");
+const answer = document.getElementById("answer");
+const submit = document.getElementById("submit");
+const hintBtn = document.getElementById("hint");
+const levelText = document.getElementById("levelText");
+const inputArea = document.getElementById("inputArea");
+
+function loadLevel(){
+  const l = levels[level];
+  puzzle.textContent = l.puzzle || " ";
+  levelText.textContent = `Level ${level + 1}`;
+  answer.value = "";
+  inputArea.style.display = l.answer !== undefined ? "flex" : "none";
+}
+
+function nextLevel(){
+  level++;
+  localStorage.setItem("villa8Level", level);
+  if(level >= levels.length){
+    puzzle.textContent = "VILLA8 COMPLETED";
+    inputArea.style.display = "none";
+    return;
+  }
+  loadLevel();
+}
+
+submit.onclick = ()=>{
+  const l = levels[level];
+  if(l.answer !== undefined && answer.value.trim().toUpperCase() === l.answer){
+    nextLevel();
+  }else{
+    shake();
+  }
+};
+
+hintBtn.onclick = ()=>{
+  alert("HINT:\n" + levels[level].hint + "\n\nUnlock by Ad / Website / Instagram");
+};
+
+/* ================= INTERACTIONS ================= */
+
+puzzle.onclick = ()=> {
+  if(levels[level].action === "tap") nextLevel();
+};
+
+let pressTimer;
+puzzle.addEventListener("touchstart",()=>{
+  pressTimer = setTimeout(()=>{
+    if(levels[level].action === "longpress") nextLevel();
+  },800);
+});
+puzzle.addEventListener("touchend",()=>clearTimeout(pressTimer));
+
+let startX;
+puzzle.addEventListener("touchstart",e=>startX=e.touches[0].clientX);
+puzzle.addEventListener("touchend",e=>{
+  let dx = e.changedTouches[0].clientX - startX;
+  if(Math.abs(dx) > 60 && levels[level].action === "swipe") nextLevel();
+});
+
+function shake(){
+  puzzle.animate([
+    {transform:"translateX(0)"},
+    {transform:"translateX(-8px)"},
+    {transform:"translateX(8px)"},
+    {transform:"translateX(0)"}
+  ],{duration:300});
+}
+
+loadLevel();
+</script>
+
 </body>
 </html>
