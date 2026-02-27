@@ -1,76 +1,116 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Talking Scion</title>
-    <style>
-        body { background: #f0f0f0; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; font-family: 'Comic Sans MS', sans-serif; }
-        #scion-container { cursor: pointer; position: relative; }
-        #scion-img { width: 300px; transition: transform 0.1s; }
-        #scion-img:active { transform: scale(0.95); }
-        .bubble { background: white; padding: 15px; border-radius: 20px; border: 3px solid #333; margin-bottom: 20px; font-weight: bold; min-height: 20px; }
-        button { padding: 10px 20px; font-size: 18px; cursor: pointer; border-radius: 10px; border: none; background: #4CAF50; color: white; margin-top: 20px; }
-    </style>
-</head>
-<body>
+// --- ENGINE SETUP ---
+const { Engine, Render, Runner, World, Bodies, Composite } = Matter;
 
-    <div class="bubble" id="status-bubble">Click "Record" and talk to Scion!</div>
+const engine = Engine.create();
+const world = engine.world;
+world.gravity.y = 1.2; // Slightly higher gravity for faster water
 
-    <div id="scion-container" onclick="pokeScion()">
-        <img id="scion-img" src="scion_closed.png" alt="Scion">
-    </div>
+const render = Render.create({
+    element: document.getElementById('game-container'),
+    engine: engine,
+    options: {
+        width: window.innerWidth,
+        height: window.innerHeight,
+        wireframes: false, // CRITICAL: Set to false to see images
+        background: '#aed6f1' // Light blue sky background
+    }
+});
 
-    <button onclick="startListening()">🎤 Record (Talk to Scion)</button>
+Render.run(render);
+Runner.run(Runner.create(), engine);
 
-    <script>
-        const scionImg = document.getElementById('scion-img');
-        const statusBubble = document.getElementById('status-bubble');
+// --- LEVEL DATA ---
+const levels = [
+    // Level 1
+    { 
+        pipe: { x: 100, y: 100 }, 
+        scion: { x: window.innerWidth - 150, y: window.innerHeight - 150 }, 
+        obstacles: [{x: window.innerWidth/2, y: window.innerHeight/2 + 50, w: 200, h: 20}] 
+    },
+    // ... define 19 more levels here ...
+];
 
-        // 1. SCION REPEATS WHAT YOU SAY
-        function startListening() {
-            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-            recognition.lang = 'en-US';
+let currentLevel = 0;
+let scionBody;
+let pipeBody;
 
-            statusBubble.innerText = "Scion is listening...";
-            recognition.start();
+// --- LOAD LEVEL ---
+function loadLevel(levelIdx) {
+    World.clear(world);
+    Engine.clear(engine);
+    
+    // Scion with Image
+    scionBody = Bodies.rectangle(levels[levelIdx].scion.x, levels[levelIdx].scion.y, 100, 100, { 
+        isStatic: true, 
+        render: { 
+            sprite: {
+                texture: 'assets/scion_normal.png',
+                xScale: 0.5, // Adjust based on your image size
+                yScale: 0.5
+            }
+        } 
+    });
+    
+    // Pipe with Image
+    pipeBody = Bodies.rectangle(levels[levelIdx].pipe.x, levels[levelIdx].pipe.y, 60, 60, { 
+        isStatic: true, 
+        render: { 
+            sprite: {
+                texture: 'assets/pipe.png',
+                xScale: 0.5,
+                yScale: 0.5
+            }
+        } 
+    });
+    
+    World.add(world, [scionBody, pipeBody]);
 
-            recognition.onresult = (event) => {
-                const transcript = event.results[0][0].transcript;
-                statusBubble.innerText = `You said: "${transcript}"`;
-                scionTalk(transcript);
-            };
-        }
+    // Add Obstacles with nice colors
+    levels[levelIdx].obstacles.forEach(obs => {
+        World.add(world, Bodies.rectangle(obs.x, obs.y, obs.w, obs.h, { 
+            isStatic: true, 
+            render: { fillStyle: '#8e44ad', strokeStyle: 'white', lineWidth: 3 } // Purple obstacles
+        }));
+    });
+}
 
-        // 2. SCION TALKING LOGIC
-        function scionTalk(text) {
-            const utterance = new SpeechSynthesisUtterance(text);
-            
-            // Make Scion sound funny (high pitch)
-            utterance.pitch = 2.0; 
-            utterance.rate = 1.2;
+// --- ATTRACTIVE DRAWING (Fluid Lines) ---
+let isDrawing = false;
 
-            // Mouth Animation
-            utterance.onstart = () => {
-                const interval = setInterval(() => {
-                    // Toggle mouth open/closed every 150ms
-                    scionImg.src = scionImg.src.includes('closed') ? 'scion_open.png' : 'scion_closed.png';
-                }, 150);
+window.addEventListener('mousedown', () => { isDrawing = true; });
+window.addEventListener('mouseup', () => { isDrawing = false; });
+window.addEventListener('mousemove', (e) => {
+    if (isDrawing) {
+        // Create smaller, more frequent dots for a "line" effect
+        const dot = Bodies.circle(e.clientX, e.clientY, 8, { 
+            isStatic: true, 
+            render: { fillStyle: '#3498db' } 
+        });
+        World.add(world, dot);
+    }
+});
 
-                utterance.onend = () => {
-                    clearInterval(interval);
-                    scionImg.src = 'scion_closed.png'; // Reset to closed
-                    statusBubble.innerText = "Done! Tell me something else.";
-                };
-            };
+// --- FLUID WATER ---
+function releaseWater() {
+    for (let i = 0; i < 60; i++) {
+        setTimeout(() => {
+            const drop = Bodies.circle(levels[currentLevel].pipe.x, levels[currentLevel].pipe.y, 6, {
+                restitution: 0.3,
+                friction: 0.001,
+                render: { fillStyle: 'rgba(52, 152, 219, 0.8)' } // Semi-transparent blue
+            });
+            World.add(world, drop);
+        }, i * 30);
+    }
+}
 
-            window.speechSynthesis.speak(utterance);
-        }
+// Spacebar to release water
+window.addEventListener('keydown', (e) => { if(e.code === "Space") releaseWater(); });
 
-        // 3. POKE SCION
-        function pokeScion() {
-            scionTalk("Hey! Stop poking me!");
-        }
-    </script>
-</body>
-</html>
+function nextLevel() {
+    currentLevel = (currentLevel + 1) % levels.length;
+    loadLevel(currentLevel);
+}
+
+// Start Game
+loadLevel(currentLevel);
