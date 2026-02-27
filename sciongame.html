@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gravity Friend Runner</title>
+    <style>
+        body { margin: 0; overflow: hidden; background: #222; font-family: sans-serif; }
+        canvas { display: block; background: #333; border-bottom: 5px solid #555; border-top: 5px solid #555; }
+        #score { position: absolute; top: 20px; left: 20px; color: white; font-size: 24px; }
+    </style>
+</head>
+<body>
+    <div id="score">Score: 0</div>
+    <canvas id="gameCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = 400;
+
+        let score = 0;
+        let gravity = 0.6;
+        let flip = 1; // 1 for down, -1 for up
+        
+        // Load your friend's face here!
+        const friendFace = new Image();
+        friendFace.src = 'your-friend-face.png'; // REPLACE THIS WITH YOUR FILE NAME
+
+        const player = {
+            x: 50,
+            y: 200,
+            w: 50,
+            h: 50,
+            dy: 0
+        };
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Apply Gravity
+            player.dy += gravity * flip;
+            player.y += player.dy;
+
+            // Floor/Ceiling Constraints
+            if (player.y + player.h > canvas.height) {
+                player.y = canvas.height - player.h;
+                player.dy = 0;
+            } else if (player.y < 0) {
+                player.y = 0;
+                player.dy = 0;
+            }
+
+            // Draw Friend (Flipped if gravity is inverted)
+            ctx.save();
+            if (flip === -1) {
+                ctx.translate(player.x + player.w/2, player.y + player.h/2);
+                ctx.scale(1, -1);
+                ctx.drawImage(friendFace, -player.w/2, -player.h/2, player.w, player.h);
+            } else {
+                ctx.drawImage(friendFace, player.x, player.y, player.w, player.h);
+            }
+            ctx.restore();
+
+            requestAnimationFrame(draw);
+        }
+
+        // Click or Spacebar to flip
+        window.addEventListener('mousedown', () => flip *= -1);
+        window.addEventListener('keydown', (e) => { if(e.code === "Space") flip *= -1; });
+
+        friendFace.onload = draw;
+    </script>
+</body>
+</html>
