@@ -1,116 +1,139 @@
-// --- ENGINE SETUP ---
-const { Engine, Render, Runner, World, Bodies, Composite } = Matter;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thirsty Scion</title>
+    <style>
+        body { margin: 0; padding: 0; background: #2c3e50; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow: hidden; color: white; }
+        #ui { position: absolute; top: 10px; left: 10px; z-index: 10; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 10px; }
+        h1 { margin: 0 0 10px 0; font-size: 24px; }
+        button { padding: 10px 20px; cursor: pointer; background: #e67e22; border: none; color: white; border-radius: 5px; font-size: 16px; }
+        button:hover { background: #d35400; }
+        #instructions { margin-top: 10px; font-size: 14px; color: #bdc3c7; }
+    </style>
+</head>
+<body>
 
-const engine = Engine.create();
-const world = engine.world;
-world.gravity.y = 1.2; // Slightly higher gravity for faster water
+    <div id="ui">
+        <h1>Thirsty Scion: Lvl <span id="level-num">1</span></h1>
+        <button onclick="releaseWater()">Release Water (Space)</button>
+        <button onclick="nextLevel()">Next Level</button>
+        <div id="instructions">Click & Drag to draw lines!</div>
+    </div>
+    <div id="game-container"></div>
 
-const render = Render.create({
-    element: document.getElementById('game-container'),
-    engine: engine,
-    options: {
-        width: window.innerWidth,
-        height: window.innerHeight,
-        wireframes: false, // CRITICAL: Set to false to see images
-        background: '#aed6f1' // Light blue sky background
-    }
-});
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.18.0/matter.min.js"></script>
+    <script>
+        // --- ENGINE SETUP ---
+        const { Engine, Render, Runner, World, Bodies, Composite } = Matter;
 
-Render.run(render);
-Runner.run(Runner.create(), engine);
+        const engine = Engine.create();
+        const world = engine.world;
+        world.gravity.y = 1;
 
-// --- LEVEL DATA ---
-const levels = [
-    // Level 1
-    { 
-        pipe: { x: 100, y: 100 }, 
-        scion: { x: window.innerWidth - 150, y: window.innerHeight - 150 }, 
-        obstacles: [{x: window.innerWidth/2, y: window.innerHeight/2 + 50, w: 200, h: 20}] 
-    },
-    // ... define 19 more levels here ...
-];
-
-let currentLevel = 0;
-let scionBody;
-let pipeBody;
-
-// --- LOAD LEVEL ---
-function loadLevel(levelIdx) {
-    World.clear(world);
-    Engine.clear(engine);
-    
-    // Scion with Image
-    scionBody = Bodies.rectangle(levels[levelIdx].scion.x, levels[levelIdx].scion.y, 100, 100, { 
-        isStatic: true, 
-        render: { 
-            sprite: {
-                texture: 'assets/scion_normal.png',
-                xScale: 0.5, // Adjust based on your image size
-                yScale: 0.5
+        const render = Render.create({
+            element: document.getElementById('game-container'),
+            engine: engine,
+            options: {
+                width: window.innerWidth,
+                height: window.innerHeight,
+                wireframes: false,
+                background: '#34495e'
             }
-        } 
-    });
-    
-    // Pipe with Image
-    pipeBody = Bodies.rectangle(levels[levelIdx].pipe.x, levels[levelIdx].pipe.y, 60, 60, { 
-        isStatic: true, 
-        render: { 
-            sprite: {
-                texture: 'assets/pipe.png',
-                xScale: 0.5,
-                yScale: 0.5
-            }
-        } 
-    });
-    
-    World.add(world, [scionBody, pipeBody]);
-
-    // Add Obstacles with nice colors
-    levels[levelIdx].obstacles.forEach(obs => {
-        World.add(world, Bodies.rectangle(obs.x, obs.y, obs.w, obs.h, { 
-            isStatic: true, 
-            render: { fillStyle: '#8e44ad', strokeStyle: 'white', lineWidth: 3 } // Purple obstacles
-        }));
-    });
-}
-
-// --- ATTRACTIVE DRAWING (Fluid Lines) ---
-let isDrawing = false;
-
-window.addEventListener('mousedown', () => { isDrawing = true; });
-window.addEventListener('mouseup', () => { isDrawing = false; });
-window.addEventListener('mousemove', (e) => {
-    if (isDrawing) {
-        // Create smaller, more frequent dots for a "line" effect
-        const dot = Bodies.circle(e.clientX, e.clientY, 8, { 
-            isStatic: true, 
-            render: { fillStyle: '#3498db' } 
         });
-        World.add(world, dot);
-    }
-});
 
-// --- FLUID WATER ---
-function releaseWater() {
-    for (let i = 0; i < 60; i++) {
-        setTimeout(() => {
-            const drop = Bodies.circle(levels[currentLevel].pipe.x, levels[currentLevel].pipe.y, 6, {
-                restitution: 0.3,
-                friction: 0.001,
-                render: { fillStyle: 'rgba(52, 152, 219, 0.8)' } // Semi-transparent blue
+        Render.run(render);
+        Runner.run(Runner.create(), engine);
+
+        // --- LEVEL DATA ---
+        // To add 20 levels, follow the structure below for each level.
+        const levels = [
+            // Level 1: Simple drop
+            { pipe: { x: 100, y: 100 }, scion: { x: window.innerWidth - 100, y: window.innerHeight - 100 }, obstacles: [] },
+            // Level 2: Wall obstacle
+            { pipe: { x: 100, y: 100 }, scion: { x: window.innerWidth - 100, y: window.innerHeight - 100 }, obstacles: [{x: window.innerWidth/2, y: window.innerHeight/2, w: 20, h: 300}] },
+            // Level 3: Funnel challenge
+            { pipe: { x: window.innerWidth/2, y: 50 }, scion: { x: window.innerWidth/2, y: window.innerHeight - 100 }, obstacles: [{x: window.innerWidth/2 - 100, y: window.innerHeight/2, w: 20, h: 400}, {x: window.innerWidth/2 + 100, y: window.innerHeight/2, w: 20, h: 400}] }
+        ];
+
+        let currentLevel = 0;
+        let scionBody;
+        let pipeBody;
+        let drawnBodies = [];
+
+        // --- LOAD LEVEL ---
+        function loadLevel(levelIdx) {
+            // Clear previous level elements
+            Composite.clear(world, false);
+            
+            // Scion Body
+            scionBody = Bodies.rectangle(levels[levelIdx].scion.x, levels[levelIdx].scion.y, 80, 80, { 
+                isStatic: true, 
+                render: { fillStyle: '#f1c40f' } // Yellow Scion
             });
-            World.add(world, drop);
-        }, i * 30);
-    }
-}
+            
+            // Pipe Body
+            pipeBody = Bodies.rectangle(levels[levelIdx].pipe.x, levels[levelIdx].pipe.y, 60, 60, { 
+                isStatic: true, 
+                render: { fillStyle: '#7f8c8d' } 
+            });
+            
+            World.add(world, [scionBody, pipeBody]);
 
-// Spacebar to release water
-window.addEventListener('keydown', (e) => { if(e.code === "Space") releaseWater(); });
+            // Add Obstacles
+            levels[levelIdx].obstacles.forEach(obs => {
+                World.add(world, Bodies.rectangle(obs.x, obs.y, obs.w, obs.h, { 
+                    isStatic: true, 
+                    render: { fillStyle: '#c0392b' } 
+                }));
+            });
 
-function nextLevel() {
-    currentLevel = (currentLevel + 1) % levels.length;
-    loadLevel(currentLevel);
-}
+            document.getElementById('level-num').innerText = levelIdx + 1;
+        }
 
-// Start Game
-loadLevel(currentLevel);
+        // --- DRAWING MECHANIC ---
+        let isDrawing = false;
+        let lastX, lastY;
+
+        window.addEventListener('mousedown', (e) => { isDrawing = true; lastX = e.clientX; lastY = e.clientY; });
+        window.addEventListener('mouseup', () => { isDrawing = false; });
+        window.addEventListener('mousemove', (e) => {
+            if (isDrawing) {
+                // Create small circles to act as a line
+                const dot = Bodies.circle(e.clientX, e.clientY, 8, { 
+                    isStatic: true, 
+                    render: { fillStyle: '#3498db' } 
+                });
+                World.add(world, dot);
+                drawnBodies.push(dot);
+            }
+        });
+
+        // --- WATER MECHANIC ---
+        function releaseWater() {
+            for (let i = 0; i < 60; i++) {
+                setTimeout(() => {
+                    const drop = Bodies.circle(levels[currentLevel].pipe.x, levels[currentLevel].pipe.y, 5, {
+                        restitution: 0.5,
+                        friction: 0.01,
+                        render: { fillStyle: '#2980b9' }
+                    });
+                    World.add(world, drop);
+                }, i * 30);
+            }
+        }
+
+        // Spacebar to release water
+        window.addEventListener('keydown', (e) => { if(e.code === "Space") releaseWater(); });
+
+        function nextLevel() {
+            currentLevel = (currentLevel + 1) % levels.length;
+            loadLevel(currentLevel);
+        }
+
+        // Start Game
+        loadLevel(currentLevel);
+    </script>
+</body>
+</html>
