@@ -28,7 +28,6 @@
 
         #lvl-display { font-weight: bold; color: #2c3e50; font-size: 18px; margin-bottom: 10px; }
         
-        /* Canvas fix */
         canvas { display: block; }
     </style>
 </head>
@@ -41,7 +40,7 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.18.0/matter.min.js"></script>
     <script>
-        const { Engine, Render, Runner, World, Bodies, Events, Composite } = Matter;
+        const { Engine, Render, Runner, World, Bodies, Events, Composite, Mouse, MouseConstraint } = Matter;
 
         const engine = Engine.create();
         const render = Render.create({
@@ -55,8 +54,7 @@
             }
         });
 
-        // --- CARTOON ASSETS ---
-        // REPLACE THESE URLS WITH YOUR OWN IMAGES FOR BEST RESULTS
+        // --- CARTOON ASSETS (Replace URLs with your own) ---
         const SPRITES = {
             normal: 'https://cdn-icons-png.flaticon.com/512/4140/4140037.png',
             happy: 'https://cdn-icons-png.flaticon.com/512/4140/4140058.png',
@@ -79,10 +77,12 @@
         let scionBody;
         let waterReleased = false;
         let levelActive = true;
+        let collectedWater = 0;
 
         function initLevel(idx) {
             levelActive = true;
             waterReleased = false;
+            collectedWater = 0;
             World.clear(engine.world);
             
             // Scion (Goal)
@@ -112,21 +112,26 @@
             document.getElementById('lvl-display').innerText = 'Level ' + (idx + 1);
         }
 
-        // --- FIXED DRAWING MECHANIC ---
+        // --- FIX: ROBUST DRAWING MECHANIC ---
         let drawing = false;
         
+        // Listen to the canvas specifically
         render.canvas.addEventListener('mousedown', () => drawing = true);
         render.canvas.addEventListener('mouseup', () => drawing = false);
         render.canvas.addEventListener('mousemove', (e) => {
             if(drawing && levelActive) {
+                // Create small circles to act as a solid line
                 const linePart = Bodies.circle(e.clientX, e.clientY, 8, {
                     isStatic: true,
                     label: 'line',
-                    render: { fillStyle: '#FFF' }
+                    render: { fillStyle: '#FFFFFF' }
                 });
                 World.add(engine.world, linePart);
             }
         });
+        
+        // Prevent default browser behavior (like dragging images)
+        render.canvas.addEventListener('dragstart', (e) => e.preventDefault());
 
         // --- ACTION: WATER ---
         function releaseWater() {
@@ -152,7 +157,6 @@
         }
 
         // --- WIN/LOSS LOGIC ---
-        let collectedWater = 0;
         Events.on(engine, 'collisionStart', (event) => {
             event.pairs.forEach(pair => {
                 if(pair.bodyA.label === 'scion' && pair.bodyB.label === 'water') {
@@ -171,17 +175,19 @@
             if(collectedWater < 10 && levelActive) {
                 levelActive = false;
                 scionBody.render.sprite.texture = SPRITES.crying;
-                // Add crying animation here
+                // Auto restart level after 2 seconds
+                setTimeout(() => initLevel(currentLevel), 2000);
             }
         }
 
         function nextLevel() {
             currentLevel++;
-            collectedWater = 0;
             if(currentLevel < levels.length) {
                 initLevel(currentLevel);
             } else {
                 alert("You beat all levels!");
+                currentLevel = 0;
+                initLevel(currentLevel);
             }
         }
 
